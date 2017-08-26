@@ -1,0 +1,84 @@
+import std.datetime
+import std.json
+import vibe.d
+import duel_log
+
+
+private struct _Session
+    DuelLog log
+    SysTime lastUpdated
+    ManualEvent event
+    bool finished
+
+
+final class Site
+    void postSend(string id, int turn, string allies, string map, string log)
+        _submitLog(DuelLog(id, turn, allies, map, log))
+        render!"send.dt"
+
+    void get()
+        render!"index.dt"
+
+    void getDuels()
+        redirect("/")
+
+    @path("/duels/log") \
+    void getDuelsLogRoot()
+        redirect("/")
+
+    @path("/duels/log/:id") \
+    void getDuelsLog(string _id)
+        _removeOldSessions()
+        if (auto session = _id in _sessions)
+            auto log = &session.log
+            render!("log.dt", log)
+        else
+            //The sailing has apparently ended.
+            redirect("https://godville.net/duels/log/" ~ _id)
+
+    @path("/duels/log/:id/ws") \
+    void getWS(string _id, scope WebSocket socket)
+        auto response = JSONValue([
+            "turn":   JSONValue(),
+            "allies": JSONValue(),
+            "map":    JSONValue(),
+            "log":    JSONValue(),
+        ])
+        auto session = _id in _sessions
+        do
+            if (_id !in _sessions || session.finished)
+                //TODO: Support godvillegame.com.
+                response = JSONValue(["redirect": "https://godville.net/duels/log/" ~ _id])
+                socket.send(response.toJSON())
+                return
+
+            auto log = &session.log
+            response["turn"] = log.turn
+            response["allies"] = log.allies
+            response["map"] = log.map
+            response["log"] = log.log
+            socket.send(response.toJSON())
+            session.event.wait()
+        while (socket.connected)
+
+    private:
+
+    _Session[string] _sessions
+
+    void _submitLog(DuelLog log)
+        if (auto session = log.id in _sessions)
+            if (log.turn > session.log.turn)
+                session.log = log
+                session.lastUpdated = Clock.currTime()
+                session.event.emit()
+        else
+            _sessions[log.id] = _Session(log, Clock.currTime(), createManualEvent())
+
+    void _removeOldSessions()
+        if (_sessions.length)
+            const now = Clock.currTime()
+            foreach (ref session; _sessions)
+                if (now - session.lastUpdated >= 40.minutes)
+                    session.finished = true
+                    session.event.emit()
+                    _sessions.remove(session.log.id)

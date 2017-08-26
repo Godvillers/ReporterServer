@@ -1,0 +1,8 @@
+doctype html
+
+html
+  head
+    meta(charset="UTF-8")
+    title Морской Репортёр
+  body
+    p Идёт трансляция. Не закрывайте это окно до окончания заплыва.

@@ -1,0 +1,66 @@
+#search_block {
+	background: #FFFEF4 -webkit-gradient(linear, left top, left 70, from(#FFF), to(#EFEFEF), color-stop(0.3, #FBFBFB));
+	background: #FFFEF4 -moz-linear-gradient(top, #FBFBFB, #F9F9F9 20px, #F2F2F2);
+	background: #FFFEF4 -o-linear-gradient(top, #DDF3FF, #E3F1F9 20px, #F4F8FF);
+	background-color:#FAFAFA;
+}
+
+.hint_bar{
+		background: #FFFEF4 -webkit-gradient(linear, left top, left 60, from(#FCFFDD), to(#FEFFF4), color-stop(0.5, #EDE7B3), color-stop(0.5, #F9F8D8));
+		background: #FFFEF4 -moz-linear-gradient(top, #FEFFDD, #EFE8B0 31px, #FDFFF4 31px, #FFFEE4);
+		background: #FFFEF4 -o-linear-gradient(top, #FEFFDD, #EFE8B0 31px, #FDFFF4 31px, #FFFEE4);
+		-webkit-box-shadow: 0px 0px 5px #CFCA7A;
+	    -moz-box-shadow: 0px 0px 5px #CFCA7A;
+	    box-shadow: 0px 0px 5px #CFCA7A;
+}
+
+.block {
+	background: #F5F5F5 -webkit-gradient(linear, left top, left 60, from(#F6F8F9), to(#F7F7F7), color-stop(0.5, #E7E7E7), color-stop(0.5, #F9F9F9));
+	background: #F5F5F5 -moz-linear-gradient(top, #F7FBFE, #E7E7E7 31px, #F9F9F9 31px, #F7F7F7);
+	background: #F5F5F5 -o-linear-gradient(top, #F7FBFE, #E7E7E7 31px, #F9F9F9 31px, #F7F7F7);
+	background-color:#FAFAFA;
+}
+
+.opera_header_fix {background-color:#E8E8E8;border-top-left-radius: 6px;border-top-right-radius: 6px;}
+
+.msgDock {
+	background: #F5F5F5 -webkit-gradient(linear, left top, left 60, from(#F6F8F9), to(#F7F7F7), color-stop(0.5, #E7E7E7), color-stop(0.5, #F9F9F9));
+	background: #F5F5F5 -moz-linear-gradient(top, #F7FBFE, #ECECEC 31px, #F9F9F9 31px, #F7FAFF);
+	background: #F5F5F5 -o-linear-gradient(top, #F7FBFE, #ECECEC 31px, #F9F9F9 31px, #F7FAFF);
+	background-color:#FAFAFA;
+}
+
+.msgDockPopup {background-color:#F6F6F6;}
+
+.frbutton_pressed {
+	background: #FFFEF4 -webkit-gradient(linear, left top, left 60, from(#F5F5F5), to(#F5F5F5), color-stop(0.5, #B7B7B7), color-stop(0.5, #F7F7F7));
+	background: #FFFEF4 -moz-linear-gradient(top, #F3F3F3, #BCBCBC 31px, #F0F0F0 31px, #FAFAFA);
+	background: #FFFEF4 -o-linear-gradient(top, #F3F3F3, #BCBCBC 31px, #F0F0F0 31px, #FAFAFA);
+}
+
+
+.frline_a {background:#EBEBEB;}
+.frline:hover{background:#EBEBEB;}
+.chf_line:hover{background:#EBEBEB;}
+.frlist_right {background:#EBEBEB;}
+.frline .div_link:hover {color:#DA251D;}
+
+.fr_chat_header {background-color:#E8E8E8}
+
+.wup.bottom > .wup-arrow:after,
+.wup.bottom-right > .wup-arrow:after,
+.wup.bottom-left > .wup-arrow:after { border-bottom-color: #E7E7E7;}
+
+.wup-title {
+	background: #F5F5F5 -webkit-gradient(linear, left top, left 60, from(#F6F8F9), to(#F7F7F7), color-stop(0.5, #E7E7E7), color-stop(0.5, #F9F9F9));
+	background: #F5F5F5 -moz-linear-gradient(top, #F7FBFE, #E7E7E7 31px, #F9F9F9 31px, #F7F7F7);
+	background: #F5F5F5 -o-linear-gradient(top, #F7FBFE, #E7E7E7 31px, #F9F9F9 31px, #F7F7F7);
+	background-color:#E8E8E8;
+}
+
+.fb_top_bar {
+	background: #F5F5F5 -webkit-gradient(linear, left top, left 60, from(#F6F8F9), to(#F7F7F7), color-stop(0.5, #E7E7E7), color-stop(0.5, #F9F9F9));
+	background: #F5F5F5 -moz-linear-gradient(top, #F7FBFE, #ECECEC 31px, #F9F9F9 31px, #F7FAFF);
+	background: #F5F5F5 -o-linear-gradient(top, #F7FBFE, #ECECEC 31px, #F9F9F9 31px, #F7FAFF);
+	background-color:#FAFAFA;
+}

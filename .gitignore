@@ -1,0 +1,5 @@
+/.dub/
+/dub.selections.json
+/gvnavalrepsrv.log
+/gvnavalrepsrv
+/*.exe

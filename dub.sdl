@@ -1,0 +1,27 @@
+name        "gvnavalrepsrv"
+description "Godville Naval Reporter Server."
+authors     "Cordarion the Grey"
+copyright   "Copyright © 2017, Cordarion the Grey"
+license     "MIT"
+
+dependency "dython" version="~>0.1.0"
+dependency "vibe-d" version="~>0.8.0"
+
+subConfiguration "vibe-d:tls" "notls"
+
+versions "VibeDefaultMain"
+
+buildType "debug" {
+    buildOptions "debugMode" "debugInfo"
+    versions /*"VibeDebugCatchAll"*/ "VibeJsonFieldNames" "JsonLineNumbers" "DietUseCache"
+}
+
+buildType "release" {
+    buildOptions "releaseMode" "optimize" "inline"
+    versions "VibeOutputCompactHTML"
+}
+
+buildType "release-nobounds" {
+    buildOptions "releaseMode" "noBoundsCheck" "optimize" "inline"
+    versions "VibeOutputCompactHTML"
+}

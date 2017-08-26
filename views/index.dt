@@ -1,0 +1,11 @@
+doctype html
+
+html
+  head
+    meta(charset="UTF-8")
+    title Морской Репортёр
+  body
+    p.
+      Морской Репортёр — это расширение для браузера, транслирующее хронику заплыва (с картой!),
+      чтобы зрители могли наблюдать за ней в реальном времени.
+    p #[a(href="https://github.com/Godvillers/NavalReporter/releases", target="_blank") Скачать].

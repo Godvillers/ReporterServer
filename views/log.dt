@@ -1,0 +1,26 @@
+doctype html
+
+html
+  head
+    meta(charset="UTF-8")
+    title #{log.id} — Морской Репортёр
+    script(type="text/javascript", src="/log.js")
+    link(rel="stylesheet", type="text/css", href="/superhero_ru_packaged.css")
+    link(rel="stylesheet", type="text/css", href="/sail_packaged.css")
+    link(rel="stylesheet", type="text/css", href="/th_classic.css")
+
+  body: #main_wrapper.page_wrapper: #hero_block
+    #arena_columns
+      .lastduelpl
+        //-TODO: Support godvillegame.com.
+        a(href="https://godville.net/duels/log/#{log.id}", target="_blank") Прямая трансляция
+
+      #a_left_block.s_col.group_wrapper.l_group.ui-sortable
+        != log.allies
+      #a_central_block.c_col.group_wrapper.ui-sortable
+        != log.map
+      #a_right_block.s_col.group_wrapper.r_group.ui-sortable
+        != log.log
+
+    div(style="clear:both;text-align:center;font-size:80%;").
+      Хроники хранятся 40 минут.

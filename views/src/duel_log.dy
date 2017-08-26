@@ -1,0 +1,4 @@
+struct DuelLog
+    string id//\w{5,}
+    int turn
+    string allies, map, log//HTML.
