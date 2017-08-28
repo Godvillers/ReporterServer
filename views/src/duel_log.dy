@@ -1,4 +1,44 @@
+import std.range
+import std.regex
+
+
 struct DuelLog
     string id//\w{5,}
     int turn
     string allies, map, log//HTML.
+
+    void process()
+        allies = allies.replaceAll(ctRegex!(r"
+            <span[^<>]* class=[^<>]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
+        ", "x"), "")
+
+        map = map.replaceAll!((c) {
+            if (!c[1].empty)
+                return ".5"
+            if (!c[2].empty)
+                return "0"
+            if (!c[3].empty)
+                return c[3]
+            if (!c[4].empty)
+                return "(1 клетка)"
+            if (!c[5].empty)
+                return ""
+            assert(false)
+        })(ctRegex!(r"
+            (\.499\d*)\b
+        |   (-?\d\.\d+e-\d{2,})
+        |   (\.\d{3})\d*\b
+        |   (?<=<title>) (Рулить[^<>]*) (?=</title>)
+        |   (   <text[^<>]*> \s* </text>
+            |   <line[^<]*</line>
+            |   <div[^<>]*dir_resp[^<]*</div>
+            |   \s? \bd_overlay\b
+            |   <span[^<>]* class=[^<>]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
+            )
+        ", "x"))
+
+        //Show partially hidden text.
+        log = log.replaceAll(ctRegex!(r"
+            (?<=\bd_line\b[^<>=]*)\s?style=[^<>]*
+        |   <span[^<>]* class=[^<>]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
+        ", "x"), "")

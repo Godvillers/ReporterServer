@@ -8,7 +8,7 @@ shared static this()
         registerMemoryErrorHandler();
 
     ushort port = 8000
-    readOption("p|port", &port, "Port to listen to.")
+    readOption("p|port", &port, "Port to listen to (default: 8000).")
 
     auto settings = new HTTPServerSettings
     settings.port = port

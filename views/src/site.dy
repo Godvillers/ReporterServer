@@ -68,10 +68,12 @@ final class Site
     void _submitLog(DuelLog log)
         if (auto session = log.id in _sessions)
             if (log.turn > session.log.turn)
+                log.process()
                 session.log = log
                 session.lastUpdated = Clock.currTime()
                 session.event.emit()
         else
+            log.process()
             _sessions[log.id] = _Session(log, Clock.currTime(), createManualEvent())
 
     void _removeOldSessions()
