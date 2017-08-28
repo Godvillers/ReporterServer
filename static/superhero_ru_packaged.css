@@ -52,7 +52,7 @@ svg {pointer-events: visiblePainted; -webkit-user-select: none; -moz-user-select
 .tile.oi6 polygon{stroke: hsla(221, 93%, 52%, 1.0); stroke-width: 1.0}
 .tile.oi7 polygon{stroke: hsla(275, 100%, 48%, 1.0); stroke-width: 1.0}
 .tile polygon {pointer-events: all; fill: hsl(200, 50%, 92%); stroke: hsl(0, 0%, 70%); stroke-width: 0.5}
-polygon:hover {stroke-width: 1.0; stroke: hsl(0, 0%, 50%); !important;}
+polygon:hover {stroke-width: 1.0; stroke: hsl(0, 0%, 50%) !important;}
 .rb polygon {fill: hsl(200, 50%, 87%);}
 .tile.d_overlay polygon {fill: hsl(200, 15%, 85%);}
 .tile.d_selected polygon {fill: hsl(200, 15%, 69%);}
