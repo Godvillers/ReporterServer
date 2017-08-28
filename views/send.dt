@@ -5,4 +5,7 @@ html
     meta(charset="UTF-8")
     title Морской Репортёр
   body
-    p Идёт трансляция. Не закрывайте это окно до окончания заплыва.
+    p.
+      #[a(href="/duels/log/#{dLog.id}", target="_blank") Идёт трансляция].
+      Пожалуйста, не закрывайте это окно до окончания заплыва.
+    //-TODO: Check browser extension version.

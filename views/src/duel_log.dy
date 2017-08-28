@@ -1,17 +1,18 @@
 import std.range
-import std.regex
 
 
 struct DuelLog
+    string host
     string id//\w{5,}
     int turn
     string allies, map, log//HTML.
 
     void process()
+        import std.regex
+
         allies = allies.replaceAll!((c) {
             if (!c[1].empty)
-                //TODO: Support godvillegame.com.
-                return `<a href="https://godville.net/gods/` ~ c[1] ~ `" target="_blank">▶</a>`
+                return `<a href="` ~ host ~ `/gods/` ~ c[1] ~ `" target="_blank">▶</a>`
             return ""
         })(ctRegex!(r"
             ▼ (?=</div> [\s\S]*? >\( ([^<]*) \)</span></div>)
@@ -45,3 +46,19 @@ struct DuelLog
             (?<=\bd_line\b [^<>=]*) \s? style=[^<>]*
         |   <span [^<>]* class=[^<>]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
         ", "x"), "")
+
+
+auto duelLog(string link, int turn, string allies, string map, string log)
+    import std.algorithm.searching
+    import std.uri
+
+    string host = "https://godville.net", id = "00000"
+    const end = link.uriLength()
+    if (end > 0)
+        link = link[0 .. end - link[0 .. end].find('#').length]
+        const firstSlash = link.length - link[8 .. $].find('/').length
+        host = link[0 .. firstSlash]
+        const lastSlash = firstSlash + link[firstSlash .. $].retro().find('/').retro().length
+        id = link[lastSlash .. $]
+
+    return DuelLog(host, id, turn, allies, map, log)

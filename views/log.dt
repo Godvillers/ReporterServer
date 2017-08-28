@@ -3,7 +3,8 @@ doctype html
 html
   head
     meta(charset="UTF-8")
-    title #{log.id} — Морской Репортёр
+    title #{dLog.id} — Морской Репортёр
+    //-TODO: Append random query string.
     script(type="text/javascript", src="/static/log.js")
     link(rel="stylesheet", type="text/css", href="/static/superhero_ru_packaged.css")
     link(rel="stylesheet", type="text/css", href="/static/sail_packaged.css")
@@ -12,15 +13,14 @@ html
   body: #main_wrapper.page_wrapper: #hero_block
     #arena_columns
       .lastduelpl
-        //-TODO: Support godvillegame.com.
-        a(href="https://godville.net/duels/log/#{log.id}", target="_blank") Прямая трансляция
+        a(href="#{dLog.host}/duels/log/#{dLog.id}", target="_blank") Прямая трансляция
 
       #a_left_block.s_col.group_wrapper.l_group.ui-sortable
-        != log.allies
+        != dLog.allies
       #a_central_block.c_col.group_wrapper.ui-sortable
-        != log.map
+        != dLog.map
       #a_right_block.s_col.group_wrapper.r_group.ui-sortable
-        != log.log
+        != dLog.log
 
     div(style="clear:both;text-align:center;font-size:80%;").
       Хроники хранятся 40 минут.

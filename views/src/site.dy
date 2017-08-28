@@ -5,16 +5,17 @@ import duel_log
 
 
 private struct _Session
-    DuelLog log
+    DuelLog dLog
     SysTime lastUpdated
     ManualEvent event
     bool finished
 
 
 final class Site
-    void postSend(string id, int turn, string allies, string map, string log)
-        _submitLog(DuelLog(id, turn, allies, map, log))
-        render!"send.dt"
+    void postSend(string link, int turn, string allies, string map, string log)
+        const dLog = duelLog(link, turn, allies, map, log)
+        _submitLog(dLog)
+        render!("send.dt", dLog)
 
     void get()
         render!"index.dt"
@@ -30,10 +31,11 @@ final class Site
     void getDuelsLog(string _id)
         _removeOldSessions()
         if (auto session = _id in _sessions)
-            auto log = &session.log
-            render!("log.dt", log)
+            const dLog = &session.dLog
+            render!("log.dt", dLog)
         else
-            //The sailing has apparently ended.
+            //The sailing has apparently ended, and there is no way to know
+            //if it was hosted on godville.net or on godvillegame.com.
             redirect("https://godville.net/duels/log/" ~ _id)
 
     @path("/duels/log/:id/ws") \
@@ -47,16 +49,16 @@ final class Site
         auto session = _id in _sessions
         do
             if (_id !in _sessions || session.finished)
-                //TODO: Support godvillegame.com.
-                response = JSONValue(["redirect": "https://godville.net/duels/log/" ~ _id])
+                const host = session !is null ? session.dLog.host : "https://godville.net"
+                response = JSONValue(["redirect": host ~ "/duels/log/" ~ _id])
                 socket.send(response.toJSON())
                 return
 
-            auto log = &session.log
-            response["turn"] = log.turn
-            response["allies"] = log.allies
-            response["map"] = log.map
-            response["log"] = log.log
+            auto dLog = &session.dLog
+            response["turn"] = dLog.turn
+            response["allies"] = dLog.allies
+            response["map"] = dLog.map
+            response["log"] = dLog.log
             socket.send(response.toJSON())
             session.event.wait()
         while (socket.connected)
@@ -65,16 +67,16 @@ final class Site
 
     _Session[string] _sessions
 
-    void _submitLog(DuelLog log)
-        if (auto session = log.id in _sessions)
-            if (log.turn > session.log.turn)
-                log.process()
-                session.log = log
+    void _submitLog(DuelLog dLog)
+        if (auto session = dLog.id in _sessions)
+            if (dLog.turn > session.dLog.turn)
+                dLog.process()
+                session.dLog = dLog
                 session.lastUpdated = Clock.currTime()
                 session.event.emit()
         else
-            log.process()
-            _sessions[log.id] = _Session(log, Clock.currTime(), createManualEvent())
+            dLog.process()
+            _sessions[dLog.id] = _Session(dLog, Clock.currTime(), createManualEvent())
 
     void _removeOldSessions()
         if (_sessions.length)
@@ -83,4 +85,4 @@ final class Site
                 if (now - session.lastUpdated >= 40.minutes)
                     session.finished = true
                     session.event.emit()
-                    _sessions.remove(session.log.id)
+                    _sessions.remove(session.dLog.id)
