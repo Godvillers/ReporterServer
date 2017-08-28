@@ -37,8 +37,15 @@ connect = ->
             location.replace url
         else if +response.turn > getTurn()
             document.getElementById("alls").outerHTML = response.allies
+
+            map = document.getElementById "map_wrap"
+            scrollValue = map.scrollLeft / map.scrollWidth
             document.getElementById("s_map").outerHTML = response.map
+            map = document.getElementById "map_wrap"
+            map.scrollLeft = scrollValue * map.scrollWidth
+
             document.getElementById("m_fight_log").outerHTML = response.log
+
             runProgressTimer()
 
     socket.onclose = -> setTimeout connect, 3000

@@ -20,5 +20,5 @@ shared static this()
     listenHTTP(settings,
         (new URLRouter)
         .registerWebInterface(new Site)
-        .get("*", serveStaticFiles("public"))
+        .get("/static/*", serveStaticFiles("."))
     )
