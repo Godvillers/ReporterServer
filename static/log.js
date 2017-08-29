@@ -52,6 +52,7 @@
         map = document.getElementById("map_wrap");
         scrollValue = map.scrollLeft / map.scrollWidth;
         document.getElementById("s_map").outerHTML = response.map;
+        map = document.getElementById("map_wrap");
         map.scrollLeft = scrollValue * map.scrollWidth;
         document.getElementById("m_fight_log").outerHTML = response.log;
         return runProgressTimer();
