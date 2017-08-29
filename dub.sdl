@@ -1,5 +1,5 @@
-name        "gvnavalrepsrv"
-description "Godville Naval Reporter Server."
+name        "gvrepsrv"
+description "Godville Reporter Server."
 authors     "Cordarion the Grey"
 copyright   "Copyright © 2017, Cordarion the Grey"
 license     "MIT"

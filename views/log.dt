@@ -3,7 +3,7 @@ doctype html
 html
   head
     meta(charset="UTF-8")
-    title #{dLog.id} — Морской Репортёр
+    title #{dLog.id} — Репортёр
     //-TODO: Append random query string.
     script(type="text/javascript", src="/static/log.js")
     link(rel="stylesheet", type="text/css", href="/static/superhero_ru_packaged.css")

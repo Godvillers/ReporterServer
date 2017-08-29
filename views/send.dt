@@ -3,7 +3,7 @@ doctype html
 html
   head
     meta(charset="UTF-8")
-    title Морской Репортёр
+    title Репортёр
   body
     p.
       #[a(href="/duels/log/#{dLog.id}", target="_blank") Идёт трансляция].
