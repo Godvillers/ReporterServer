@@ -1,0 +1,8 @@
+shared immutable string seed
+
+
+shared static this()
+    import std.conv
+    import std.random
+
+    seed = uniform!uint().to!string

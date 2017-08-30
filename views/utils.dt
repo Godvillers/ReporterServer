@@ -1,0 +1,8 @@
+- void script(string src)
+  - import random_seed;
+  script(type="text/javascript", src="/static/#{src}.js?a=#{seed}")
+
+
+- void stylesheet(string href)
+  - import random_seed;
+  link(rel="stylesheet", type="text/css", href="/static/#{href}.css?a=#{seed}")

@@ -6,11 +6,12 @@ prepend title
 
 
 append head
-  //-TODO: Append random query string.
-  script(type="text/javascript", src="/static/log.js")
-  link(rel="stylesheet", type="text/css", href="/static/superhero_ru_packaged.css")
-  link(rel="stylesheet", type="text/css", href="/static/sail_packaged.css")
-  link(rel="stylesheet", type="text/css", href="/static/th_classic.css")
+  include utils
+
+  - script("log");
+  - stylesheet("superhero_ru_packaged");
+  - stylesheet("sail_packaged");
+  - stylesheet("th_classic");
 
 
 block body
