@@ -1,17 +1,20 @@
-doctype html
+extends base
 
-html
-  head
-    meta(charset="UTF-8")
-    title #{dLog.id} — Репортёр
-    link(rel="shortcut icon", href="/static/favicon.ico", type="image/x-icon")
-    //-TODO: Append random query string.
-    script(type="text/javascript", src="/static/log.js")
-    link(rel="stylesheet", type="text/css", href="/static/superhero_ru_packaged.css")
-    link(rel="stylesheet", type="text/css", href="/static/sail_packaged.css")
-    link(rel="stylesheet", type="text/css", href="/static/th_classic.css")
 
-  body: #main_wrapper.page_wrapper: #hero_block
+prepend title
+  | #{dLog.id} —
+
+
+append head
+  //-TODO: Append random query string.
+  script(type="text/javascript", src="/static/log.js")
+  link(rel="stylesheet", type="text/css", href="/static/superhero_ru_packaged.css")
+  link(rel="stylesheet", type="text/css", href="/static/sail_packaged.css")
+  link(rel="stylesheet", type="text/css", href="/static/th_classic.css")
+
+
+block body
+  #main_wrapper.page_wrapper: #hero_block
     #arena_columns
       .lastduelpl
         a(href="#{dLog.host}/duels/log/#{dLog.id}", target="_blank") Прямая трансляция

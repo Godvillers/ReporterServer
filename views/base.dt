@@ -1,0 +1,11 @@
+doctype html
+
+
+html
+  head: block head
+    meta(charset="UTF-8")
+    title: block title
+      | Репортёр
+    link(rel="shortcut icon", href="/static/favicon.ico", type="image/x-icon")
+  body
+    block body
