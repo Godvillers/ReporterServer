@@ -14,6 +14,8 @@ append head
 
 
 block body
+  - import std.algorithm.comparison;
+
   #main_wrapper.page_wrapper: #hero_block
     #arena_columns
       .lastduelpl
@@ -26,5 +28,7 @@ block body
       #a_right_block.s_col.group_wrapper.r_group.ui-sortable
         != dLog.log
 
-    div(style="clear:both;text-align:center;font-size:80%;").
+    div(style="clear: both; text-align: center; font-size: 80%;").
       Хроники хранятся 40 минут.
+
+    script(type="text/javascript") initialProgress = #{min(ago * 5, 100)};

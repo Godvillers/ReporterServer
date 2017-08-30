@@ -10,6 +10,9 @@ private struct _Session
     ManualEvent event
     bool finished
 
+    @property long secondsSinceLastUpdated() const
+        return (Clock.currTime() - lastUpdated).total!"seconds"
+
 
 final class Site
     void postSend(string link, int turn, string allies, string map, string log)
@@ -32,7 +35,8 @@ final class Site
         _removeOldSessions()
         if (auto session = _id in _sessions)
             const dLog = &session.dLog
-            render!("log.dt", dLog)
+            const ago = session.secondsSinceLastUpdated
+            render!("log.dt", dLog, ago)
         else
             //The sailing has apparently ended, and there is no way to know
             //if it was hosted on godville.net or on godvillegame.com.
@@ -42,6 +46,7 @@ final class Site
     void getWS(string _id, scope WebSocket socket)
         auto response = JSONValue([
             "turn":   JSONValue(),
+            "ago":    JSONValue(),
             "allies": JSONValue(),
             "map":    JSONValue(),
             "log":    JSONValue(),
@@ -56,6 +61,7 @@ final class Site
 
             auto dLog = &session.dLog
             response["turn"] = dLog.turn
+            response["ago"] = session.secondsSinceLastUpdated
             response["allies"] = dLog.allies
             response["map"] = dLog.map
             response["log"] = dLog.log

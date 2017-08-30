@@ -3,25 +3,28 @@ every = (ms, action) ->
 
 
 getTurn = ->
-    try +document.querySelector("#m_fight_log .block_h .block_title").innerText.match(/\d+/)[0]
+    try +document.querySelector("#m_fight_log .block_h .block_title").data.match(/\d+/)[0]
     catch then 0
 
 
 setProgress = (value) ->
-    div = document.querySelector "#turn_pbar .p_bar"
-    div.title = "прогресс хода — #{Math.round value}%"
-    div.getElementsByTagName("div")[0].style.width = "#{value}%"
+    if (div = document.querySelector "#turn_pbar .p_bar")?
+        div.title = "прогресс хода — #{Math.round value}%"
+        try div.getElementsByTagName("div")[0].style.width = "#{value}%"
 
 
 progressTimer = null
 
 
-runProgressTimer = ->
-    setProgress progress = 0
+runProgressTimer = (progress) ->
+    setProgress progress
     clearInterval progressTimer if progressTimer?
     progressTimer = every 500, ->
-        setProgress progress += 2.5
-        if progress > 100 - 1e-5
+        progress += 2.5
+        if progress < 100 - 1e-5
+            setProgress progress
+        else
+            setProgress 100
             clearInterval progressTimer
             progressTimer = null
 
@@ -33,9 +36,10 @@ connect = ->
     socket = new WebSocket "ws://#{location.host}#{location.pathname}/ws"
     socket.onmessage = (msg) ->
         response = JSON.parse msg.data
+        console.log response
         if (url = response.redirect)?
             location.replace url
-        else if +response.turn > getTurn()
+        else if response.turn > getTurn()
             document.getElementById("alls").outerHTML = response.allies
 
             map = document.getElementById "map_wrap"
@@ -46,11 +50,11 @@ connect = ->
 
             document.getElementById("m_fight_log").outerHTML = response.log
 
-            runProgressTimer()
+            runProgressTimer Math.min response.ago * 5, 100
 
     socket.onclose = -> setTimeout connect, 3000
 
 
 addEventListener "DOMContentLoaded", ->
-    runProgressTimer()
+    runProgressTimer initialProgress
     connect()

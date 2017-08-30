@@ -8,7 +8,7 @@
 
   getTurn = function() {
     try {
-      return +document.querySelector("#m_fight_log .block_h .block_title").innerText.match(/\d+/)[0];
+      return +document.querySelector("#m_fight_log .block_h .block_title").data.match(/\d+/)[0];
     } catch (error) {
       return 0;
     }
@@ -16,22 +16,27 @@
 
   setProgress = function(value) {
     var div;
-    div = document.querySelector("#turn_pbar .p_bar");
-    div.title = "прогресс хода — " + (Math.round(value)) + "%";
-    return div.getElementsByTagName("div")[0].style.width = value + "%";
+    if ((div = document.querySelector("#turn_pbar .p_bar")) != null) {
+      div.title = "прогресс хода — " + (Math.round(value)) + "%";
+      try {
+        return div.getElementsByTagName("div")[0].style.width = value + "%";
+      } catch (error) {}
+    }
   };
 
   progressTimer = null;
 
-  runProgressTimer = function() {
-    var progress;
-    setProgress(progress = 0);
+  runProgressTimer = function(progress) {
+    setProgress(progress);
     if (progressTimer != null) {
       clearInterval(progressTimer);
     }
     return progressTimer = every(500, function() {
-      setProgress(progress += 2.5);
-      if (progress > 100 - 1e-5) {
+      progress += 2.5;
+      if (progress < 100 - 1e-5) {
+        return setProgress(progress);
+      } else {
+        setProgress(100);
         clearInterval(progressTimer);
         return progressTimer = null;
       }
@@ -45,9 +50,10 @@
     socket.onmessage = function(msg) {
       var map, response, scrollValue, url;
       response = JSON.parse(msg.data);
+      console.log(response);
       if ((url = response.redirect) != null) {
         return location.replace(url);
-      } else if (+response.turn > getTurn()) {
+      } else if (response.turn > getTurn()) {
         document.getElementById("alls").outerHTML = response.allies;
         map = document.getElementById("map_wrap");
         scrollValue = map.scrollLeft / map.scrollWidth;
@@ -55,7 +61,7 @@
         map = document.getElementById("map_wrap");
         map.scrollLeft = scrollValue * map.scrollWidth;
         document.getElementById("m_fight_log").outerHTML = response.log;
-        return runProgressTimer();
+        return runProgressTimer(Math.min(response.ago * 5, 100));
       }
     };
     return socket.onclose = function() {
@@ -64,7 +70,7 @@
   };
 
   addEventListener("DOMContentLoaded", function() {
-    runProgressTimer();
+    runProgressTimer(initialProgress);
     return connect();
   });
 
