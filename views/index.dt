@@ -4,6 +4,7 @@ html
   head
     meta(charset="UTF-8")
     title Репортёр
+    link(rel="shortcut icon", href="/static/favicon.ico", type="image/x-icon")
   body
     p.
       Годвилльский Репортёр — это расширение для браузера, транслирующее хронику заплыва

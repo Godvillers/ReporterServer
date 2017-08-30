@@ -4,6 +4,7 @@ html
   head
     meta(charset="UTF-8")
     title #{dLog.id} — Репортёр
+    link(rel="shortcut icon", href="/static/favicon.ico", type="image/x-icon")
     //-TODO: Append random query string.
     script(type="text/javascript", src="/static/log.js")
     link(rel="stylesheet", type="text/css", href="/static/superhero_ru_packaged.css")
