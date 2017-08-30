@@ -5,7 +5,7 @@ import site
 
 shared static this()
     static if (is(typeof(registerMemoryErrorHandler)))
-        registerMemoryErrorHandler();
+        registerMemoryErrorHandler()
 
     ushort port = 8000
     readOption("p|port", &port, "Port to listen to (default: 8000).")

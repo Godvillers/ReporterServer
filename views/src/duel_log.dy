@@ -15,8 +15,9 @@ struct DuelLog
                 return `<a href="` ~ host ~ `/gods/` ~ c[1] ~ `" target="_blank">▶</a>`
             return ""
         })(ctRegex!(r"
-            ▼ (?=</div> [\s\S]*? >\( ([^<]*) \)</span></div>)
-        |   <span [^<>]* class=[^<>]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
+            ▼ (?=</div> [\s\S]*? >\( ([^<]*) \) (?:<a [^<>]* >➤</a>)? </span></div>)
+        |   <span [^<>]* class=[^<>=]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
+        |   <a [^<>]* class=[^<>=]* \bpm_link\b [^<>]* >➤</a>
         ", "x"))
 
         map = map.replaceAll!((c) {
@@ -31,20 +32,20 @@ struct DuelLog
             return ""
         })(ctRegex!(r"
             (\.499\d*)\b
-        |   (-?\d\.\d+e-\d{2,})
+        |   (-?\d\.\d*e-\d{2,})
         |   (\.\d{3})\d+\b
         |   (?<=<title>) (Рулить[^<>]*) (?=</title>)
         |   <text [^<>]*> \s* </text>
         |   <line [^<]* </line>
         |   <div [^<>]* dir_resp [^<]* </div>
         |   \s? \bd_overlay\b
-        |   <span [^<>]* class=[^<>]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
+        |   <span [^<>]* class=[^<>=]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
         ", "x"))
 
         //Show partially hidden text.
         log = log.replaceAll(ctRegex!(r"
             (?<=\bd_line\b [^<>=]*) \s? style=[^<>]*
-        |   <span [^<>]* class=[^<>]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
+        |   <span [^<>]* class=[^<>=]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
         ", "x"), "")
 
 
