@@ -1,8 +1,12 @@
-shared immutable string seed
+import std.conv
+import std.random
 
 
-shared static this()
-    import std.conv
-    import std.random
+debug
+    @property string seed()
+        return uniform!uint().to!string
+else
+    shared immutable string seed
 
-    seed = uniform!uint().to!string
+    shared static this()
+        seed = uniform!uint().to!string
