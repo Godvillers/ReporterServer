@@ -2,4 +2,6 @@
 /dub.selections.json
 /gvrepsrv
 /*.exe
+/*.a
+/*.lib
 /*.log

@@ -1,4 +1,13 @@
+//This module takes a huge amount of time to build because of complex compile-time regexes,
+//so it is placed in a subpackage to avoid recompilation whenever possible.
 import std.range
+import std.regex
+
+
+debug
+    private enum _rx(string text) = regex(text, "x")
+else
+    private enum _rx(string text) = ctRegex!(text, "x")
 
 
 struct DuelLog
@@ -8,17 +17,15 @@ struct DuelLog
     string allies, map, log//HTML.
 
     void process()
-        import std.regex
-
         allies = allies.replaceAll!((c) {
             if (!c[1].empty)
                 return `<a href="` ~ host ~ `/gods/` ~ c[1] ~ `" target="_blank">▶</a>`
             return ""
-        })(ctRegex!(r"
+        })(_rx!r"
             ▼ (?=</div> [\s\S]*? >\( ([^<]*) \) (?:<a [^<>]* >➤</a>)? </span></div>)
         |   <span [^<>]* class=[^<>=]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
         |   <a [^<>]* class=[^<>=]* \bpm_link\b [^<>]* >➤</a>
-        ", "x"))
+        ")
 
         map = map.replaceAll!((c) {
             if (!c[1].empty)
@@ -30,7 +37,7 @@ struct DuelLog
             if (!c[4].empty)
                 return "(1 клетка)"
             return ""
-        })(ctRegex!(r"
+        })(_rx!r"
             (\.499\d*)\b
         |   (-?\d\.\d*e-\d{2,})
         |   (\.\d{3})\d+\b
@@ -40,16 +47,16 @@ struct DuelLog
         |   <div [^<>]* dir_resp [^<]* </div>
         |   \s? \bd_overlay\b
         |   <span [^<>]* class=[^<>=]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
-        ", "x"))
+        ")
 
         //Show partially hidden text.
-        log = log.replaceAll(ctRegex!(r"
+        log = log.replaceAll(_rx!r"
             (?<=\bd_line\b [^<>=]*) \s? style=[^<>]*
         |   <span [^<>]* class=[^<>=]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
-        ", "x"), "")
+        ", "")
 
 
-auto duelLog(string link, int turn, string allies, string map, string log)
+DuelLog duelLog(string link, int turn, string allies, string map, string log)
     import std.algorithm.searching
     import std.uri
 

@@ -6,6 +6,18 @@ license     "MIT"
 
 dependency "dython" version="~>0.1.0"
 dependency "vibe-d" version="~>0.8.0"
+dependency "gvrepsrv:duel_log" version="*"
+
+subPackage {
+    name "duel_log"
+    targetType "staticLibrary"
+
+    dependency "dython" version="~>0.1.0"
+
+    sourcePaths "duel_log"
+    importPaths "duel_log"
+    stringImportPaths "duel_log/views"
+}
 
 subConfiguration "vibe-d:tls" "notls"
 
