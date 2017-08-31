@@ -5,7 +5,7 @@ copyright   "Copyright © 2017, Cordarion the Grey"
 license     "MIT"
 
 dependency "dython" version="~>0.1.0"
-dependency "vibe-d" version="~>0.8.0"
+dependency "vibe-d" version="~>0.8.1"
 dependency "gvrepsrv:duel_log" version="*"
 
 subPackage {
