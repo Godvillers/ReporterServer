@@ -8,6 +8,10 @@ import std.regex
 private Appender!(char[ ]) _buffer
 
 
+static this()
+    _buffer.reserve(150 << 10)
+
+
 private string _replace(string pattern, alias replacer)(string text)
     debug
         static rx = regex(pattern, "x")
