@@ -1,5 +1,4 @@
 import std.datetime
-import std.json
 import vibe.d
 import duel_log
 
@@ -15,9 +14,12 @@ private struct _Session
 
 
 final class Site
-    void postSend(string link, int turn, string allies, string map, string log)
+    void postSend(
+        string clientVersion, string link, int turn, string allies, string map, string log
+    )
         const dLog = duelLog(link, turn, allies, map, log)
         _submitLog(dLog)
+        //TODO: Check browser extension version.
         render!("send.dt", dLog)
 
     void get()
@@ -44,6 +46,8 @@ final class Site
 
     @path("/duels/log/:id/ws") \
     void getWS(string _id, scope WebSocket socket)
+        import std.json
+
         auto response = JSONValue([
             "turn":   JSONValue(),
             "ago":    JSONValue(),

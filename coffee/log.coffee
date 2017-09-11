@@ -36,7 +36,6 @@ connect = ->
     socket = new WebSocket "ws://#{location.host}#{location.pathname}/ws"
     socket.onmessage = (msg) ->
         response = JSON.parse msg.data
-        console.log response
         if (url = response.redirect)?
             location.replace url
         else if response.turn > getTurn()

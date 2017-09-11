@@ -1,10 +1,11 @@
-import etc.linux.memoryerror
 import vibe.d
 import site
 
 
 shared static this()
     version (DigitalMars)
+        import etc.linux.memoryerror
+
         static if (is(typeof(registerMemoryErrorHandler)))
             registerMemoryErrorHandler()
 

@@ -103,7 +103,7 @@ polygon:hover {stroke-width: 1.0; stroke: hsl(0, 0%, 50%) !important;}
  .tile.hl polygon {stroke: hsla(264, 93%, 52%, 0.83); stroke-width: 0.7}
 .dir_resp {text-align:center;font-style:italic;font-size:90%;padding-top:10px;}
 #hint {padding:0.5em;text-align:center;font-family: Verdana, Helvetica, Arial, sans-serif;font-size:12px;color:#555;}
-@font-face {font-family: Em; src: url('/em.ttf')}
+@font-face {font-family: Em; src: url('/static/em.ttf')}
 .em_font {font-family: 'Em', sans-serif;}
 body,html {margin:0;padding:0;}
 img {border-width:0;}

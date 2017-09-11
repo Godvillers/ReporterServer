@@ -50,7 +50,6 @@
     socket.onmessage = function(msg) {
       var map, response, scrollValue, url;
       response = JSON.parse(msg.data);
-      console.log(response);
       if ((url = response.redirect) != null) {
         return location.replace(url);
       } else if (response.turn > getTurn()) {
