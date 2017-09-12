@@ -10,7 +10,6 @@ append head
 
   - script("log");
   - stylesheet("superhero_ru_packaged");
-  - stylesheet("sail_packaged");
   - stylesheet("th_classic");
 
 
