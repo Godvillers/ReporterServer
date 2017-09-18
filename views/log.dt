@@ -8,26 +8,23 @@ prepend title
 append head
   include utils
 
+  - import std.algorithm.comparison;
+
   - script("log");
+  script(type="text/javascript") initialProgress = #{min(ago * 5, 100)};
   - stylesheet("log");
 
 
 block body
-  - import std.algorithm.comparison;
-
   #main_wrapper.page_wrapper: #hero_block
+    .headnote
+      a(href="#{dLog.host}/duels/log/#{dLog.id}", target="_blank") Прямая трансляция
+
     #arena_columns
-      .lastduelpl
-        a(href="#{dLog.host}/duels/log/#{dLog.id}", target="_blank") Прямая трансляция
-
-      #a_left_block.s_col.group_wrapper.l_group.ui-sortable
+      .m_small_col.group_wrapper
         != dLog.allies
-      #a_central_block.c_col.group_wrapper.ui-sortable
-        != dLog.map
-      #a_right_block.s_col.group_wrapper.r_group.ui-sortable
         != dLog.log
+      .m_large_col.group_wrapper
+        != dLog.map
 
-    div(style="clear: both; text-align: center; font-size: 80%;").
-      Хроники хранятся 40 минут.
-
-    script(type="text/javascript") initialProgress = #{min(ago * 5, 100)};
+    .footnote Хроники хранятся 40 минут.

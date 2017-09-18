@@ -24,9 +24,15 @@
 =transform-origin($value...)
     +browser-specific(transform-origin, -webkit, $value)
 
-.lastduelpl
+.headnote
     text-align: center
     margin-top: 10px
+
+.footnote
+    clear: both
+    text-align: center
+    font-size: 80%
+    margin-bottom: 8px
 
 body, html
     font-family: Verdana, Helvetica, Arial, sans-serif
@@ -50,13 +56,6 @@ h1, h2
 h2
     text-align: left
     margin-bottom: 1.0em
-
-//FIXME: It is referenced in HTML as a class (?).
-#page_wrapper
-    width: 995px
-    margin-left: auto
-    margin-right: auto
-    height: auto
 
 svg
     pointer-events: visiblePainted
@@ -319,23 +318,33 @@ img
 #hero_block
     font-size: 0.96em
 
-.c_col
-    width: 448px
+.c_col, .s_col
     float: left
-    padding: 0em 0.2em 0.2em 0.2em
+    padding: 0 0.4em
+
+$c_col_width: 448px
+$s_col_width: 234px
+$m_large_col_width: 750px
+$m_small_col_width: 270px
+
+.c_col
+    width: $c_col_width
 
 .s_col
-    width: 234px
-    float: left
-    padding: 0em 0.2em 0.2em 0.2em
+    width: $s_col_width
 
-#right_right_block, #a_right_right_block
-    padding: 0em 0.4em 0.4em 0.2em
+.m_large_col
+    @extend .c_col
+    width: $m_large_col_width
+
+.m_small_col
+    @extend .s_col
+    width: $m_small_col_width
 
 .block
     clear: both
-    padding: 4px 4px 4px 4px
-    margin: 1em 0 1.5em 0
+    padding: 4px
+    margin-top: 0.8em
     color: #333
     line-height: 145%
     +border-radius(6px)
@@ -351,14 +360,14 @@ img
 
 .l_slot
     position: absolute
-    left: 0px
+    left: 0
 
 .r_slot
     position: absolute
     right: 7px
     text-align: right
     width: 48px
-    top: 0px
+    top: 0
 
 .m_hover:hover
     color: #DA251D
@@ -371,7 +380,7 @@ img
 #d_refresh
     position: absolute
     right: 10px
-    top: 0px
+    top: 0
 
 .group_wrapper
     min-height: 400px
@@ -384,10 +393,13 @@ img
     font-size: 1em
     margin: 0 auto
 
-.s_col .block_title
-    margin-left: 40px
-    margin-right: 40px
-    width: 146px
+    .s_col &
+        margin-left: 40px
+        margin-right: 40px
+        width: $s_col_width - 88px
+
+    .m_small_col &
+        width: $m_small_col_width - 88px
 
 .block_content
     padding: 10px 5px 5px 5px
@@ -450,7 +462,7 @@ img
     display: inline
 
 .d_line
-    padding: 4px 5px 7px 0px
+    padding: 4px 5px 7px 0
     position: relative
 
 div.p_bar
@@ -465,7 +477,7 @@ div.p_val
     background-color: #777
     width: 100%
     height: 8px
-    margin-left: 0px
+    margin-left: 0
     float: left
     +border-radius(3px)
 
@@ -558,13 +570,13 @@ div.p_val
     padding-right: 0.5em
     padding-top: 0.2em
     vertical-align: bottom
-    border-width: 0px
+    border-width: 0
 
 .spinner_img
     background: url("/static/images/spinner_w.gif") no-repeat
     height: 16px
     width: 16px
-    border-width: 0px
+    border-width: 0
     margin: 0
     padding: 0
 
@@ -597,7 +609,7 @@ div.p_val
 .opp_dropdown
     float: right
     height: 13px
-    padding: 0px 1px 2px 1px
+    padding: 0 1px 2px
     text-align: center
     font-weight: bold
     font-size: 10px
@@ -686,13 +698,13 @@ div.p_val
     background-color: rgba(239, 161, 105, 0.25)
 
 .saild_3
-    background-color: rgba(179, 230, 179, 0.25)
+    background-color: rgba(179, 230, 179, 0.5)
 
 .saild_4
     background-color: rgba(38, 223, 189, 0.25)
 
 #m_fight_log > .block_content
-    padding: 10px 0px 5px 0px
+    padding: 10px 0 5px
 
 #turn_pbar
     padding: 7px 10px 19px 9px

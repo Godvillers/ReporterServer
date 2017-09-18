@@ -29,12 +29,19 @@ struct DuelLog
 
     void process()
         allies = allies._replace!(r"
-            ▼ (?=</div> [\s\S]*? >\( ([^<]*) \) (?:<a [^<>]* >➤</a>)? </span></div>)
+            ▼ (?=</div> [\s\S]*? >\( ([^<]*) \) (?:<a [^<>]*>➤</a>)? </span></div>)
+        |   (?<=style=[^<>=]* width: \s*) (\d\w+)
+        |   (?<=style=[^<>=]* font-size: \s*) \d\w+ (?=[^<>]*> \s* ([\d(]))
         |   <span [^<>]* class=[^<>=]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
-        |   <a [^<>]* class=[^<>=]* \bpm_link\b [^<>]* >➤</a>
+        |   <a [^<>]* class=[^<>=]* \bpm_link\b [^<>]*>➤</a>
         ", (c) {
             if (!c[1].empty)
                 return `<a href="` ~ host ~ `/gods/` ~ c[1] ~ `" target="_blank">▶</a>`
+            //TODO: Move this to the style sheet.
+            if (!c[2].empty)
+                return "175px"
+            if (!c[3].empty)
+                return c[3][0] == '(' ? "11px" : "12px"
             return ""
         })
 
