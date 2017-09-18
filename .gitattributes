@@ -1,4 +1,4 @@
 *.dy linguist-language=D
 *.dt linguist-language=Pug
 *.conf linguist-language=INI
-/static/*.css linguist-vendored
+/static/*.css linguist-generated

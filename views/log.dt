@@ -9,8 +9,7 @@ append head
   include utils
 
   - script("log");
-  - stylesheet("superhero_ru_packaged");
-  - stylesheet("th_classic");
+  - stylesheet("log");
 
 
 block body
