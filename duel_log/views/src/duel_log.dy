@@ -28,6 +28,15 @@ struct DuelLog
     string allies, map, log//HTML.
 
     void process()
+        import std.datetime
+        import vibe.core.log
+
+        const start = Clock.currTime()
+
+        scope(success)
+            const end = Clock.currTime()
+            logDiagnostic("Processed %s in %s ms", id, (end - start).total!"msecs")
+
         allies = allies._replace!(r"
             ▼ (?=</div> [\s\S]*? >\( ([^<]*) \) (?:<a [^<>]*>➤</a>)? </span></div>)
         |   (?<=style=[^<>=]* width: \s*) (\d\w+)

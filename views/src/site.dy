@@ -1,5 +1,5 @@
 import std.datetime
-import vibe.d
+import vibe.vibe
 import duel_log
 
 
@@ -13,12 +13,22 @@ private struct _Session
         return (Clock.currTime() - lastUpdated).total!"seconds"
 
 
+private enum _SubmissionStatus: ubyte
+    ignored,
+    created,
+    updated,
+
+
 final class Site
     void postSend(
         string clientVersion, string link, int turn, string allies, string map, string log
     )
         const dLog = duelLog(link, turn, allies, map, log)
-        _submitLog(dLog)
+        final switch (_submitLog(dLog)) with (_SubmissionStatus)
+            case ignored: logDiagnostic("Ignoring duplicate %s", dLog.id); break
+            case created: logInfo("Streaming %s", dLog.id); break
+            case updated: break
+
         //TODO: Check browser extension version.
         render!("send.dt", dLog)
 
@@ -75,18 +85,22 @@ final class Site
 
     private:
 
+    //TODO: Factor this out.
     _Session[string] _sessions
 
-    void _submitLog(DuelLog dLog)
+    _SubmissionStatus _submitLog(DuelLog dLog)
         if (auto session = dLog.id in _sessions)
-            if (dLog.turn > session.dLog.turn)
-                dLog.process()
-                session.dLog = dLog
-                session.lastUpdated = Clock.currTime()
-                session.event.emit()
-        else
+            if (dLog.turn <= session.dLog.turn)
+                return _SubmissionStatus.ignored
             dLog.process()
-            _sessions[dLog.id] = _Session(dLog, Clock.currTime(), createManualEvent())
+            session.dLog = dLog
+            session.lastUpdated = Clock.currTime()
+            session.event.emit()
+            return _SubmissionStatus.updated
+
+        dLog.process()
+        _sessions[dLog.id] = _Session(dLog, Clock.currTime(), createManualEvent())
+        return _SubmissionStatus.created
 
     void _removeOldSessions()
         if (_sessions.length)
