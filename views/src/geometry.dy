@@ -1,0 +1,43 @@
+import std.algorithm.comparison
+import std.math
+import std.traits
+
+
+private template _coordOps()
+    nothrow pure @safe @nogc:
+
+    auto ref opOpAssign(string op)(auto ref const typeof(this) rhs) if (op.among!("+", "-"))
+        foreach (field; FieldNameTuple!(typeof(this)))
+            mixin(field ~ op ~ `= rhs.` ~ field ~ `;`)
+        return this
+
+    auto opBinary(string op)(auto ref const typeof(this) rhs) const if (op.among!("+", "-"))
+        Unqual!(typeof(this)) temp = this
+        return mixin(`temp ` ~ op ~ `= rhs`)
+
+
+struct RectCoord
+    int y, x
+
+    mixin _coordOps
+
+    @property int dist() const nothrow pure @safe @nogc \
+    out (result)
+        assert(result >= 0)
+    body
+        return abs(y) + abs(x)
+
+
+struct HexCoord
+    int skew, horiz
+
+    mixin _coordOps
+
+    @property int dist() const nothrow pure @safe @nogc \
+    out (result)
+        assert(result >= 0)
+    body
+        int result = abs(skew + horiz)
+        if ((skew ^ horiz) < 0)
+            result += min(abs(skew), abs(horiz))
+        return result
