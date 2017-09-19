@@ -1,7 +1,6 @@
 import vibe.vibe
-import site
 
-
+private /+immutable+/ string[2] _addresses = ["::1", "127.0.0.1"]
 private ushort _port = 8000
 
 
@@ -10,11 +9,13 @@ private void _parseArguments()
 
 
 private void _configure()
+    import site
+
     setLogFormat(FileLogger.Format.threadTime, FileLogger.Format.threadTime)
 
     auto settings = new HTTPServerSettings
+    settings.bindAddresses = _addresses[ ]
     settings.port = _port
-    settings.bindAddresses = ["::1", "127.0.0.1"]
     debug { }
     else
         settings.options &= ~HTTPServerOption.errorStackTraces
@@ -49,7 +50,7 @@ int main()
     catch (Throwable th)
         logFatal("Configuration error: %s", th.msg)
         logDiagnostic("%s", th.toString().sanitize())
-        return 3
+        return 4
 
     try
         lowerPrivileges()

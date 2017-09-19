@@ -1,30 +1,16 @@
-import std.datetime
 import vibe.vibe
 import duel_log
-
-
-private struct _Session
-    DuelLog dLog
-    SysTime lastUpdated
-    ManualEvent event
-    bool finished
-
-    @property long secondsSinceLastUpdated() const
-        return (Clock.currTime() - lastUpdated).total!"seconds"
-
-
-private enum _SubmissionStatus: ubyte
-    ignored,
-    created,
-    updated,
+import session_storage
 
 
 final class Site
+    private SessionStorage _storage
+
     void postSend(
         string clientVersion, string link, int turn, string allies, string map, string log
     )
         const dLog = duelLog(link, turn, allies, map, log)
-        final switch (_submitLog(dLog)) with (_SubmissionStatus)
+        final switch (_storage.submit(dLog)) with (SubmissionStatus)
             case ignored: logDiagnostic("Ignoring duplicate %s", dLog.id); break
             case created: logInfo("Streaming %s", dLog.id); break
             case updated: break
@@ -44,8 +30,10 @@ final class Site
 
     @path("/duels/log/:id") \
     void getDuelsLog(string _id)
-        _removeOldSessions()
-        if (auto session = _id in _sessions)
+        import core.time
+
+        _storage.dropOldSessions(40.minutes)
+        if (auto session = _id in _storage)
             const dLog = &session.dLog
             const ago = session.secondsSinceLastUpdated
             render!("log.dt", dLog, ago)
@@ -65,9 +53,9 @@ final class Site
             "map":    JSONValue(),
             "log":    JSONValue(),
         ])
-        auto session = _id in _sessions
+        auto session = _id in _storage
         do
-            if (_id !in _sessions || session.finished)
+            if (_id !in _storage || session.finished)
                 const host = session !is null ? session.dLog.host : "https://godville.net"
                 response = JSONValue(["redirect": host ~ "/duels/log/" ~ _id])
                 socket.send(response.toJSON())
@@ -82,31 +70,3 @@ final class Site
             socket.send(response.toJSON())
             session.event.wait()
         while (socket.connected)
-
-    private:
-
-    //TODO: Factor this out.
-    _Session[string] _sessions
-
-    _SubmissionStatus _submitLog(DuelLog dLog)
-        if (auto session = dLog.id in _sessions)
-            if (dLog.turn <= session.dLog.turn)
-                return _SubmissionStatus.ignored
-            dLog.process()
-            session.dLog = dLog
-            session.lastUpdated = Clock.currTime()
-            session.event.emit()
-            return _SubmissionStatus.updated
-
-        dLog.process()
-        _sessions[dLog.id] = _Session(dLog, Clock.currTime(), createManualEvent())
-        return _SubmissionStatus.created
-
-    void _removeOldSessions()
-        if (_sessions.length)
-            const now = Clock.currTime()
-            foreach (ref session; _sessions)
-                if (now - session.lastUpdated >= 40.minutes)
-                    session.finished = true
-                    session.event.emit()
-                    _sessions.remove(session.dLog.id)

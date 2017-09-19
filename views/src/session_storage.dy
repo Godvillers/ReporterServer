@@ -1,0 +1,57 @@
+import std.datetime
+import vibe.core.sync
+import duel_log
+
+
+struct Session
+    DuelLog dLog
+    SysTime lastUpdated
+    ManualEvent event
+    bool finished
+
+    @disable this(this)//ManualEvent is non-copyable.
+
+    @property long secondsSinceLastUpdated() const
+        return (Clock.currTime() - lastUpdated).total!"seconds"
+
+
+enum SubmissionStatus: ubyte
+    ignored,
+    created,
+    updated,
+
+
+struct SessionStorage
+    private Session[string] _data
+
+    @disable this(this)
+
+    @property bool empty() const
+        return !_data.length
+
+    inout(Session)* opBinaryRight(string op: "in")(in char[ ] logId) inout
+        return logId in _data
+
+    SubmissionStatus submit(DuelLog dLog)
+        if (auto session = dLog.id in _data)
+            if (dLog.turn <= session.dLog.turn)
+                return SubmissionStatus.ignored
+            dLog.process()
+            session.dLog = dLog
+            session.lastUpdated = Clock.currTime()
+            session.event.emit()
+            return SubmissionStatus.updated
+
+        dLog.process()
+        _data[dLog.id] = Session(dLog, Clock.currTime(), createManualEvent())
+        return SubmissionStatus.created
+
+    void dropOldSessions(Duration maxAge)
+        if (!empty)
+            const thresholdPoint = Clock.currTime() - maxAge
+            foreach (ref session; _data)
+                if (session.lastUpdated <= thresholdPoint)
+                    session.finished = true
+                    session.event.emit()
+                    _data.remove(session.dLog.id)
+                    //`ref session` is now invalidated.
