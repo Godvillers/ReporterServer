@@ -43,6 +43,7 @@ struct DuelLog
         |   (?<=style=[^<>=]* font-size: \s*) \d\w+ (?=[^<>]*> \s* ([\d(]))
         |   <span [^<>]* class=[^<>=]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
         |   <a [^<>]* class=[^<>=]* \bpm_link\b [^<>]*>➤</a>
+        |   (?<=>\s) \s+ (?=<)
         ", (c) {
             if (!c[1].empty)
                 return `<a href="` ~ host ~ `/gods/` ~ c[1] ~ `" target="_blank">▶</a>`
@@ -65,6 +66,7 @@ struct DuelLog
         |   <div [^<>]* dir_resp [^<]* </div>
         |   \s? \bd_overlay\b
         |   <span [^<>]* class=[^<>=]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
+        |   (?<=>\s) \s+ (?=<)
         ", (c) {
             if (!c[1].empty)
                 return ".5"
@@ -81,6 +83,7 @@ struct DuelLog
         log = log._replace!(r"
             (?<=\bd_line\b [^<>=]*) \s? style=[^<>]*
         |   <span [^<>]* class=[^<>=]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
+        |   (?<=>\s) \s+ (?=<)
         ", c => "")
 
 
