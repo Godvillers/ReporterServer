@@ -3,10 +3,10 @@ import std.random
 
 
 debug
-    @property string seed()
+    @property string seed() @safe
         return uniform!uint().to!string
 else
-    shared immutable string seed
+    immutable string seed
 
-    shared static this()
+    shared static this() @safe
         seed = uniform!uint().to!string

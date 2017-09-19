@@ -4,7 +4,7 @@ struct DuelLog {
     int turn;
     string allies, map, log;//HTML.
 
-    void process();
+    void process() @safe;
 }
 
-DuelLog duelLog(string link, int turn, string allies, string map, string log);
+DuelLog duelLog(string link, int turn, string allies, string map, string log) pure @safe;

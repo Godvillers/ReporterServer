@@ -4,11 +4,13 @@ import session_storage
 
 
 final class Site
+    @safe:
+
     private SessionStorage _storage
 
     void postSend(
         string clientVersion, string link, int turn, string allies, string map, string log
-    )
+    ) @system
         const dLog = duelLog(link, turn, allies, map, log)
         final switch (_storage.submit(dLog)) with (SubmissionStatus)
             case ignored: logDiagnostic("Ignoring duplicate %s", dLog.id); break
@@ -18,7 +20,7 @@ final class Site
         //TODO: Check browser extension version.
         render!("send.dt", dLog)
 
-    void get()
+    void get() @system
         render!"index.dt"
 
     void getDuels()
@@ -29,7 +31,7 @@ final class Site
         redirect("/")
 
     @path("/duels/log/:id") \
-    void getDuelsLog(string _id)
+    void getDuelsLog(string _id) @system
         import core.time
 
         _storage.dropOldSessions(40.minutes)

@@ -4,10 +4,12 @@ import std.array
 import std.regex
 
 
+@safe:
+
 private Appender!(char[ ]) _buffer
 
 
-static this()
+static this() nothrow
     _buffer.reserve(150 << 10)
 
 
@@ -22,6 +24,8 @@ private string _replace(string pattern, alias replacer)(string text)
 
 
 struct DuelLog
+    @safe:
+
     string host
     string id//\w{5,}
     int turn
@@ -87,7 +91,7 @@ struct DuelLog
         ", c => "")
 
 
-DuelLog duelLog(string link, int turn, string allies, string map, string log)
+DuelLog duelLog(string link, int turn, string allies, string map, string log) pure
     import std.algorithm.searching
     import std.range
     import std.uri

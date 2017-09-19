@@ -11,7 +11,7 @@ struct Session
 
     @disable this(this)//ManualEvent is non-copyable.
 
-    @property long secondsSinceLastUpdated() const
+    @property long secondsSinceLastUpdated() const @safe
         return (Clock.currTime() - lastUpdated).total!"seconds"
 
 
@@ -22,14 +22,16 @@ enum SubmissionStatus: ubyte
 
 
 struct SessionStorage
+    @safe:
+
     private Session[string] _data
 
     @disable this(this)
 
-    @property bool empty() const
+    @property bool empty() const nothrow pure @nogc
         return !_data.length
 
-    inout(Session)* opBinaryRight(string op: "in")(in char[ ] logId) inout
+    inout(Session)* opBinaryRight(string op: "in")(in char[ ] logId) inout nothrow pure @nogc
         return logId in _data
 
     SubmissionStatus submit(DuelLog dLog)
