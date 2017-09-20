@@ -13,13 +13,17 @@ static this() nothrow
     _buffer.reserve(150 << 10)
 
 
-private string _replace(string pattern, alias replacer)(string text)
+private @property auto ref _rx(string pattern)() nothrow @nogc
     debug
         static rx = regex(pattern, "x")
     else
         static rx = ctRegex!(pattern, "x")
+    return rx
+
+
+private string _replace(string pattern, alias replacer)(string text)
     _buffer.clear()
-    replaceAllInto!replacer(_buffer, text, rx)
+    replaceAllInto!replacer(_buffer, text, _rx!pattern)
     return _buffer.data.idup
 
 
@@ -32,7 +36,9 @@ struct DuelLog
     string allies, map, log//HTML.
 
     void process()
+        import std.conv
         import std.datetime
+        import std.math
         import vibe.core.log
 
         const start = Clock.currTime()
@@ -42,11 +48,11 @@ struct DuelLog
             logDiagnostic("Processed %s in %s ms", id, (end - start).total!"msecs")
 
         allies = allies._replace!(r"
-            ▼ (?=</div> [\s\S]*? >\( ([^<]*) \) (?:<a [^<>]*>➤</a>)? </span></div>)
-        |   (?<=style=[^<>=]* width: \s*) (\d\w+)
-        |   (?<=style=[^<>=]* font-size: \s*) \d\w+ (?=[^<>]*> \s* ([\d(]))
-        |   <span [^<>]* class=[^<>=]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
-        |   <a [^<>]* class=[^<>=]* \bpm_link\b [^<>]*>➤</a>
+            ▼ (?=</div> [\s\S]*? >\( ([^<]*?) \) (?:<a [^<>]*>➤</a>)? </span></div>)
+        |   (?<=style=[^<>=]*? width: \s*) (\d\w+)
+        |   (?<=style=[^<>=]*? font-size: \s*) (\d\w+) (?=[^<>]*> \s* [\d(])
+        |   <span [^<>]*? class=[^<>=]*? \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
+        |   <a [^<>]*? class=[^<>=]*? \bpm_link\b [^<>]*>➤</a>
         |   (?<=>\s) \s+ (?=<)
         ", (c) {
             if (!c[1].empty)
@@ -55,32 +61,45 @@ struct DuelLog
             if (!c[2].empty)
                 return "175px"
             if (!c[3].empty)
-                return c[3][0] == '(' ? "11px" : "12px"
+                return "12px"
             return ""
         })
 
+        double scale = 1
+        if (const c = map.matchFirst(_rx!r"\bscale \s* \( \s* ([\d.]+)"))
+            try
+                scale = 1 / c[1].to!double
+            catch (ConvException) { }
+
         map = map._replace!(r"
-            \. (499|500)\d*\b
+            (?<=\bheight[:=] \D?) \s* ([\d.]+)
+        |   \bscale \s* \( \s* ([\d.]+)
+        |   \. (499|500)\d*\b
         |   (-?\d\.\d*e-\d{2,})
         |   (?<=\d) \.000\d*\b
-        |   (\.\d{3})\d+\b
         |   (?<=<title>) (Рулить[^<>]*) (?=</title>)
+        |   (\.\d\d)\d+\b
         |   <text [^<>]*> \s* </text>
         |   <line [^<]* </line>
-        |   <div [^<>]* dir_resp [^<]* </div>
+        |   <div [^<>]*? dir_resp [^<]* </div>
         |   \s? \bd_overlay\b
-        |   <span [^<>]* class=[^<>=]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
+        |   <span [^<>]*? class=[^<>=]*? \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
         |   (?<=>\s) \s+ (?=<)
         ", (c) {
             if (!c[1].empty)
-                return ".5"
+                try
+                    return lrint(c[1].to!double * scale).to!string
+                catch (ConvException)
+                    return c[1]
             if (!c[2].empty)
-                return "0"
+                return "scale(1"
             if (!c[3].empty)
-                return c[3]
+                return ".5"
             if (!c[4].empty)
+                return "0"
+            if (!c[5].empty)
                 return "(1 клетка)"
-            return ""
+            return c[6]
         })
 
         //Show partially hidden text.
