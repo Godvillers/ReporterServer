@@ -1,0 +1,16 @@
+import std.traits
+
+
+nothrow pure @safe @nogc:
+
+enum Number: ubyte
+    singular,
+    plural,
+
+
+Number getNumber(I)(I number) if (isIntegral!I)
+    switch (number)
+        static if (isSigned!I)
+            case -1: goto case
+        case 1:  return Number.singular
+        default: return Number.plural

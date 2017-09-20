@@ -1,16 +1,16 @@
-//This module takes a huge amount of time to build because of complex compile-time regexes,
-//so it is placed in a subpackage to avoid recompilation whenever possible.
 import std.array
 import std.regex
+import geometry
 
 
 @safe:
 
-private Appender!(char[ ]) _buffer
+private Appender!(char[ ]) _buffer, _distanceBuffer
 
 
 static this() nothrow
     _buffer.reserve(150 << 10)
+    _distanceBuffer.reserve(150)
 
 
 private @property auto ref _rx(string pattern)() nothrow @nogc
@@ -27,6 +27,33 @@ private string _replace(string pattern, alias replacer)(string text)
     return _buffer.data.idup
 
 
+private HexCoord _rectToHex(double y, double x) nothrow pure @nogc
+    import std.math
+
+    enum scale = 1 / 19.05256
+
+    const t = y * (sqrt(3.) / 3)
+    const skew = t * (2 * scale)
+    const horiz = (x - t) * scale
+    return HexCoord(cast(int)lrint(skew), cast(int)lrint(horiz))
+
+
+//Warning: Memory is reused across calls.
+private char[ ] _formatDistanceMsg(in char[ ] prefix, int value) nothrow
+    import std.conv
+    import ru = l10n.russian
+
+    _distanceBuffer.clear()
+    _distanceBuffer ~= prefix
+    _distanceBuffer ~= " ("
+    _distanceBuffer ~= value.toChars()
+    final switch (ru.getNumber(value)) with (ru.Number)
+        case plural:   _distanceBuffer ~= " клеток)"; break
+        case paucal:   _distanceBuffer ~= " клетки)"; break
+        case singular: _distanceBuffer ~= " клетка)"; break
+    return _distanceBuffer.data
+
+
 struct DuelLog
     @safe:
 
@@ -36,9 +63,10 @@ struct DuelLog
     string allies, map, log//HTML.
 
     void process()
+        import std.algorithm.searching
         import std.conv
         import std.datetime
-        import std.math
+        import std.format
         import vibe.core.log
 
         const start = Clock.currTime()
@@ -71,13 +99,16 @@ struct DuelLog
                 scale = 1 / c[1].to!double
             catch (ConvException) { }
 
+        char[21] numBuffer = void
+        HexCoord hc
         map = map._replace!(r"
             (?<=\bheight[:=] \D?) \s* ([\d.]+)
         |   \bscale \s* \( \s* ([\d.]+)
+        |   (?=\btranslate \s* \( \s* (-?[\d.]+) \s* , \s* (-?[\d.]+))
+        |   (<title> [^<>]*?) \s? (?:\( [^<>()]*? \d [^<>()]* \))? \s* (?=</)
         |   \. (499|500)\d*\b
         |   (-?\d\.\d*e-\d{2,})
         |   (?<=\d) \.000\d*\b
-        |   (?<=<title>) (Рулить[^<>]*) (?=</title>)
         |   (\.\d\d)\d+\b
         |   <text [^<>]*> \s* </text>
         |   <line [^<]* </line>
@@ -88,18 +119,25 @@ struct DuelLog
         ", (c) {
             if (!c[1].empty)
                 try
-                    return lrint(c[1].to!double * scale).to!string
+                    return cast(const)numBuffer[ ].sformat("%.0f", c[1].to!double * scale)
                 catch (ConvException)
                     return c[1]
-            if (!c[2].empty)
+            else if (!c[2].empty)
                 return "scale(1"
-            if (!c[3].empty)
+            else if (!c[3].empty)
+                try
+                    hc = _rectToHex(c[4].to!double, c[3].to!double)
+                catch (ConvException)
+                    hc = HexCoord.init
+            else if (!c[5].empty)
+                if (hc == HexCoord.init)
+                    return c[5]
+                return _formatDistanceMsg(c[5].canFind("Рулить") ? "<title>" : c[5], hc.dist)
+            else if (!c[6].empty)
                 return ".5"
-            if (!c[4].empty)
+            else if (!c[7].empty)
                 return "0"
-            if (!c[5].empty)
-                return "(1 клетка)"
-            return c[6]
+            return c[8]
         })
 
         //Show partially hidden text.
