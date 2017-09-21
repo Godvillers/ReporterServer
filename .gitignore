@@ -1,6 +1,12 @@
-/.sass-cache/
 /.dub/
+/.sass-cache/
+/build/
+/.waf3-?.*.*-*/
+/.waf-?.*.*-*/
+/waf3-?.*.*-*/
+/waf-?.*.*-*/
 /dub.selections.json
+/.lock-waf*build
 /gvrepsrv
 /*.exe
 /*.a
