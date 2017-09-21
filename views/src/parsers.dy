@@ -1,0 +1,35 @@
+enum Status: int
+    ok         = 0,
+    error      = 1,
+    incomplete = 2,
+
+
+struct StringSlice
+    const(char)* ptr
+    size_t len
+
+    @property const(char)[ ] arr() const nothrow pure @nogc
+        return ptr[0 .. len]
+
+    alias arr this
+
+
+struct FsmState
+    const(char)* p//inout
+    const(char)* pe//in
+    const(char)* ts//internal
+    const(char)* te//internal
+    int act//internal
+    int cs//internal
+    ubyte branch//out
+    StringSlice skipped//out
+    StringSlice[8] cap//out
+
+
+extern (C) nothrow pure @nogc
+    //void   cParseAlliesInit(FsmState*)
+    //Status cParseAlliesExec(FsmState*)
+    //void   cParseMapInit(FsmState*)
+    //Status cParseMapExec(FsmState*)
+    void   cParseLogInit(FsmState*)
+    Status cParseLogExec(FsmState*)

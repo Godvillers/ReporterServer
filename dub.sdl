@@ -12,6 +12,8 @@ subConfiguration "vibe-d:tls" "notls"
 
 versions "VibeCustomMain"
 
+lflags "$PACKAGE_DIR/build/libparsers.a"
+
 buildType "debug" {
     buildOptions "debugMode" "debugInfo"
     versions /*"VibeDebugCatchAll"*/ "VibeJsonFieldNames" "JsonLineNumbers" "DietUseCache"

@@ -1,6 +1,8 @@
 import std.array
 import std.regex
+import vibe.core.log
 import geometry
+import parsers
 
 
 @safe:
@@ -25,6 +27,23 @@ private string _replace(string pattern, alias replacer)(string text)
     _buffer.clear()
     replaceAllInto!replacer(_buffer, text, _rx!pattern)
     return _buffer.data.idup
+
+
+private void _process(alias text, alias init, alias exec, alias callback)() \
+nothrow @trusted
+    FsmState fsm
+    fsm.p = text.ptr
+    fsm.pe = text.ptr + text.length
+    init(&fsm)
+    _buffer.clear()
+    while (fsm.p != fsm.pe)
+        if (exec(&fsm) == Status.error)
+            logError("Error while parsing HTML (" ~ __traits(identifier, text) ~ ')')
+            return
+        _buffer ~= fsm.skipped
+        callback(fsm.branch, fsm.cap[ ])
+
+    text = _buffer.data.idup
 
 
 private HexCoord _rectToHex(double y, double x) nothrow pure @nogc
@@ -67,7 +86,6 @@ struct DuelLog
         import std.conv
         import std.datetime
         import std.format
-        import vibe.core.log
 
         const start = Clock.currTime()
 
@@ -140,12 +158,7 @@ struct DuelLog
             return c[8]
         })
 
-        //Show partially hidden text.
-        log = log._replace!(r"
-            (?<=\bd_line\b [^<>=]*) \s? style=[^<>]*
-        |   <span [^<>]* class=[^<>=]* \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
-        |   (?<=>\s) \s+ (?=<)
-        ", c => "")
+        _process!(log, cParseLogInit, cParseLogExec, (br, c) { })
 
 
 DuelLog duelLog(string link, int turn, string allies, string map, string log) pure
