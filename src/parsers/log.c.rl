@@ -1,5 +1,7 @@
 #include "parsers/parsers.h"
 
+enum { BRANCHES = 3 };
+
 %%{
     machine log;
 
@@ -8,15 +10,15 @@
     variable pe f.pe;
 
     action setMargin1 {
-        lmargin[1] = f.p;
+        lmargin[1] = fpc;
     }
 
     action setMargin2 {
-        lmargin[2] = f.p;
+        lmargin[2] = fpc;
     }
 
     action setMargin3 {
-        lmargin[3] = f.p;
+        lmargin[3] = fpc;
     }
 
     action accept1 {
@@ -41,10 +43,10 @@
     main := |*
         # Branch 1.
         # Remove custom styling, showing partially hidden text.
-        'd_line' [^<>=]* %setMargin1 ' style=' [^<>]* => accept1;
+        /d_line[^<>=]*/ %setMargin1 / style=[^<>]*/ => accept1;
 
         # Branch 2.
-        # Remove control buttons in the header.
+        # Remove control buttons from the header.
         /<span[^<>]*class=[^<>=]*[lr]_slot[^<>]*>/ >setMargin2
         any* :>> ('</span>' ws* '</span>') => accept2;
 
@@ -71,11 +73,11 @@ void cParseLogInit(Fsm* fsm) {
 int32_t cParseLogExec(Fsm* fsm) {
     Fsm f = *fsm;//Drop one level of indirection.
     const char* const eof = f.pe;
-    const char* lmargin[4] = { f.pe };
+    const char* lmargin[BRANCHES + 1] = { f.pe };
     f.branch = 0;
-    f.skipped.ptr = f.p;
+    f.cap[0].ptr = f.p;
     %% write exec;
-    f.skipped.len = (size_t)(lmargin[f.branch] - f.skipped.ptr);
+    f.cap[0].len = (size_t)(lmargin[f.branch] - f.cap[0].ptr);
     *fsm = f;
 
     if (f.cs == %%{ write error; }%%)

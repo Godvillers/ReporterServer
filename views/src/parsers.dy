@@ -1,4 +1,4 @@
-enum Status: int
+enum FsmStatus: int
     ok         = 0,
     error      = 1,
     incomplete = 2,
@@ -22,14 +22,13 @@ struct FsmState
     int act//internal
     int cs//internal
     ubyte branch//out
-    StringSlice skipped//out
-    StringSlice[8] cap//out
+    StringSlice[2] cap//out
 
 
 extern (C) nothrow pure @nogc
-    //void   cParseAlliesInit(FsmState*)
-    //Status cParseAlliesExec(FsmState*)
-    //void   cParseMapInit(FsmState*)
-    //Status cParseMapExec(FsmState*)
-    void   cParseLogInit(FsmState*)
-    Status cParseLogExec(FsmState*)
+    void      cParseAlliesInit(FsmState*)
+    FsmStatus cParseAlliesExec(FsmState*)
+    //void      cParseMapInit(FsmState*)
+    //FsmStatus cParseMapExec(FsmState*)
+    void      cParseLogInit(FsmState*)
+    FsmStatus cParseLogExec(FsmState*)

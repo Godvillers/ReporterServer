@@ -31,17 +31,16 @@ private string _replace(string pattern, alias replacer)(string text)
 
 private void _process(alias text, alias init, alias exec, alias callback)() \
 nothrow @trusted
-    FsmState fsm
-    fsm.p = text.ptr
-    fsm.pe = text.ptr + text.length
+    FsmState fsm = { text.ptr, text.ptr + text.length, };
     init(&fsm)
     _buffer.clear()
     while (fsm.p != fsm.pe)
-        if (exec(&fsm) == Status.error)
+        if (exec(&fsm) == FsmStatus.error)
             logError("Error while parsing HTML (" ~ __traits(identifier, text) ~ ')')
             return
-        _buffer ~= fsm.skipped
-        callback(fsm.branch, fsm.cap[ ])
+        _buffer ~= fsm.cap[0]
+        if (fsm.branch)
+            callback(fsm.branch, fsm.cap[ ])
 
     text = _buffer.data.idup
 
@@ -93,22 +92,20 @@ struct DuelLog
             const end = Clock.currTime()
             logDiagnostic("Processed %s in %s ms", id, (end - start).total!"msecs")
 
-        allies = allies._replace!(r"
-            ▼ (?=</div> [\s\S]*? >\( ([^<]*?) \) (?:<a [^<>]*>➤</a>)? </span></div>)
-        |   (?<=style=[^<>=]*? width: \s*) (\d\w+)
-        |   (?<=style=[^<>=]*? font-size: \s*) (\d\w+) (?=[^<>]*> \s* [\d(])
-        |   <span [^<>]*? class=[^<>=]*? \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
-        |   <a [^<>]*? class=[^<>=]*? \bpm_link\b [^<>]*>➤</a>
-        |   (?<=>\s) \s+ (?=<)
-        ", (c) {
-            if (!c[1].empty)
-                return `<a href="` ~ host ~ `/gods/` ~ c[1] ~ `" target="_blank">▶</a>`
-            //TODO: Move this to the style sheet.
-            if (!c[2].empty)
-                return "175px"
-            if (!c[3].empty)
-                return "12px"
-            return ""
+        _process!(allies, cParseAlliesInit, cParseAlliesExec, (br, c) {
+            final switch (br)
+                case 1:
+                    _buffer ~= `<a href="`
+                    _buffer ~= host
+                    _buffer ~= `/gods/`
+                    _buffer ~= c[1]
+                    _buffer ~= `" target="_blank">▶</a>`
+                    break
+
+                //TODO: Move this to the style sheet.
+                case 2: _buffer ~= "175px"; break
+                case 3: _buffer ~= "12px"; break
+                case 4, 5: break
         })
 
         double scale = 1

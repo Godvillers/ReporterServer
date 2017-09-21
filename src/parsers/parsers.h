@@ -22,16 +22,15 @@ typedef struct {
     int32_t act;//internal
     int32_t cs;//internal
     uint8_t branch;//out
-    StringSlice skipped;//out
-    StringSlice cap[8];//out
+    StringSlice cap[2];//out
 } Fsm;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-//void    cParseAlliesInit(Fsm*);
-//int32_t cParseAlliesExec(Fsm*);
+void    cParseAlliesInit(Fsm*);
+int32_t cParseAlliesExec(Fsm*);
 //void    cParseMapInit(Fsm*);
 //int32_t cParseMapExec(Fsm*);
 void    cParseLogInit(Fsm*);
