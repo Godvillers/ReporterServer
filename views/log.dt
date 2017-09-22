@@ -8,10 +8,8 @@ prepend title
 append head
   include utils
 
-  - import std.algorithm.comparison;
-
   - script("log");
-  script(type="text/javascript") initialProgress = #{min(ago * 5, 100)};
+  script(type="text/javascript") updatedAgo = #{ago};
   - stylesheet("log");
 
 

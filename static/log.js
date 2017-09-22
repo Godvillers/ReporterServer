@@ -26,14 +26,16 @@
 
   progressTimer = null;
 
-  runProgressTimer = function(progress) {
-    setProgress(progress);
+  runProgressTimer = function(ago) {
+    var basePoint;
+    basePoint = Date.now();
     if (progressTimer != null) {
       clearInterval(progressTimer);
     }
+    setProgress(Math.min(ago *= 5, 100));
     return progressTimer = every(500, function() {
-      progress += 2.5;
-      if (progress < 100 - 1e-5) {
+      var progress;
+      if ((progress = ago + (Date.now() - basePoint) * .005) < 100 - 1e-5) {
         return setProgress(progress);
       } else {
         setProgress(100);
@@ -60,7 +62,7 @@
         map = document.getElementById("map_wrap");
         map.scrollLeft = scrollValue * map.scrollWidth;
         document.getElementById("m_fight_log").outerHTML = response.log;
-        return runProgressTimer(Math.min(response.ago * 5, 100));
+        return runProgressTimer(response.ago);
       }
     };
     return socket.onclose = function() {
@@ -69,7 +71,7 @@
   };
 
   addEventListener("DOMContentLoaded", function() {
-    runProgressTimer(initialProgress);
+    runProgressTimer(updatedAgo);
     return connect();
   });
 

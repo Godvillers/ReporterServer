@@ -16,12 +16,12 @@ setProgress = (value) ->
 progressTimer = null
 
 
-runProgressTimer = (progress) ->
-    setProgress progress
+runProgressTimer = (ago) ->
+    basePoint = Date.now()
     clearInterval progressTimer if progressTimer?
+    setProgress Math.min ago *= 5, 100
     progressTimer = every 500, ->
-        progress += 2.5
-        if progress < 100 - 1e-5
+        if (progress = ago + (Date.now() - basePoint) * .005) < 100 - 1e-5
             setProgress progress
         else
             setProgress 100
@@ -49,11 +49,11 @@ connect = ->
 
             document.getElementById("m_fight_log").outerHTML = response.log
 
-            runProgressTimer Math.min response.ago * 5, 100
+            runProgressTimer response.ago
 
     socket.onclose = -> setTimeout connect, 3000
 
 
 addEventListener "DOMContentLoaded", ->
-    runProgressTimer initialProgress
+    runProgressTimer updatedAgo
     connect()
