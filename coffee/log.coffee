@@ -34,6 +34,7 @@ socket = null
 
 connect = ->
     socket = new WebSocket "ws://#{location.host}#{location.pathname}/ws"
+    firstMessage = true
     socket.onmessage = (msg) ->
         response = JSON.parse msg.data
         if (url = response.redirect)?
@@ -49,7 +50,9 @@ connect = ->
 
             document.getElementById("m_fight_log").outerHTML = response.log
 
-            runProgressTimer response.ago
+            runProgressTimer if firstMessage then response.ago else 0
+
+        firstMessage = false
 
     socket.onclose = -> setTimeout connect, 3000
 
