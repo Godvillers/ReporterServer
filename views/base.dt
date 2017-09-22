@@ -6,6 +6,6 @@ html
     meta(charset="UTF-8")
     title: block title
       | Репортёр
-    link(rel="shortcut icon", href="/static/favicon.ico", type="image/x-icon")
+    link(rel="shortcut icon", type="image/x-icon", href="/favicon.ico")
   body
     block body

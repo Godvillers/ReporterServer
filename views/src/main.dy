@@ -25,6 +25,8 @@ private void _configure() @safe
         (new URLRouter)
         .registerWebInterface(new Site)
         .get("/static/*", serveStaticFiles("."))
+        .get("/favicon.ico", serveStaticFile("static/favicon.ico"))
+        .get("/robots.txt", serveStaticFile("static/robots.txt"))
     )
 
 
