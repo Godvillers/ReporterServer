@@ -89,11 +89,11 @@ enum { BRANCHES = 5 };
         ws* digit alnum* => accept3;
 
         # Branch 4.
-        # Remove control buttons from the header.
-        # Remove personal message (friend) link.
         (
+            # Remove control buttons from the header.
             /<span[^<>]*class=[^<>=]*[lr]_slot[^<>]*>/
             any* :>> ('</span>' ws* '</span>')
+            # Remove personal message (friend) link.
         |   /<a[^<>]*class=[^<>=]*pm_link[^<>]*>➤<\/a>/
         ) >setLMargin4 => accept4;
 

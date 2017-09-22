@@ -1,4 +1,5 @@
 import std.array
+import std.math
 import std.regex
 import vibe.core.log
 import geometry
@@ -7,30 +8,14 @@ import parsers
 
 @safe:
 
-private Appender!(char[ ]) _buffer, _distanceBuffer
+private Appender!(char[ ]) _buffer
 
 
 static this() nothrow
-    _buffer.reserve(150 << 10)
-    _distanceBuffer.reserve(150)
+    _buffer.reserve(170 << 10)
 
 
-private @property auto ref _rx(string pattern)() nothrow @nogc
-    debug
-        static rx = regex(pattern, "x")
-    else
-        static rx = ctRegex!(pattern, "x")
-    return rx
-
-
-private string _replace(string pattern, alias replacer)(string text)
-    _buffer.clear()
-    replaceAllInto!replacer(_buffer, text, _rx!pattern)
-    return _buffer.data.idup
-
-
-private void _process(alias text, alias init, alias exec, alias callback)() \
-nothrow @trusted
+private void _process(alias text, alias init, alias exec, alias callback)() /+nothrow+/ @trusted
     FsmState fsm = { text.ptr, text.ptr + text.length, };
     init(&fsm)
     _buffer.clear()
@@ -46,8 +31,6 @@ nothrow @trusted
 
 
 private HexCoord _rectToHex(double y, double x) nothrow pure @nogc
-    import std.math
-
     enum scale = 1 / 19.05256
 
     const t = y * (sqrt(3.) / 3)
@@ -56,20 +39,16 @@ private HexCoord _rectToHex(double y, double x) nothrow pure @nogc
     return HexCoord(cast(int)lrint(skew), cast(int)lrint(horiz))
 
 
-//Warning: Memory is reused across calls.
-private char[ ] _formatDistanceMsg(in char[ ] prefix, int value) nothrow
+private void _formatDistanceMsg(int value) nothrow
     import std.conv
     import ru = l10n.russian
 
-    _distanceBuffer.clear()
-    _distanceBuffer ~= prefix
-    _distanceBuffer ~= " ("
-    _distanceBuffer ~= value.toChars()
+    _buffer ~= '('
+    _buffer ~= value.toChars()
     final switch (ru.getNumber(value)) with (ru.Number)
-        case plural:   _distanceBuffer ~= " клеток)"; break
-        case paucal:   _distanceBuffer ~= " клетки)"; break
-        case singular: _distanceBuffer ~= " клетка)"; break
-    return _distanceBuffer.data
+        case plural:   _buffer ~= " клеток)"; break
+        case paucal:   _buffer ~= " клетки)"; break
+        case singular: _buffer ~= " клетка)"; break
 
 
 struct DuelLog
@@ -90,7 +69,7 @@ struct DuelLog
 
         scope(success)
             const end = Clock.currTime()
-            logDiagnostic("Processed %s in %s ms", id, (end - start).total!"msecs")
+            logDiagnostic("Processed %s in %s", id, end - start)
 
         _process!(allies, cParseAlliesInit, cParseAlliesExec, (br, c) {
             final switch (br)
@@ -109,50 +88,45 @@ struct DuelLog
         })
 
         double scale = 1
-        if (const c = map.matchFirst(_rx!r"\bscale \s* \( \s* ([\d.]+)"))
-            try
-                scale = 1 / c[1].to!double
-            catch (ConvException) { }
-
-        char[21] numBuffer = void
         HexCoord hc
-        map = map._replace!(r"
-            (?<=\bheight[:=] \D?) \s* ([\d.]+)
-        |   \bscale \s* \( \s* ([\d.]+)
-        |   (?=\btranslate \s* \( \s* (-?[\d.]+) \s* , \s* (-?[\d.]+))
-        |   (<title> [^<>]*?) \s? (?:\( [^<>()]*? \d [^<>()]* \))? \s* (?=</)
-        |   \. (499|500)\d*\b
-        |   (-?\d\.\d*e-\d{2,})
-        |   (?<=\d) \.000\d*\b
-        |   (\.\d\d)\d+\b
-        |   <text [^<>]*> \s* </text>
-        |   <line [^<]* </line>
-        |   <div [^<>]*? dir_resp [^<]* </div>
-        |   \s? \bd_overlay\b
-        |   <span [^<>]*? class=[^<>=]*? \b[lr]_slot\b [^<>]*> [\s\S]*? </span>\s*</span>
-        |   (?<=>\s) \s+ (?=<)
-        ", (c) {
-            if (!c[1].empty)
-                try
-                    return cast(const)numBuffer[ ].sformat("%.0f", c[1].to!double * scale)
-                catch (ConvException)
-                    return c[1]
-            else if (!c[2].empty)
-                return "scale(1"
-            else if (!c[3].empty)
-                try
-                    hc = _rectToHex(c[4].to!double, c[3].to!double)
-                catch (ConvException)
-                    hc = HexCoord.init
-            else if (!c[5].empty)
-                if (hc == HexCoord.init)
-                    return c[5]
-                return _formatDistanceMsg(c[5].canFind("Рулить") ? "<title>" : c[5], hc.dist)
-            else if (!c[6].empty)
-                return ".5"
-            else if (!c[7].empty)
-                return "0"
-            return c[8]
+        _process!(map, cParseMapInit, cParseMapExec, (br, c) {
+            final switch (br)
+                case 1:
+                    if (c[1].len)
+                        try
+                            scale = 1 / c[1].arr.to!double
+                        catch (ConvException) { }
+                        c[1].len = 0
+                    try
+                        _buffer ~= lrint(c[2].arr.to!double * scale).toChars()
+                    catch (ConvException)
+                        _buffer ~= c[2]
+                    break
+
+                case 2: _buffer ~= '1'; break
+
+                case 3:
+                    try
+                        hc = _rectToHex(c[3].arr.to!double, c[2].arr.to!double)
+                    catch (ConvException)
+                        hc = HexCoord.init
+                    break
+
+                case 4:
+                    if (c[2].len && c[2][$ - 1] == ' ')
+                        c[2].len--
+                    if (hc == HexCoord.init)
+                        _buffer ~= c[2]
+                    else
+                        if (c[2].len && !c[2].arr.canFind("Рулить"))
+                            _buffer ~= c[2]
+                            _buffer ~= ' '
+                        _formatDistanceMsg(hc.dist)
+                    break
+
+                case 5: _buffer ~= '5'; break
+                case 6: _buffer ~= '0'; break
+                case 7, 8, 9, 10: break
         })
 
         _process!(log, cParseLogInit, cParseLogExec, (br, c) { })

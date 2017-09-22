@@ -9,15 +9,15 @@ enum { BRANCHES = 3 };
     variable p f.p;
     variable pe f.pe;
 
-    action setMargin1 {
+    action setLMargin1 {
         lmargin[1] = fpc;
     }
 
-    action setMargin2 {
+    action setLMargin2 {
         lmargin[2] = fpc;
     }
 
-    action setMargin3 {
+    action setLMargin3 {
         lmargin[3] = fpc;
     }
 
@@ -43,16 +43,16 @@ enum { BRANCHES = 3 };
     main := |*
         # Branch 1.
         # Remove custom styling, showing partially hidden text.
-        /d_line[^<>=]*/ %setMargin1 / style=[^<>]*/ => accept1;
+        /d_line[^<>=]*/ %setLMargin1 / style=[^<>]*/ => accept1;
 
         # Branch 2.
         # Remove control buttons from the header.
-        /<span[^<>]*class=[^<>=]*[lr]_slot[^<>]*>/ >setMargin2
+        /<span[^<>]*class=[^<>=]*[lr]_slot[^<>]*>/ >setLMargin2
         any* :>> ('</span>' ws* '</span>') => accept2;
 
         # Branch 3.
         # Remove extra whitespace between tags.
-        '>' ws %setMargin3 ws+ '<' => accept3;
+        '>' ws %setLMargin3 ws+ '<' => accept3;
 
         any;
     *|;

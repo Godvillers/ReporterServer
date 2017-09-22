@@ -22,13 +22,13 @@ struct FsmState
     int act//internal
     int cs//internal
     ubyte branch//out
-    StringSlice[2] cap//out
+    StringSlice[4] cap//out
 
 
 extern (C) nothrow pure @nogc
     void      cParseAlliesInit(FsmState*)
     FsmStatus cParseAlliesExec(FsmState*)
-    //void      cParseMapInit(FsmState*)
-    //FsmStatus cParseMapExec(FsmState*)
+    void      cParseMapInit(FsmState*)
+    FsmStatus cParseMapExec(FsmState*)
     void      cParseLogInit(FsmState*)
     FsmStatus cParseLogExec(FsmState*)
