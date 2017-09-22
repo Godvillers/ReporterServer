@@ -12,7 +12,13 @@ Building
 This project is implemented in the [D Programming Language][dlang], so you'll need a
 [D Compiler][dmd-download] to build it. DMD is the easiest one to install.
 
-Run `dub build -brelease-nobounds` from the project root to get a release version.
+To get a release version, run from the project root:
+
+```sh
+dub upgrade
+./waf configure build
+dub build -brelease-nobounds
+```
 
 [dlang]:        https://dlang.org
 [dmd-download]: https://dlang.org/download
