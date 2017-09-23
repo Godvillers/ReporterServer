@@ -1,3 +1,6 @@
+"use strict"
+
+
 every = (ms, action) ->
     setInterval action, ms
 

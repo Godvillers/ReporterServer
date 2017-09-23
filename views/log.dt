@@ -9,7 +9,7 @@ append head
   include utils
 
   - script("log");
-  script(type="text/javascript") updatedAgo = #{ago};
+  script(type="text/javascript") var updatedAgo = #{ago};
   - stylesheet("log");
 
 
