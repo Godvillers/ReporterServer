@@ -1,3 +1,3 @@
 import dython;
 
-mixin(dythonizeFile!"src/geometry.dy");
+mixin(dythonizeFile!"geometry.dy");

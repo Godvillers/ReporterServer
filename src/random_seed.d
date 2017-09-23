@@ -1,3 +1,3 @@
 import dython;
 
-mixin(dythonizeFile!"src/random_seed.dy");
+mixin(dythonizeFile!"random_seed.dy");

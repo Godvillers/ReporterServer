@@ -75,9 +75,11 @@ def build(bld):
 
 def dist(dst):
     dst.files = dst.path.ant_glob("""
+        src/dy/
         src/**/*.[cdh]
         static/
         views/**/[^_]*
+        waftools/select_flags.py
         dub.sdl
         gvrepsrv.conf
         LICENSE

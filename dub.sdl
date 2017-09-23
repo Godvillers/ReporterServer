@@ -10,6 +10,7 @@ dependency "vibe-d" version="~>0.8.1"
 
 subConfiguration "vibe-d:tls" "notls"
 
+stringImportPaths "src/dy" "views"
 versions "VibeCustomMain"
 
 lflags "$PACKAGE_DIR/build/libparsers.a"

@@ -1,3 +1,3 @@
 import dython;
 
-mixin(dythonizeFile!"src/session_storage.dy");
+mixin(dythonizeFile!"session_storage.dy");

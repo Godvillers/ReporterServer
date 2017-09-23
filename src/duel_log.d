@@ -1,3 +1,3 @@
 import dython;
 
-mixin(dythonizeFile!"src/duel_log.dy");
+mixin(dythonizeFile!"duel_log.dy");

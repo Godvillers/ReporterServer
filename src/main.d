@@ -1,3 +1,3 @@
 import dython;
 
-mixin(dythonizeFile!"src/main.dy");
+mixin(dythonizeFile!"main.dy");
