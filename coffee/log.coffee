@@ -1,8 +1,8 @@
 "use strict"
 
 
-after = (ms, action) ->
-    setTimeout action, ms
+every = (ms, action) ->
+    setInterval action, ms
 
 
 getTurn = ->
@@ -10,25 +10,24 @@ getTurn = ->
     catch then 0
 
 
+setProgress = (value) ->
+    try document.querySelector("#turn_pbar .p_bar div").style.width = "#{value}%"
+
+
 progressTimer = null
 
 
-animateProgressBar = (elapsed) ->
-    try style = document.querySelector("#turn_pbar .p_bar div").style
-    catch then return
-
-    style.transition = "none"
-    clearTimeout progressTimer if progressTimer?
-    progressTimer =
-        if elapsed >= 20
-            style.width = "100%"
-            null
+runProgressTimer = (ago) ->
+    basePoint = Date.now()
+    clearInterval progressTimer if progressTimer?
+    setProgress Math.min ago *= 5, 100
+    progressTimer = every 250, ->
+        if (progress = ago + (Date.now() - basePoint) * .005) < 100 - 1e-5
+            setProgress progress
         else
-            style.width = "#{elapsed * 5}%"
-            after 250, ->
-                style.transition = "width #{19.75 - elapsed}s steps(#{79 - elapsed * 4}, start)"
-                style.width = "100%"
-                progressTimer = null
+            setProgress 100
+            clearInterval progressTimer
+            progressTimer = null
 
 
 socket = null
@@ -52,7 +51,7 @@ connect = ->
 
             document.getElementById("m_fight_log").outerHTML = response.log
 
-            animateProgressBar if justConnected then response.ago else 0
+            runProgressTimer if justConnected then response.ago else 0
 
         justConnected = false
 
@@ -60,5 +59,5 @@ connect = ->
 
 
 addEventListener "DOMContentLoaded", ->
-    animateProgressBar updatedAgo
+    runProgressTimer updatedAgo
     connect()
