@@ -1,8 +1,8 @@
 "use strict"
 
 
-every = (ms, action) ->
-    setInterval action, ms
+after = (ms, action) ->
+    setTimeout action, ms
 
 
 getTurn = ->
@@ -10,26 +10,25 @@ getTurn = ->
     catch then 0
 
 
-setProgress = (value) ->
-    if (div = document.querySelector "#turn_pbar .p_bar")?
-        div.title = "прогресс хода — #{Math.round value}%"
-        try div.getElementsByTagName("div")[0].style.width = "#{value}%"
-
-
 progressTimer = null
 
 
-runProgressTimer = (ago) ->
-    basePoint = Date.now()
-    clearInterval progressTimer if progressTimer?
-    setProgress Math.min ago *= 5, 100
-    progressTimer = every 500, ->
-        if (progress = ago + (Date.now() - basePoint) * .005) < 100 - 1e-5
-            setProgress progress
+animateProgressBar = (elapsed) ->
+    try style = document.querySelector("#turn_pbar .p_bar div").style
+    catch then return
+
+    style.transition = "none"
+    clearTimeout progressTimer if progressTimer?
+    progressTimer =
+        if elapsed >= 20
+            style.width = "100%"
+            null
         else
-            setProgress 100
-            clearInterval progressTimer
-            progressTimer = null
+            style.width = "#{elapsed * 5}%"
+            after 250, ->
+                style.transition = "width #{19.75 - elapsed}s steps(#{79 - elapsed * 4}, start)"
+                style.width = "100%"
+                progressTimer = null
 
 
 socket = null
@@ -37,7 +36,7 @@ socket = null
 
 connect = ->
     socket = new WebSocket "ws://#{location.host}#{location.pathname}/ws"
-    firstMessage = true
+    justConnected = true
     socket.onmessage = (msg) ->
         response = JSON.parse msg.data
         if (url = response.redirect)?
@@ -53,13 +52,13 @@ connect = ->
 
             document.getElementById("m_fight_log").outerHTML = response.log
 
-            runProgressTimer if firstMessage then response.ago else 0
+            animateProgressBar if justConnected then response.ago else 0
 
-        firstMessage = false
+        justConnected = false
 
     socket.onclose = -> setTimeout connect, 3000
 
 
 addEventListener "DOMContentLoaded", ->
-    runProgressTimer updatedAgo
+    animateProgressBar updatedAgo
     connect()

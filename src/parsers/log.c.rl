@@ -1,6 +1,6 @@
 #include "parsers/parsers.h"
 
-enum { BRANCHES = 3 };
+enum { BRANCHES = 4 };
 
 %%{
     machine log;
@@ -21,6 +21,10 @@ enum { BRANCHES = 3 };
         lmargin[3] = fpc;
     }
 
+    action setLMargin4 {
+        lmargin[4] = fpc;
+    }
+
     action accept1 {
         f.branch = 1;
         fbreak;
@@ -33,6 +37,11 @@ enum { BRANCHES = 3 };
 
     action accept3 {
         f.branch = 3;
+        fbreak;
+    }
+
+    action accept4 {
+        f.branch = 4;
         fhold;
         fbreak;
     }
@@ -51,8 +60,12 @@ enum { BRANCHES = 3 };
         any* :>> ('</span>' ws* '</span>') => accept2;
 
         # Branch 3.
+        # Remove progress bar title.
+        /p_bar[^<>]*/ :> '"' %setLMargin3 / title="[^<>]*/ :> '"' => accept3;
+
+        # Branch 4.
         # Remove extra whitespace between tags.
-        '>' ws %setLMargin3 ws+ '<' => accept3;
+        '>' ws %setLMargin4 ws+ '<' => accept4;
 
         any;
     *|;

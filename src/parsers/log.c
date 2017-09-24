@@ -2,22 +2,22 @@
 #line 1 "../src/parsers/log.c.rl"
 #include "parsers/parsers.h"
 
-enum { BRANCHES = 3 };
+enum { BRANCHES = 4 };
 
 
-#line 59 "../src/parsers/log.c.rl"
+#line 72 "../src/parsers/log.c.rl"
 
 
 
 #line 13 "../src/parsers/log.c"
-static const int log_start = 57;
-static const int log_first_final = 57;
+static const int log_start = 70;
+static const int log_first_final = 70;
 static const int log_error = -1;
 
-static const int log_en_main = 57;
+static const int log_en_main = 70;
 
 
-#line 62 "../src/parsers/log.c.rl"
+#line 75 "../src/parsers/log.c.rl"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +34,7 @@ void cParseLogInit(Fsm* fsm) {
 	 f.act = 0;
 	}
 
-#line 70 "../src/parsers/log.c.rl"
+#line 83 "../src/parsers/log.c.rl"
     *fsm = f;
 }
 
@@ -52,84 +52,92 @@ int32_t cParseLogExec(Fsm* fsm) {
 	switch (  f.cs )
 	{
 tr0:
-#line 57 "../src/parsers/log.c.rl"
+#line 70 "../src/parsers/log.c.rl"
 	{{( f.p) = (( f.te))-1;}}
-	goto st57;
+	goto st70;
 tr34:
-#line 29 "../src/parsers/log.c.rl"
+#line 33 "../src/parsers/log.c.rl"
 	{{( f.p) = (( f.te))-1;}{
         f.branch = 2;
-        {( f.p)++;  f.cs = 57; goto _out;}
+        {( f.p)++;  f.cs = 70; goto _out;}
     }}
-	goto st57;
+	goto st70;
 tr42:
-#line 29 "../src/parsers/log.c.rl"
+#line 33 "../src/parsers/log.c.rl"
 	{ f.te = ( f.p)+1;{
         f.branch = 2;
-        {( f.p)++;  f.cs = 57; goto _out;}
+        {( f.p)++;  f.cs = 70; goto _out;}
     }}
-	goto st57;
+	goto st70;
 tr47:
-#line 34 "../src/parsers/log.c.rl"
+#line 43 "../src/parsers/log.c.rl"
+	{ f.te = ( f.p)+1;{
+        f.branch = 4;
+        ( f.p)--;
+        {( f.p)++;  f.cs = 70; goto _out;}
+    }}
+	goto st70;
+tr72:
+#line 38 "../src/parsers/log.c.rl"
 	{ f.te = ( f.p)+1;{
         f.branch = 3;
-        ( f.p)--;
-        {( f.p)++;  f.cs = 57; goto _out;}
+        {( f.p)++;  f.cs = 70; goto _out;}
     }}
-	goto st57;
-tr60:
-#line 57 "../src/parsers/log.c.rl"
+	goto st70;
+tr73:
+#line 70 "../src/parsers/log.c.rl"
 	{ f.te = ( f.p)+1;}
-	goto st57;
-tr64:
-#line 57 "../src/parsers/log.c.rl"
+	goto st70;
+tr78:
+#line 70 "../src/parsers/log.c.rl"
 	{ f.te = ( f.p);( f.p)--;}
-	goto st57;
-tr66:
-#line 29 "../src/parsers/log.c.rl"
+	goto st70;
+tr80:
+#line 33 "../src/parsers/log.c.rl"
 	{ f.te = ( f.p);( f.p)--;{
         f.branch = 2;
-        {( f.p)++;  f.cs = 57; goto _out;}
+        {( f.p)++;  f.cs = 70; goto _out;}
     }}
-	goto st57;
-tr70:
-#line 24 "../src/parsers/log.c.rl"
+	goto st70;
+tr84:
+#line 28 "../src/parsers/log.c.rl"
 	{ f.te = ( f.p);( f.p)--;{
         f.branch = 1;
-        {( f.p)++;  f.cs = 57; goto _out;}
+        {( f.p)++;  f.cs = 70; goto _out;}
     }}
-	goto st57;
-st57:
+	goto st70;
+st70:
 #line 1 "NONE"
 	{ f.ts = 0;}
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof57;
-case 57:
+		goto _test_eof70;
+case 70:
 #line 1 "NONE"
 	{ f.ts = ( f.p);}
-#line 111 "../src/parsers/log.c"
+#line 118 "../src/parsers/log.c"
 	switch( (*( f.p)) ) {
-		case 60: goto tr61;
-		case 62: goto tr62;
-		case 100: goto tr63;
+		case 60: goto tr74;
+		case 62: goto tr75;
+		case 100: goto tr76;
+		case 112: goto tr77;
 	}
-	goto tr60;
-tr61:
+	goto tr73;
+tr74:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
 #line 16 "../src/parsers/log.c.rl"
 	{
         lmargin[2] = ( f.p);
     }
-	goto st58;
-st58:
+	goto st71;
+st71:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof58;
-case 58:
-#line 130 "../src/parsers/log.c"
+		goto _test_eof71;
+case 71:
+#line 138 "../src/parsers/log.c"
 	if ( (*( f.p)) == 115 )
 		goto st0;
-	goto tr64;
+	goto tr78;
 st0:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof0;
@@ -465,19 +473,19 @@ case 31:
 tr33:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
-	goto st59;
-st59:
+	goto st72;
+st72:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof59;
-case 59:
-#line 474 "../src/parsers/log.c"
+		goto _test_eof72;
+case 72:
+#line 482 "../src/parsers/log.c"
 	switch( (*( f.p)) ) {
 		case 32: goto st32;
 		case 60: goto st33;
 	}
 	if ( 9 <= (*( f.p)) && (*( f.p)) <= 13 )
 		goto st32;
-	goto tr66;
+	goto tr80;
 st32:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof32;
@@ -571,22 +579,22 @@ case 41:
 		case 114: goto st13;
 	}
 	goto st9;
-tr62:
+tr75:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
-	goto st60;
-st60:
+	goto st73;
+st73:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof60;
-case 60:
-#line 583 "../src/parsers/log.c"
+		goto _test_eof73;
+case 73:
+#line 591 "../src/parsers/log.c"
 	switch( (*( f.p)) ) {
 		case 13: goto st44;
 		case 32: goto st42;
 	}
 	if ( 9 <= (*( f.p)) && (*( f.p)) <= 12 )
 		goto st42;
-	goto tr64;
+	goto tr78;
 st42:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof42;
@@ -597,16 +605,16 @@ case 42:
 		goto tr45;
 	goto tr0;
 tr45:
-#line 20 "../src/parsers/log.c.rl"
+#line 24 "../src/parsers/log.c.rl"
 	{
-        lmargin[3] = ( f.p);
+        lmargin[4] = ( f.p);
     }
 	goto st43;
 st43:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof43;
 case 43:
-#line 610 "../src/parsers/log.c"
+#line 618 "../src/parsers/log.c"
 	switch( (*( f.p)) ) {
 		case 32: goto st43;
 		case 60: goto tr47;
@@ -626,16 +634,16 @@ case 44:
 		goto tr45;
 	goto tr0;
 tr48:
-#line 20 "../src/parsers/log.c.rl"
+#line 24 "../src/parsers/log.c.rl"
 	{
-        lmargin[3] = ( f.p);
+        lmargin[4] = ( f.p);
     }
 	goto st45;
 st45:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof45;
 case 45:
-#line 639 "../src/parsers/log.c"
+#line 647 "../src/parsers/log.c"
 	switch( (*( f.p)) ) {
 		case 32: goto tr45;
 		case 60: goto tr47;
@@ -643,18 +651,18 @@ case 45:
 	if ( 9 <= (*( f.p)) && (*( f.p)) <= 13 )
 		goto tr45;
 	goto tr0;
-tr63:
+tr76:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
-	goto st61;
-st61:
+	goto st74;
+st74:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof61;
-case 61:
-#line 655 "../src/parsers/log.c"
+		goto _test_eof74;
+case 74:
+#line 663 "../src/parsers/log.c"
 	if ( (*( f.p)) == 95 )
 		goto st46;
-	goto tr64;
+	goto tr78;
 st46:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof46;
@@ -702,7 +710,7 @@ st51:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof51;
 case 51:
-#line 706 "../src/parsers/log.c"
+#line 714 "../src/parsers/log.c"
 	switch( (*( f.p)) ) {
 		case 32: goto tr53;
 		case 115: goto st52;
@@ -760,23 +768,139 @@ st56:
 case 56:
 	switch( (*( f.p)) ) {
 		case 32: goto tr53;
-		case 61: goto st62;
+		case 61: goto st75;
 	}
 	if ( 60 <= (*( f.p)) && (*( f.p)) <= 62 )
 		goto tr0;
 	goto st50;
+st75:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof75;
+case 75:
+	switch( (*( f.p)) ) {
+		case 60: goto tr84;
+		case 62: goto tr84;
+	}
+	goto st75;
+tr77:
+#line 1 "NONE"
+	{ f.te = ( f.p)+1;}
+	goto st76;
+st76:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof76;
+case 76:
+#line 794 "../src/parsers/log.c"
+	if ( (*( f.p)) == 95 )
+		goto st57;
+	goto tr78;
+st57:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof57;
+case 57:
+	if ( (*( f.p)) == 98 )
+		goto st58;
+	goto tr0;
+st58:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof58;
+case 58:
+	if ( (*( f.p)) == 97 )
+		goto st59;
+	goto tr0;
+st59:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof59;
+case 59:
+	if ( (*( f.p)) == 114 )
+		goto st60;
+	goto tr0;
+st60:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof60;
+case 60:
+	switch( (*( f.p)) ) {
+		case 34: goto st61;
+		case 60: goto tr0;
+		case 62: goto tr0;
+	}
+	goto st60;
+st61:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof61;
+case 61:
+	if ( (*( f.p)) == 32 )
+		goto tr64;
+	goto tr0;
+tr64:
+#line 20 "../src/parsers/log.c.rl"
+	{
+        lmargin[3] = ( f.p);
+    }
+	goto st62;
 st62:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof62;
 case 62:
+#line 846 "../src/parsers/log.c"
+	if ( (*( f.p)) == 116 )
+		goto st63;
+	goto tr0;
+st63:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof63;
+case 63:
+	if ( (*( f.p)) == 105 )
+		goto st64;
+	goto tr0;
+st64:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof64;
+case 64:
+	if ( (*( f.p)) == 116 )
+		goto st65;
+	goto tr0;
+st65:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof65;
+case 65:
+	if ( (*( f.p)) == 108 )
+		goto st66;
+	goto tr0;
+st66:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof66;
+case 66:
+	if ( (*( f.p)) == 101 )
+		goto st67;
+	goto tr0;
+st67:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof67;
+case 67:
+	if ( (*( f.p)) == 61 )
+		goto st68;
+	goto tr0;
+st68:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof68;
+case 68:
+	if ( (*( f.p)) == 34 )
+		goto st69;
+	goto tr0;
+st69:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof69;
+case 69:
 	switch( (*( f.p)) ) {
-		case 60: goto tr70;
-		case 62: goto tr70;
+		case 34: goto tr72;
+		case 60: goto tr0;
+		case 62: goto tr0;
 	}
-	goto st62;
+	goto st69;
 	}
-	_test_eof57:  f.cs = 57; goto _test_eof; 
-	_test_eof58:  f.cs = 58; goto _test_eof; 
+	_test_eof70:  f.cs = 70; goto _test_eof; 
+	_test_eof71:  f.cs = 71; goto _test_eof; 
 	_test_eof0:  f.cs = 0; goto _test_eof; 
 	_test_eof1:  f.cs = 1; goto _test_eof; 
 	_test_eof2:  f.cs = 2; goto _test_eof; 
@@ -809,7 +933,7 @@ case 62:
 	_test_eof29:  f.cs = 29; goto _test_eof; 
 	_test_eof30:  f.cs = 30; goto _test_eof; 
 	_test_eof31:  f.cs = 31; goto _test_eof; 
-	_test_eof59:  f.cs = 59; goto _test_eof; 
+	_test_eof72:  f.cs = 72; goto _test_eof; 
 	_test_eof32:  f.cs = 32; goto _test_eof; 
 	_test_eof33:  f.cs = 33; goto _test_eof; 
 	_test_eof34:  f.cs = 34; goto _test_eof; 
@@ -820,12 +944,12 @@ case 62:
 	_test_eof39:  f.cs = 39; goto _test_eof; 
 	_test_eof40:  f.cs = 40; goto _test_eof; 
 	_test_eof41:  f.cs = 41; goto _test_eof; 
-	_test_eof60:  f.cs = 60; goto _test_eof; 
+	_test_eof73:  f.cs = 73; goto _test_eof; 
 	_test_eof42:  f.cs = 42; goto _test_eof; 
 	_test_eof43:  f.cs = 43; goto _test_eof; 
 	_test_eof44:  f.cs = 44; goto _test_eof; 
 	_test_eof45:  f.cs = 45; goto _test_eof; 
-	_test_eof61:  f.cs = 61; goto _test_eof; 
+	_test_eof74:  f.cs = 74; goto _test_eof; 
 	_test_eof46:  f.cs = 46; goto _test_eof; 
 	_test_eof47:  f.cs = 47; goto _test_eof; 
 	_test_eof48:  f.cs = 48; goto _test_eof; 
@@ -837,13 +961,27 @@ case 62:
 	_test_eof54:  f.cs = 54; goto _test_eof; 
 	_test_eof55:  f.cs = 55; goto _test_eof; 
 	_test_eof56:  f.cs = 56; goto _test_eof; 
+	_test_eof75:  f.cs = 75; goto _test_eof; 
+	_test_eof76:  f.cs = 76; goto _test_eof; 
+	_test_eof57:  f.cs = 57; goto _test_eof; 
+	_test_eof58:  f.cs = 58; goto _test_eof; 
+	_test_eof59:  f.cs = 59; goto _test_eof; 
+	_test_eof60:  f.cs = 60; goto _test_eof; 
+	_test_eof61:  f.cs = 61; goto _test_eof; 
 	_test_eof62:  f.cs = 62; goto _test_eof; 
+	_test_eof63:  f.cs = 63; goto _test_eof; 
+	_test_eof64:  f.cs = 64; goto _test_eof; 
+	_test_eof65:  f.cs = 65; goto _test_eof; 
+	_test_eof66:  f.cs = 66; goto _test_eof; 
+	_test_eof67:  f.cs = 67; goto _test_eof; 
+	_test_eof68:  f.cs = 68; goto _test_eof; 
+	_test_eof69:  f.cs = 69; goto _test_eof; 
 
 	_test_eof: {}
 	if ( ( f.p) == eof )
 	{
 	switch (  f.cs ) {
-	case 58: goto tr64;
+	case 71: goto tr78;
 	case 0: goto tr0;
 	case 1: goto tr0;
 	case 2: goto tr0;
@@ -876,7 +1014,7 @@ case 62:
 	case 29: goto tr0;
 	case 30: goto tr0;
 	case 31: goto tr0;
-	case 59: goto tr66;
+	case 72: goto tr80;
 	case 32: goto tr34;
 	case 33: goto tr34;
 	case 34: goto tr34;
@@ -887,12 +1025,12 @@ case 62:
 	case 39: goto tr0;
 	case 40: goto tr0;
 	case 41: goto tr0;
-	case 60: goto tr64;
+	case 73: goto tr78;
 	case 42: goto tr0;
 	case 43: goto tr0;
 	case 44: goto tr0;
 	case 45: goto tr0;
-	case 61: goto tr64;
+	case 74: goto tr78;
 	case 46: goto tr0;
 	case 47: goto tr0;
 	case 48: goto tr0;
@@ -904,20 +1042,34 @@ case 62:
 	case 54: goto tr0;
 	case 55: goto tr0;
 	case 56: goto tr0;
-	case 62: goto tr70;
+	case 75: goto tr84;
+	case 76: goto tr78;
+	case 57: goto tr0;
+	case 58: goto tr0;
+	case 59: goto tr0;
+	case 60: goto tr0;
+	case 61: goto tr0;
+	case 62: goto tr0;
+	case 63: goto tr0;
+	case 64: goto tr0;
+	case 65: goto tr0;
+	case 66: goto tr0;
+	case 67: goto tr0;
+	case 68: goto tr0;
+	case 69: goto tr0;
 	}
 	}
 
 	_out: {}
 	}
 
-#line 80 "../src/parsers/log.c.rl"
+#line 93 "../src/parsers/log.c.rl"
     f.cap[0].len = (size_t)(lmargin[f.branch] - f.cap[0].ptr);
     *fsm = f;
 
     if (f.cs == -1)
         return FSM_ERROR;
-    if (f.cs >= 57)
+    if (f.cs >= 70)
         return FSM_OK;
     return FSM_INCOMPLETE;
 }
