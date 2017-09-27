@@ -5,7 +5,7 @@
 enum { BRANCHES = 5 };
 
 
-#line 106 "../src/parsers/allies.c.rl"
+#line 113 "../src/parsers/allies.c.rl"
 
 
 
@@ -17,7 +17,7 @@ static const int allies_error = -1;
 static const int allies_en_main = 127;
 
 
-#line 109 "../src/parsers/allies.c.rl"
+#line 116 "../src/parsers/allies.c.rl"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +34,7 @@ void cParseAlliesInit(Fsm* fsm) {
 	 f.act = 0;
 	}
 
-#line 117 "../src/parsers/allies.c.rl"
+#line 124 "../src/parsers/allies.c.rl"
     *fsm = f;
 }
 
@@ -53,7 +53,7 @@ int32_t cParseAlliesExec(Fsm* fsm) {
 	switch (  f.cs )
 	{
 tr0:
-#line 104 "../src/parsers/allies.c.rl"
+#line 111 "../src/parsers/allies.c.rl"
 	{{( f.p) = (( f.te))-1;}}
 	goto st127;
 tr14:
@@ -108,11 +108,11 @@ tr111:
 	}
 	goto st127;
 tr144:
-#line 104 "../src/parsers/allies.c.rl"
+#line 111 "../src/parsers/allies.c.rl"
 	{ f.te = ( f.p)+1;}
 	goto st127;
 tr149:
-#line 104 "../src/parsers/allies.c.rl"
+#line 111 "../src/parsers/allies.c.rl"
 	{ f.te = ( f.p);( f.p)--;}
 	goto st127;
 tr152:
@@ -1101,7 +1101,7 @@ case 83:
 tr148:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
-#line 104 "../src/parsers/allies.c.rl"
+#line 111 "../src/parsers/allies.c.rl"
 	{ f.act = 6;}
 	goto st132;
 st132:
@@ -2291,7 +2291,7 @@ case 145:
 	_out: {}
 	}
 
-#line 128 "../src/parsers/allies.c.rl"
+#line 135 "../src/parsers/allies.c.rl"
     f.cap[0].len = (size_t)(lmargin[f.branch] - f.cap[0].ptr);
     *fsm = f;
 

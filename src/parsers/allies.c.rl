@@ -71,6 +71,15 @@ enum { BRANCHES = 5 };
     ws =
         space | '\r\n';
 
+    class =
+        /class=[^<>=]*/;
+
+    style =
+        /style=[^<>=]*/;
+
+    cssValue =
+        digit alnum*;
+
     main := |*
         # Branch 1.
         # Replace a dropdown menu with a profile link.
@@ -80,21 +89,18 @@ enum { BRANCHES = 5 };
 
         # Branch 2.
         # Widen name containers.
-        /style=[^<>=]*/ :>> 'width:' %setLMargin2
-        ws* digit alnum* => accept2;
+        style :>> 'width:' %setLMargin2 ws* cssValue => accept2;
 
         # Branch 3.
         # Increase font size in names.
-        /style=[^<>=]*/ :>> 'font-size:' %setLMargin3
-        ws* digit alnum* => accept3;
+        style :>> 'font-size:' %setLMargin3 ws* cssValue => accept3;
 
         # Branch 4.
-        (
-            # Remove control buttons from the header.
-            /<span[^<>]*class=[^<>=]*[lr]_slot[^<>]*>/
+        (   # Remove control buttons from the header.
+            /<span[^<>]*/ class /[lr]_slot[^<>]*>/
             any* :>> ('</span>' ws* '</span>')
             # Remove personal message (friend) link.
-        |   /<a[^<>]*class=[^<>=]*pm_link[^<>]*>➤<\/a>/
+        |   /<a[^<>]*/ class /pm_link[^<>]*>➤<\/a>/
         ) >setLMargin4 => accept4;
 
         # Branch 5.

@@ -146,7 +146,7 @@ enum { BRANCHES = 10 };
 
     scan := |*
         # Branch 1.
-        # Change figure height.
+        # Change map height.
         /height[:=]/ '"'? %setLMargin1 ws*
         [0-9.]* >startCap2 %endCap2 => accept1;
 
@@ -156,38 +156,36 @@ enum { BRANCHES = 10 };
 
         # Branch 3.
         # Parse hexagon coordinates.
-        'translate' ws* '(' @setLMargin3 @setRMargin3 ws*
-        number >startCap2 %endCap2 <: ws* ',' ws*
-        number >startCap3 %endCap3 => accept3;
+        'translate' ws* '(' @setLMargin3 @setRMargin3
+        ws* number >startCap2 %endCap2 <: ws* ','
+        ws* number >startCap3 %endCap3 => accept3;
 
         # Branch 4.
         # Replace distance in a hexagon tooltip.
         '<title>' %setLMargin4 %startCap2
-        [^<>]* %endCap2 :>> (/([^<>()]*/ :> digit /[^<>()]*)/ ws* '<') => accept4;
+        [^<>]* %endCap2 :>> (/\([^<>()]*/ :> digit /[^<>()]*\)/ ws* '<') => accept4;
 
         '<title>' %setLMargin4 %startCap2
         [^<>]* %endCap2 :> '<' => accept4;
 
         # Branch 5.
         # Replace .499xxx with .5.
-        '.' %setLMargin5 '499' digit* => accept5;
+        '.' %setLMargin5 /499[0-9]*/ => accept5;
 
         # Branch 6.
         # Replace x.xe-15 with 0.
-        ('-'? digit) >setLMargin6 '.' digit* /e-[1-9]/i digit+ => accept6;
+        ('-'? digit) >setLMargin6 /\.[0-9]*e-[1-9]/i digit+ => accept6;
 
         # Branch 7.
-        (
-            # Replace .500xxx with .5.
-            '.5' %setLMargin7 '00' digit*
+        (   # Replace .500xxx with .5.
+            '.5' %setLMargin7 /00[0-9]*/
             # Remove class="d_overlay" (possible move).
         |   (ws? 'd_overlay') >setLMargin7
         ) => accept7;
 
         # Branch 8.
-        (
-            # Remove .000xxx.
-            digit %setLMargin8 '.000' digit*
+        (   # Remove .000xxx.
+            digit %setLMargin8 /\.000[0-9]*/
             # Remove extra whitespace between tags.
         |   '>' ws %setLMargin8 ws+ '<' @hold
         ) => accept8;
@@ -197,11 +195,10 @@ enum { BRANCHES = 10 };
         '.' digit{2} %setLMargin9 digit+ => accept9;
 
         # Branch 10.
-        (
-            # Remove empty <text> tags.
+        (   # Remove empty <text> tags.
             /<text[^<>]*>/ ws* '</text>'
             # Remove <line> tags (ark direction hint).
-        |   '<line' any* :> '</line>'
+        |   /<line.*/ :> '</line>'
             # Remove <div class="dir_resp"> tag (navigation response).
         |   /<div[^<>]*/ :>> 'dir_resp' any* :> '</div>'
             # Remove control buttons from the header.
