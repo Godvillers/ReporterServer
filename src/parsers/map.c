@@ -2,23 +2,23 @@
 #line 1 "../src/parsers/map.c.rl"
 #include "parsers/parsers.h"
 
-enum { BRANCHES = 10 };
+enum { BRANCHES = 11 };
 
 
-#line 217 "../src/parsers/map.c.rl"
+#line 234 "../src/parsers/map.c.rl"
 
 
 
 #line 13 "../src/parsers/map.c"
 static const int map_start = 1;
-static const int map_first_final = 145;
+static const int map_first_final = 162;
 static const int map_error = 0;
 
-static const int map_en_scan = 146;
+static const int map_en_scan = 163;
 static const int map_en_main = 1;
 
 
-#line 220 "../src/parsers/map.c.rl"
+#line 237 "../src/parsers/map.c.rl"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,7 +35,7 @@ void cParseMapInit(Fsm* fsm) {
 	 f.act = 0;
 	}
 
-#line 228 "../src/parsers/map.c.rl"
+#line 245 "../src/parsers/map.c.rl"
     *fsm = f;
 }
 
@@ -44,10 +44,11 @@ int32_t cParseMapExec(Fsm* fsm) {
     const char* const eof = f.pe;
     const char* lmargin[BRANCHES + 1] = { f.pe };
     const char* rmargin3 = f.p;
+    const char* rmargin11 = f.p;
     f.branch = 0;
     f.cap[0].ptr = f.p;
     
-#line 51 "../src/parsers/map.c"
+#line 52 "../src/parsers/map.c"
 	{
 	if ( ( f.p) == ( f.pe) )
 		goto _test_eof;
@@ -59,7 +60,7 @@ st1:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof1;
 case 1:
-#line 63 "../src/parsers/map.c"
+#line 64 "../src/parsers/map.c"
 	if ( (*( f.p)) == 58 )
 		goto st2;
 	goto st1;
@@ -138,36 +139,36 @@ case 8:
 		goto st8;
 	goto tr8;
 tr8:
-#line 60 "../src/parsers/map.c.rl"
+#line 68 "../src/parsers/map.c.rl"
 	{
         f.cap[1].ptr = ( f.p);
     }
-#line 64 "../src/parsers/map.c.rl"
+#line 72 "../src/parsers/map.c.rl"
 	{
-        f.cap[1].len = (size_t)(( f.p) - f.cap[1].ptr);
+        SLICE_SET_END(f.cap[1], ( f.p));
         {( f.p) = (( f.cap[0].ptr))-1;}//Restart from the beginning.
-        {goto st146;}
+        {goto st163;}
     }
-	goto st145;
+	goto st162;
 tr10:
-#line 64 "../src/parsers/map.c.rl"
+#line 72 "../src/parsers/map.c.rl"
 	{
-        f.cap[1].len = (size_t)(( f.p) - f.cap[1].ptr);
+        SLICE_SET_END(f.cap[1], ( f.p));
         {( f.p) = (( f.cap[0].ptr))-1;}//Restart from the beginning.
-        {goto st146;}
+        {goto st163;}
     }
-	goto st145;
-st145:
+	goto st162;
+st162:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof145;
-case 145:
-#line 165 "../src/parsers/map.c"
+		goto _test_eof162;
+case 162:
+#line 166 "../src/parsers/map.c"
 	goto st0;
 st0:
  f.cs = 0;
 	goto _out;
 tr9:
-#line 60 "../src/parsers/map.c.rl"
+#line 68 "../src/parsers/map.c.rl"
 	{
         f.cap[1].ptr = ( f.p);
     }
@@ -176,30 +177,30 @@ st9:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof9;
 case 9:
-#line 180 "../src/parsers/map.c"
+#line 181 "../src/parsers/map.c"
 	if ( (*( f.p)) == 46 )
 		goto st9;
 	if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
 		goto st9;
 	goto tr10;
 tr12:
-#line 212 "../src/parsers/map.c.rl"
+#line 229 "../src/parsers/map.c.rl"
 	{{( f.p) = (( f.te))-1;}}
-	goto st146;
+	goto st163;
 tr20:
-#line 118 "../src/parsers/map.c.rl"
+#line 126 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p)+1;{
         f.branch = 7;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
+	goto st163;
 tr24:
 #line 1 "NONE"
 	{	switch(  f.act ) {
 	case 9:
 	{{( f.p) = (( f.te))-1;}
         f.branch = 8;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }
 	break;
 	default:
@@ -207,260 +208,269 @@ tr24:
 	break;
 	}
 	}
-	goto st146;
+	goto st163;
 tr59:
-#line 133 "../src/parsers/map.c.rl"
+#line 141 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p)+1;{
         f.branch = 10;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
+	goto st163;
 tr101:
-#line 133 "../src/parsers/map.c.rl"
+#line 141 "../src/parsers/map.c.rl"
 	{{( f.p) = (( f.te))-1;}{
         f.branch = 10;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
+	goto st163;
 tr127:
 #line 28 "../src/parsers/map.c.rl"
 	{
         lmargin[4] = ( f.p);
     }
-#line 70 "../src/parsers/map.c.rl"
+#line 78 "../src/parsers/map.c.rl"
 	{
         f.cap[2].ptr = ( f.p);
     }
-#line 74 "../src/parsers/map.c.rl"
+#line 82 "../src/parsers/map.c.rl"
 	{
-        f.cap[2].len = (size_t)(( f.p) - f.cap[2].ptr);
+        SLICE_SET_END(f.cap[2], ( f.p));
     }
-#line 102 "../src/parsers/map.c.rl"
+#line 110 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p)+1;{
         f.branch = 4;
         ( f.p)--;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
+	goto st163;
 tr130:
-#line 74 "../src/parsers/map.c.rl"
+#line 82 "../src/parsers/map.c.rl"
 	{
-        f.cap[2].len = (size_t)(( f.p) - f.cap[2].ptr);
+        SLICE_SET_END(f.cap[2], ( f.p));
     }
-#line 102 "../src/parsers/map.c.rl"
+#line 110 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p)+1;{
         f.branch = 4;
         ( f.p)--;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
+	goto st163;
 tr134:
-#line 102 "../src/parsers/map.c.rl"
+#line 110 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p)+1;{
         f.branch = 4;
         ( f.p)--;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-#line 74 "../src/parsers/map.c.rl"
+#line 82 "../src/parsers/map.c.rl"
 	{
-        f.cap[2].len = (size_t)(( f.p) - f.cap[2].ptr);
+        SLICE_SET_END(f.cap[2], ( f.p));
     }
-	goto st146;
+	goto st163;
 tr137:
 #line 12 "../src/parsers/map.c.rl"
 	{
         ( f.p)--;
     }
-#line 123 "../src/parsers/map.c.rl"
+#line 131 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p)+1;{
         f.branch = 8;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
-tr161:
-#line 212 "../src/parsers/map.c.rl"
+	goto st163;
+tr157:
+#line 146 "../src/parsers/map.c.rl"
+	{ f.te = ( f.p)+1;{
+        f.branch = 11;
+        {( f.p) = (( rmargin11))-1;}
+        {( f.p)++;  f.cs = 163; goto _out;}
+    }}
+	goto st163;
+tr180:
+#line 229 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p)+1;}
-	goto st146;
-tr173:
-#line 212 "../src/parsers/map.c.rl"
+	goto st163;
+tr193:
+#line 229 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p);( f.p)--;}
-	goto st146;
-tr176:
-#line 113 "../src/parsers/map.c.rl"
+	goto st163;
+tr196:
+#line 121 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p);( f.p)--;{
         f.branch = 6;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
-tr180:
-#line 128 "../src/parsers/map.c.rl"
+	goto st163;
+tr200:
+#line 136 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p);( f.p)--;{
         f.branch = 9;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
-tr182:
-#line 108 "../src/parsers/map.c.rl"
+	goto st163;
+tr202:
+#line 116 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p);( f.p)--;{
         f.branch = 5;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
-tr184:
-#line 118 "../src/parsers/map.c.rl"
+	goto st163;
+tr204:
+#line 126 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p);( f.p)--;{
         f.branch = 7;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
-tr187:
-#line 123 "../src/parsers/map.c.rl"
+	goto st163;
+tr207:
+#line 131 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p);( f.p)--;{
         f.branch = 8;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
-tr188:
+	goto st163;
+tr208:
 #line 20 "../src/parsers/map.c.rl"
 	{
         lmargin[2] = ( f.p);
     }
-#line 91 "../src/parsers/map.c.rl"
+#line 99 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p);( f.p)--;{
         f.branch = 2;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
-tr190:
-#line 91 "../src/parsers/map.c.rl"
+	goto st163;
+tr210:
+#line 99 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p);( f.p)--;{
         f.branch = 2;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
-tr196:
-#line 133 "../src/parsers/map.c.rl"
+	goto st163;
+tr216:
+#line 141 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p);( f.p)--;{
         f.branch = 10;
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
-tr200:
+	goto st163;
+tr221:
 #line 16 "../src/parsers/map.c.rl"
 	{
         lmargin[1] = ( f.p);
     }
-#line 70 "../src/parsers/map.c.rl"
-	{
-        f.cap[2].ptr = ( f.p);
-    }
-#line 74 "../src/parsers/map.c.rl"
-	{
-        f.cap[2].len = (size_t)(( f.p) - f.cap[2].ptr);
-    }
-#line 86 "../src/parsers/map.c.rl"
-	{ f.te = ( f.p);( f.p)--;{
-        f.branch = 1;
-        {( f.p)++;  f.cs = 146; goto _out;}
-    }}
-	goto st146;
-tr204:
-#line 70 "../src/parsers/map.c.rl"
-	{
-        f.cap[2].ptr = ( f.p);
-    }
-#line 74 "../src/parsers/map.c.rl"
-	{
-        f.cap[2].len = (size_t)(( f.p) - f.cap[2].ptr);
-    }
-#line 86 "../src/parsers/map.c.rl"
-	{ f.te = ( f.p);( f.p)--;{
-        f.branch = 1;
-        {( f.p)++;  f.cs = 146; goto _out;}
-    }}
-	goto st146;
-tr207:
-#line 74 "../src/parsers/map.c.rl"
-	{
-        f.cap[2].len = (size_t)(( f.p) - f.cap[2].ptr);
-    }
-#line 86 "../src/parsers/map.c.rl"
-	{ f.te = ( f.p);( f.p)--;{
-        f.branch = 1;
-        {( f.p)++;  f.cs = 146; goto _out;}
-    }}
-	goto st146;
-tr210:
 #line 78 "../src/parsers/map.c.rl"
+	{
+        f.cap[2].ptr = ( f.p);
+    }
+#line 82 "../src/parsers/map.c.rl"
+	{
+        SLICE_SET_END(f.cap[2], ( f.p));
+    }
+#line 94 "../src/parsers/map.c.rl"
+	{ f.te = ( f.p);( f.p)--;{
+        f.branch = 1;
+        {( f.p)++;  f.cs = 163; goto _out;}
+    }}
+	goto st163;
+tr225:
+#line 78 "../src/parsers/map.c.rl"
+	{
+        f.cap[2].ptr = ( f.p);
+    }
+#line 82 "../src/parsers/map.c.rl"
+	{
+        SLICE_SET_END(f.cap[2], ( f.p));
+    }
+#line 94 "../src/parsers/map.c.rl"
+	{ f.te = ( f.p);( f.p)--;{
+        f.branch = 1;
+        {( f.p)++;  f.cs = 163; goto _out;}
+    }}
+	goto st163;
+tr228:
+#line 82 "../src/parsers/map.c.rl"
+	{
+        SLICE_SET_END(f.cap[2], ( f.p));
+    }
+#line 94 "../src/parsers/map.c.rl"
+	{ f.te = ( f.p);( f.p)--;{
+        f.branch = 1;
+        {( f.p)++;  f.cs = 163; goto _out;}
+    }}
+	goto st163;
+tr231:
+#line 86 "../src/parsers/map.c.rl"
 	{
         f.cap[3].ptr = ( f.p);
     }
-#line 82 "../src/parsers/map.c.rl"
+#line 90 "../src/parsers/map.c.rl"
 	{
-        f.cap[3].len = (size_t)(( f.p) - f.cap[3].ptr);
+        SLICE_SET_END(f.cap[3], ( f.p));
     }
-#line 96 "../src/parsers/map.c.rl"
+#line 104 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p);( f.p)--;{
         f.branch = 3;
         {( f.p) = (( rmargin3))-1;}
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
-tr212:
-#line 82 "../src/parsers/map.c.rl"
+	goto st163;
+tr233:
+#line 90 "../src/parsers/map.c.rl"
 	{
-        f.cap[3].len = (size_t)(( f.p) - f.cap[3].ptr);
+        SLICE_SET_END(f.cap[3], ( f.p));
     }
-#line 96 "../src/parsers/map.c.rl"
+#line 104 "../src/parsers/map.c.rl"
 	{ f.te = ( f.p);( f.p)--;{
         f.branch = 3;
         {( f.p) = (( rmargin3))-1;}
-        {( f.p)++;  f.cs = 146; goto _out;}
+        {( f.p)++;  f.cs = 163; goto _out;}
     }}
-	goto st146;
-st146:
+	goto st163;
+st163:
 #line 1 "NONE"
 	{ f.ts = 0;}
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof146;
-case 146:
+		goto _test_eof163;
+case 163:
 #line 1 "NONE"
 	{ f.ts = ( f.p);}
-#line 430 "../src/parsers/map.c"
+#line 439 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
-		case 13: goto tr163;
-		case 32: goto tr162;
-		case 45: goto tr164;
-		case 46: goto tr165;
-		case 58: goto tr167;
-		case 60: goto tr168;
-		case 62: goto tr169;
-		case 100: goto tr170;
-		case 104: goto tr171;
-		case 116: goto tr172;
+		case 13: goto tr182;
+		case 32: goto tr181;
+		case 45: goto tr183;
+		case 46: goto tr184;
+		case 58: goto tr186;
+		case 60: goto tr187;
+		case 62: goto tr188;
+		case 98: goto tr189;
+		case 100: goto tr190;
+		case 104: goto tr191;
+		case 116: goto tr192;
 	}
 	if ( (*( f.p)) > 12 ) {
 		if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-			goto tr166;
+			goto tr185;
 	} else if ( (*( f.p)) >= 9 )
-		goto tr162;
-	goto tr161;
-tr162:
+		goto tr181;
+	goto tr180;
+tr181:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
 #line 40 "../src/parsers/map.c.rl"
 	{
         lmargin[7] = ( f.p);
     }
-	goto st147;
-st147:
+	goto st164;
+st164:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof147;
-case 147:
-#line 461 "../src/parsers/map.c"
+		goto _test_eof164;
+case 164:
+#line 471 "../src/parsers/map.c"
 	if ( (*( f.p)) == 100 )
 		goto st10;
-	goto tr173;
+	goto tr193;
 st10:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof10;
@@ -517,24 +527,24 @@ case 17:
 	if ( (*( f.p)) == 121 )
 		goto tr20;
 	goto tr12;
-tr163:
+tr182:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
 #line 40 "../src/parsers/map.c.rl"
 	{
         lmargin[7] = ( f.p);
     }
-	goto st148;
-st148:
+	goto st165;
+st165:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof148;
-case 148:
-#line 533 "../src/parsers/map.c"
+		goto _test_eof165;
+case 165:
+#line 543 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
 		case 10: goto st18;
 		case 100: goto st10;
 	}
-	goto tr173;
+	goto tr193;
 st18:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof18;
@@ -542,24 +552,24 @@ case 18:
 	if ( (*( f.p)) == 100 )
 		goto st10;
 	goto tr12;
-tr164:
+tr183:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
 #line 36 "../src/parsers/map.c.rl"
 	{
         lmargin[6] = ( f.p);
     }
-#line 212 "../src/parsers/map.c.rl"
-	{ f.act = 12;}
-	goto st149;
-st149:
+#line 229 "../src/parsers/map.c.rl"
+	{ f.act = 13;}
+	goto st166;
+st166:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof149;
-case 149:
-#line 560 "../src/parsers/map.c"
+		goto _test_eof166;
+case 166:
+#line 570 "../src/parsers/map.c"
 	if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
 		goto st19;
-	goto tr173;
+	goto tr193;
 st19:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof19;
@@ -597,31 +607,31 @@ st23:
 		goto _test_eof23;
 case 23:
 	if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-		goto st150;
+		goto st167;
 	goto tr24;
-st150:
+st167:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof150;
-case 150:
+		goto _test_eof167;
+case 167:
 	if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-		goto st150;
-	goto tr176;
-tr165:
+		goto st167;
+	goto tr196;
+tr184:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
-	goto st151;
-st151:
+	goto st168;
+st168:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof151;
-case 151:
-#line 618 "../src/parsers/map.c"
+		goto _test_eof168;
+case 168:
+#line 628 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
-		case 52: goto tr178;
+		case 52: goto tr198;
 		case 53: goto st28;
 	}
 	if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
 		goto st24;
-	goto tr173;
+	goto tr193;
 st24:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof24;
@@ -641,16 +651,16 @@ tr29:
 	{
         lmargin[9] = ( f.p);
     }
-	goto st152;
-st152:
+	goto st169;
+st169:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof152;
-case 152:
-#line 650 "../src/parsers/map.c"
+		goto _test_eof169;
+case 169:
+#line 660 "../src/parsers/map.c"
 	if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-		goto st152;
-	goto tr180;
-tr178:
+		goto st169;
+	goto tr200;
+tr198:
 #line 32 "../src/parsers/map.c.rl"
 	{
         lmargin[5] = ( f.p);
@@ -660,7 +670,7 @@ st26:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof26;
 case 26:
-#line 664 "../src/parsers/map.c"
+#line 674 "../src/parsers/map.c"
 	if ( (*( f.p)) == 57 )
 		goto st27;
 	if ( 48 <= (*( f.p)) && (*( f.p)) <= 56 )
@@ -680,15 +690,15 @@ tr31:
 	{
         lmargin[9] = ( f.p);
     }
-	goto st153;
-st153:
+	goto st170;
+st170:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof153;
-case 153:
-#line 689 "../src/parsers/map.c"
+		goto _test_eof170;
+case 170:
+#line 699 "../src/parsers/map.c"
 	if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-		goto st153;
-	goto tr182;
+		goto st170;
+	goto tr202;
 st28:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof28;
@@ -708,7 +718,7 @@ st29:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof29;
 case 29:
-#line 712 "../src/parsers/map.c"
+#line 722 "../src/parsers/map.c"
 	if ( (*( f.p)) == 48 )
 		goto tr33;
 	if ( 49 <= (*( f.p)) && (*( f.p)) <= 57 )
@@ -719,34 +729,34 @@ tr33:
 	{
         lmargin[9] = ( f.p);
     }
-	goto st154;
-st154:
+	goto st171;
+st171:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof154;
-case 154:
-#line 728 "../src/parsers/map.c"
+		goto _test_eof171;
+case 171:
+#line 738 "../src/parsers/map.c"
 	if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-		goto st154;
-	goto tr184;
-tr166:
+		goto st171;
+	goto tr204;
+tr185:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
 #line 36 "../src/parsers/map.c.rl"
 	{
         lmargin[6] = ( f.p);
     }
-#line 212 "../src/parsers/map.c.rl"
-	{ f.act = 12;}
-	goto st155;
-st155:
+#line 229 "../src/parsers/map.c.rl"
+	{ f.act = 13;}
+	goto st172;
+st172:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof155;
-case 155:
-#line 746 "../src/parsers/map.c"
+		goto _test_eof172;
+case 172:
+#line 756 "../src/parsers/map.c"
 	if ( (*( f.p)) == 46 )
-		goto tr186;
-	goto tr173;
-tr186:
+		goto tr206;
+	goto tr193;
+tr206:
 #line 44 "../src/parsers/map.c.rl"
 	{
         lmargin[8] = ( f.p);
@@ -756,7 +766,7 @@ st30:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof30;
 case 30:
-#line 760 "../src/parsers/map.c"
+#line 770 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
 		case 48: goto st31;
 		case 69: goto st21;
@@ -792,37 +802,37 @@ case 32:
 tr36:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
-#line 123 "../src/parsers/map.c.rl"
+#line 131 "../src/parsers/map.c.rl"
 	{ f.act = 9;}
-	goto st156;
-st156:
+	goto st173;
+st173:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof156;
-case 156:
-#line 803 "../src/parsers/map.c"
+		goto _test_eof173;
+case 173:
+#line 813 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
 		case 69: goto st21;
 		case 101: goto st21;
 	}
 	if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
 		goto tr36;
-	goto tr187;
-tr167:
+	goto tr207;
+tr186:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
-	goto st157;
-st157:
+	goto st174;
+st174:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof157;
-case 157:
-#line 819 "../src/parsers/map.c"
+		goto _test_eof174;
+case 174:
+#line 829 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
 		case 32: goto st33;
 		case 115: goto st34;
 	}
 	if ( 9 <= (*( f.p)) && (*( f.p)) <= 13 )
 		goto st33;
-	goto tr173;
+	goto tr193;
 st33:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof33;
@@ -868,61 +878,61 @@ st38:
 case 38:
 	switch( (*( f.p)) ) {
 		case 32: goto st38;
-		case 40: goto st158;
+		case 40: goto st175;
 	}
 	if ( 9 <= (*( f.p)) && (*( f.p)) <= 13 )
 		goto st38;
 	goto tr12;
-st158:
+st175:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof158;
-case 158:
+		goto _test_eof175;
+case 175:
 	switch( (*( f.p)) ) {
-		case 32: goto st158;
-		case 46: goto tr189;
+		case 32: goto st175;
+		case 46: goto tr209;
 	}
 	if ( (*( f.p)) > 13 ) {
 		if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-			goto tr189;
+			goto tr209;
 	} else if ( (*( f.p)) >= 9 )
-		goto st158;
-	goto tr188;
-tr189:
+		goto st175;
+	goto tr208;
+tr209:
 #line 20 "../src/parsers/map.c.rl"
 	{
         lmargin[2] = ( f.p);
     }
-	goto st159;
-st159:
+	goto st176;
+st176:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof159;
-case 159:
-#line 901 "../src/parsers/map.c"
+		goto _test_eof176;
+case 176:
+#line 911 "../src/parsers/map.c"
 	if ( (*( f.p)) == 46 )
-		goto st159;
+		goto st176;
 	if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-		goto st159;
-	goto tr190;
-tr168:
+		goto st176;
+	goto tr210;
+tr187:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
 #line 52 "../src/parsers/map.c.rl"
 	{
         lmargin[10] = ( f.p);
     }
-	goto st160;
-st160:
+	goto st177;
+st177:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof160;
-case 160:
-#line 919 "../src/parsers/map.c"
+		goto _test_eof177;
+case 177:
+#line 929 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
 		case 100: goto st39;
 		case 108: goto st55;
 		case 115: goto st64;
 		case 116: goto st106;
 	}
-	goto tr173;
+	goto tr193;
 st39:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof39;
@@ -1464,19 +1474,19 @@ case 95:
 tr100:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
-	goto st161;
-st161:
+	goto st178;
+st178:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof161;
-case 161:
-#line 1473 "../src/parsers/map.c"
+		goto _test_eof178;
+case 178:
+#line 1483 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
 		case 32: goto st96;
 		case 60: goto st97;
 	}
 	if ( 9 <= (*( f.p)) && (*( f.p)) <= 13 )
 		goto st96;
-	goto tr196;
+	goto tr216;
 st96:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof96;
@@ -1691,7 +1701,7 @@ tr125:
 	{
         lmargin[4] = ( f.p);
     }
-#line 70 "../src/parsers/map.c.rl"
+#line 78 "../src/parsers/map.c.rl"
 	{
         f.cap[2].ptr = ( f.p);
     }
@@ -1700,7 +1710,7 @@ st121:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof121;
 case 121:
-#line 1704 "../src/parsers/map.c"
+#line 1714 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
 		case 40: goto tr129;
 		case 60: goto tr130;
@@ -1712,26 +1722,26 @@ tr126:
 	{
         lmargin[4] = ( f.p);
     }
-#line 70 "../src/parsers/map.c.rl"
+#line 78 "../src/parsers/map.c.rl"
 	{
         f.cap[2].ptr = ( f.p);
     }
-#line 74 "../src/parsers/map.c.rl"
+#line 82 "../src/parsers/map.c.rl"
 	{
-        f.cap[2].len = (size_t)(( f.p) - f.cap[2].ptr);
+        SLICE_SET_END(f.cap[2], ( f.p));
     }
 	goto st122;
 tr129:
-#line 74 "../src/parsers/map.c.rl"
+#line 82 "../src/parsers/map.c.rl"
 	{
-        f.cap[2].len = (size_t)(( f.p) - f.cap[2].ptr);
+        SLICE_SET_END(f.cap[2], ( f.p));
     }
 	goto st122;
 st122:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof122;
 case 122:
-#line 1735 "../src/parsers/map.c"
+#line 1745 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
 		case 40: goto tr129;
 		case 41: goto st121;
@@ -1765,22 +1775,22 @@ case 124:
 	if ( 9 <= (*( f.p)) && (*( f.p)) <= 13 )
 		goto st124;
 	goto st121;
-tr169:
+tr188:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
-	goto st162;
-st162:
+	goto st179;
+st179:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof162;
-case 162:
-#line 1777 "../src/parsers/map.c"
+		goto _test_eof179;
+case 179:
+#line 1787 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
 		case 13: goto st127;
 		case 32: goto st125;
 	}
 	if ( 9 <= (*( f.p)) && (*( f.p)) <= 12 )
 		goto st125;
-	goto tr173;
+	goto tr193;
 st125:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof125;
@@ -1800,7 +1810,7 @@ st126:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof126;
 case 126:
-#line 1804 "../src/parsers/map.c"
+#line 1814 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
 		case 32: goto st126;
 		case 60: goto tr137;
@@ -1829,7 +1839,7 @@ st128:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof128;
 case 128:
-#line 1833 "../src/parsers/map.c"
+#line 1843 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
 		case 32: goto tr135;
 		case 60: goto tr137;
@@ -1837,334 +1847,502 @@ case 128:
 	if ( 9 <= (*( f.p)) && (*( f.p)) <= 13 )
 		goto tr135;
 	goto tr12;
-tr170:
+tr189:
 #line 1 "NONE"
 	{ f.te = ( f.p)+1;}
-#line 40 "../src/parsers/map.c.rl"
-	{
-        lmargin[7] = ( f.p);
-    }
-	goto st163;
-st163:
+	goto st180;
+st180:
 	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof163;
-case 163:
-#line 1853 "../src/parsers/map.c"
-	if ( (*( f.p)) == 95 )
-		goto st11;
-	goto tr173;
-tr171:
-#line 1 "NONE"
-	{ f.te = ( f.p)+1;}
-	goto st164;
-st164:
-	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof164;
-case 164:
-#line 1865 "../src/parsers/map.c"
-	if ( (*( f.p)) == 101 )
+		goto _test_eof180;
+case 180:
+#line 1859 "../src/parsers/map.c"
+	if ( (*( f.p)) == 108 )
 		goto st129;
-	goto tr173;
+	goto tr193;
 st129:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof129;
 case 129:
-	if ( (*( f.p)) == 105 )
+	if ( (*( f.p)) == 111 )
 		goto st130;
 	goto tr12;
 st130:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof130;
 case 130:
-	if ( (*( f.p)) == 103 )
+	if ( (*( f.p)) == 99 )
 		goto st131;
 	goto tr12;
 st131:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof131;
 case 131:
-	if ( (*( f.p)) == 104 )
+	if ( (*( f.p)) == 107 )
 		goto st132;
 	goto tr12;
 st132:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof132;
 case 132:
-	if ( (*( f.p)) == 116 )
+	if ( (*( f.p)) == 95 )
 		goto st133;
 	goto tr12;
 st133:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof133;
 case 133:
-	switch( (*( f.p)) ) {
-		case 58: goto st165;
-		case 61: goto st165;
-	}
-	goto tr12;
-st165:
-	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof165;
-case 165:
-	switch( (*( f.p)) ) {
-		case 32: goto tr201;
-		case 34: goto st168;
-		case 46: goto tr203;
-	}
-	if ( (*( f.p)) > 13 ) {
-		if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-			goto tr203;
-	} else if ( (*( f.p)) >= 9 )
-		goto tr201;
-	goto tr200;
-tr201:
-#line 16 "../src/parsers/map.c.rl"
-	{
-        lmargin[1] = ( f.p);
-    }
-	goto st166;
-st166:
-	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof166;
-case 166:
-#line 1931 "../src/parsers/map.c"
-	switch( (*( f.p)) ) {
-		case 32: goto st166;
-		case 46: goto tr206;
-	}
-	if ( (*( f.p)) > 13 ) {
-		if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-			goto tr206;
-	} else if ( (*( f.p)) >= 9 )
-		goto st166;
-	goto tr204;
-tr206:
-#line 70 "../src/parsers/map.c.rl"
-	{
-        f.cap[2].ptr = ( f.p);
-    }
-	goto st167;
-tr203:
-#line 16 "../src/parsers/map.c.rl"
-	{
-        lmargin[1] = ( f.p);
-    }
-#line 70 "../src/parsers/map.c.rl"
-	{
-        f.cap[2].ptr = ( f.p);
-    }
-	goto st167;
-st167:
-	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof167;
-case 167:
-#line 1962 "../src/parsers/map.c"
-	if ( (*( f.p)) == 46 )
-		goto st167;
-	if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-		goto st167;
-	goto tr207;
-st168:
-	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof168;
-case 168:
-	switch( (*( f.p)) ) {
-		case 32: goto tr201;
-		case 46: goto tr203;
-	}
-	if ( (*( f.p)) > 13 ) {
-		if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-			goto tr203;
-	} else if ( (*( f.p)) >= 9 )
-		goto tr201;
-	goto tr200;
-tr172:
-#line 1 "NONE"
-	{ f.te = ( f.p)+1;}
-	goto st169;
-st169:
-	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof169;
-case 169:
-#line 1990 "../src/parsers/map.c"
-	if ( (*( f.p)) == 114 )
+	if ( (*( f.p)) == 116 )
 		goto st134;
-	goto tr173;
+	goto tr12;
 st134:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof134;
 case 134:
-	if ( (*( f.p)) == 97 )
+	if ( (*( f.p)) == 105 )
 		goto st135;
 	goto tr12;
 st135:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof135;
 case 135:
-	if ( (*( f.p)) == 110 )
+	if ( (*( f.p)) == 116 )
 		goto st136;
 	goto tr12;
 st136:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof136;
 case 136:
-	if ( (*( f.p)) == 115 )
+	if ( (*( f.p)) == 108 )
 		goto st137;
 	goto tr12;
 st137:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof137;
 case 137:
-	if ( (*( f.p)) == 108 )
+	if ( (*( f.p)) == 101 )
 		goto st138;
 	goto tr12;
 st138:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof138;
 case 138:
-	if ( (*( f.p)) == 97 )
+	if ( (*( f.p)) == 34 )
 		goto st139;
-	goto tr12;
+	goto st138;
 st139:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof139;
 case 139:
-	if ( (*( f.p)) == 116 )
-		goto st140;
-	goto tr12;
+	switch( (*( f.p)) ) {
+		case 60: goto tr12;
+		case 62: goto st140;
+	}
+	goto st139;
+tr150:
+#line 56 "../src/parsers/map.c.rl"
+	{
+        lmargin[11] = ( f.p);
+    }
+	goto st140;
 st140:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof140;
 case 140:
-	if ( (*( f.p)) == 101 )
-		goto st141;
-	goto tr12;
+#line 1952 "../src/parsers/map.c"
+	switch( (*( f.p)) ) {
+		case 32: goto tr150;
+		case 40: goto tr151;
+		case 60: goto tr12;
+		case 62: goto tr12;
+	}
+	if ( 9 <= (*( f.p)) && (*( f.p)) <= 13 )
+		goto tr150;
+	goto st140;
+tr151:
+#line 56 "../src/parsers/map.c.rl"
+	{
+        lmargin[11] = ( f.p);
+    }
+	goto st141;
 st141:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof141;
 case 141:
-	switch( (*( f.p)) ) {
-		case 32: goto st141;
-		case 40: goto tr151;
-	}
-	if ( 9 <= (*( f.p)) && (*( f.p)) <= 13 )
-		goto st141;
-	goto tr12;
-tr151:
-#line 24 "../src/parsers/map.c.rl"
+#line 1972 "../src/parsers/map.c"
+	if ( (*( f.p)) == 60 )
+		goto tr153;
+	goto st141;
+tr153:
+#line 64 "../src/parsers/map.c.rl"
 	{
-        lmargin[3] = ( f.p);
-    }
-#line 56 "../src/parsers/map.c.rl"
-	{
-        rmargin3 = ( f.p);
+        rmargin11 = ( f.p);
     }
 	goto st142;
 st142:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof142;
 case 142:
-#line 2068 "../src/parsers/map.c"
+#line 1986 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
-		case 32: goto st142;
-		case 44: goto tr153;
+		case 47: goto st143;
+		case 60: goto tr153;
 	}
-	if ( (*( f.p)) < 45 ) {
-		if ( 9 <= (*( f.p)) && (*( f.p)) <= 13 )
-			goto st142;
-	} else if ( (*( f.p)) > 46 ) {
-		if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-			goto tr154;
-	} else
-		goto tr154;
-	goto tr12;
-tr156:
-#line 74 "../src/parsers/map.c.rl"
-	{
-        f.cap[2].len = (size_t)(( f.p) - f.cap[2].ptr);
-    }
-	goto st170;
-tr153:
-#line 70 "../src/parsers/map.c.rl"
-	{
-        f.cap[2].ptr = ( f.p);
-    }
-#line 74 "../src/parsers/map.c.rl"
-	{
-        f.cap[2].len = (size_t)(( f.p) - f.cap[2].ptr);
-    }
-	goto st170;
-st170:
-	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof170;
-case 170:
-#line 2102 "../src/parsers/map.c"
-	if ( (*( f.p)) == 32 )
-		goto st170;
-	if ( (*( f.p)) < 45 ) {
-		if ( 9 <= (*( f.p)) && (*( f.p)) <= 13 )
-			goto st170;
-	} else if ( (*( f.p)) > 46 ) {
-		if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-			goto tr211;
-	} else
-		goto tr211;
-	goto tr210;
-tr211:
-#line 78 "../src/parsers/map.c.rl"
-	{
-        f.cap[3].ptr = ( f.p);
-    }
-	goto st171;
-st171:
-	if ( ++( f.p) == ( f.pe) )
-		goto _test_eof171;
-case 171:
-#line 2124 "../src/parsers/map.c"
-	if ( (*( f.p)) == 46 )
-		goto st171;
-	if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-		goto st171;
-	goto tr212;
-tr154:
-#line 70 "../src/parsers/map.c.rl"
-	{
-        f.cap[2].ptr = ( f.p);
-    }
-	goto st143;
+	goto st141;
 st143:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof143;
 case 143:
-#line 2140 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
-		case 32: goto tr155;
-		case 44: goto tr156;
-		case 46: goto st143;
+		case 60: goto tr153;
+		case 104: goto st144;
 	}
-	if ( (*( f.p)) > 13 ) {
-		if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
-			goto st143;
-	} else if ( (*( f.p)) >= 9 )
-		goto tr155;
-	goto tr12;
-tr155:
-#line 74 "../src/parsers/map.c.rl"
-	{
-        f.cap[2].len = (size_t)(( f.p) - f.cap[2].ptr);
-    }
-	goto st144;
+	goto st141;
 st144:
 	if ( ++( f.p) == ( f.pe) )
 		goto _test_eof144;
 case 144:
-#line 2162 "../src/parsers/map.c"
 	switch( (*( f.p)) ) {
-		case 32: goto st144;
-		case 44: goto st170;
+		case 50: goto st145;
+		case 60: goto tr153;
+	}
+	goto st141;
+st145:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof145;
+case 145:
+	switch( (*( f.p)) ) {
+		case 60: goto tr153;
+		case 62: goto tr157;
+	}
+	goto st141;
+tr190:
+#line 1 "NONE"
+	{ f.te = ( f.p)+1;}
+#line 40 "../src/parsers/map.c.rl"
+	{
+        lmargin[7] = ( f.p);
+    }
+	goto st181;
+st181:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof181;
+case 181:
+#line 2031 "../src/parsers/map.c"
+	if ( (*( f.p)) == 95 )
+		goto st11;
+	goto tr193;
+tr191:
+#line 1 "NONE"
+	{ f.te = ( f.p)+1;}
+	goto st182;
+st182:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof182;
+case 182:
+#line 2043 "../src/parsers/map.c"
+	if ( (*( f.p)) == 101 )
+		goto st146;
+	goto tr193;
+st146:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof146;
+case 146:
+	if ( (*( f.p)) == 105 )
+		goto st147;
+	goto tr12;
+st147:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof147;
+case 147:
+	if ( (*( f.p)) == 103 )
+		goto st148;
+	goto tr12;
+st148:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof148;
+case 148:
+	if ( (*( f.p)) == 104 )
+		goto st149;
+	goto tr12;
+st149:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof149;
+case 149:
+	if ( (*( f.p)) == 116 )
+		goto st150;
+	goto tr12;
+st150:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof150;
+case 150:
+	switch( (*( f.p)) ) {
+		case 58: goto st183;
+		case 61: goto st183;
+	}
+	goto tr12;
+st183:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof183;
+case 183:
+	switch( (*( f.p)) ) {
+		case 32: goto tr222;
+		case 34: goto st186;
+		case 46: goto tr224;
+	}
+	if ( (*( f.p)) > 13 ) {
+		if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
+			goto tr224;
+	} else if ( (*( f.p)) >= 9 )
+		goto tr222;
+	goto tr221;
+tr222:
+#line 16 "../src/parsers/map.c.rl"
+	{
+        lmargin[1] = ( f.p);
+    }
+	goto st184;
+st184:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof184;
+case 184:
+#line 2109 "../src/parsers/map.c"
+	switch( (*( f.p)) ) {
+		case 32: goto st184;
+		case 46: goto tr227;
+	}
+	if ( (*( f.p)) > 13 ) {
+		if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
+			goto tr227;
+	} else if ( (*( f.p)) >= 9 )
+		goto st184;
+	goto tr225;
+tr227:
+#line 78 "../src/parsers/map.c.rl"
+	{
+        f.cap[2].ptr = ( f.p);
+    }
+	goto st185;
+tr224:
+#line 16 "../src/parsers/map.c.rl"
+	{
+        lmargin[1] = ( f.p);
+    }
+#line 78 "../src/parsers/map.c.rl"
+	{
+        f.cap[2].ptr = ( f.p);
+    }
+	goto st185;
+st185:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof185;
+case 185:
+#line 2140 "../src/parsers/map.c"
+	if ( (*( f.p)) == 46 )
+		goto st185;
+	if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
+		goto st185;
+	goto tr228;
+st186:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof186;
+case 186:
+	switch( (*( f.p)) ) {
+		case 32: goto tr222;
+		case 46: goto tr224;
+	}
+	if ( (*( f.p)) > 13 ) {
+		if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
+			goto tr224;
+	} else if ( (*( f.p)) >= 9 )
+		goto tr222;
+	goto tr221;
+tr192:
+#line 1 "NONE"
+	{ f.te = ( f.p)+1;}
+	goto st187;
+st187:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof187;
+case 187:
+#line 2168 "../src/parsers/map.c"
+	if ( (*( f.p)) == 114 )
+		goto st151;
+	goto tr193;
+st151:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof151;
+case 151:
+	if ( (*( f.p)) == 97 )
+		goto st152;
+	goto tr12;
+st152:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof152;
+case 152:
+	if ( (*( f.p)) == 110 )
+		goto st153;
+	goto tr12;
+st153:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof153;
+case 153:
+	if ( (*( f.p)) == 115 )
+		goto st154;
+	goto tr12;
+st154:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof154;
+case 154:
+	if ( (*( f.p)) == 108 )
+		goto st155;
+	goto tr12;
+st155:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof155;
+case 155:
+	if ( (*( f.p)) == 97 )
+		goto st156;
+	goto tr12;
+st156:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof156;
+case 156:
+	if ( (*( f.p)) == 116 )
+		goto st157;
+	goto tr12;
+st157:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof157;
+case 157:
+	if ( (*( f.p)) == 101 )
+		goto st158;
+	goto tr12;
+st158:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof158;
+case 158:
+	switch( (*( f.p)) ) {
+		case 32: goto st158;
+		case 40: goto tr170;
 	}
 	if ( 9 <= (*( f.p)) && (*( f.p)) <= 13 )
-		goto st144;
+		goto st158;
+	goto tr12;
+tr170:
+#line 24 "../src/parsers/map.c.rl"
+	{
+        lmargin[3] = ( f.p);
+    }
+#line 60 "../src/parsers/map.c.rl"
+	{
+        rmargin3 = ( f.p);
+    }
+	goto st159;
+st159:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof159;
+case 159:
+#line 2246 "../src/parsers/map.c"
+	switch( (*( f.p)) ) {
+		case 32: goto st159;
+		case 44: goto tr172;
+	}
+	if ( (*( f.p)) < 45 ) {
+		if ( 9 <= (*( f.p)) && (*( f.p)) <= 13 )
+			goto st159;
+	} else if ( (*( f.p)) > 46 ) {
+		if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
+			goto tr173;
+	} else
+		goto tr173;
+	goto tr12;
+tr175:
+#line 82 "../src/parsers/map.c.rl"
+	{
+        SLICE_SET_END(f.cap[2], ( f.p));
+    }
+	goto st188;
+tr172:
+#line 78 "../src/parsers/map.c.rl"
+	{
+        f.cap[2].ptr = ( f.p);
+    }
+#line 82 "../src/parsers/map.c.rl"
+	{
+        SLICE_SET_END(f.cap[2], ( f.p));
+    }
+	goto st188;
+st188:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof188;
+case 188:
+#line 2280 "../src/parsers/map.c"
+	if ( (*( f.p)) == 32 )
+		goto st188;
+	if ( (*( f.p)) < 45 ) {
+		if ( 9 <= (*( f.p)) && (*( f.p)) <= 13 )
+			goto st188;
+	} else if ( (*( f.p)) > 46 ) {
+		if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
+			goto tr232;
+	} else
+		goto tr232;
+	goto tr231;
+tr232:
+#line 86 "../src/parsers/map.c.rl"
+	{
+        f.cap[3].ptr = ( f.p);
+    }
+	goto st189;
+st189:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof189;
+case 189:
+#line 2302 "../src/parsers/map.c"
+	if ( (*( f.p)) == 46 )
+		goto st189;
+	if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
+		goto st189;
+	goto tr233;
+tr173:
+#line 78 "../src/parsers/map.c.rl"
+	{
+        f.cap[2].ptr = ( f.p);
+    }
+	goto st160;
+st160:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof160;
+case 160:
+#line 2318 "../src/parsers/map.c"
+	switch( (*( f.p)) ) {
+		case 32: goto tr174;
+		case 44: goto tr175;
+		case 46: goto st160;
+	}
+	if ( (*( f.p)) > 13 ) {
+		if ( 48 <= (*( f.p)) && (*( f.p)) <= 57 )
+			goto st160;
+	} else if ( (*( f.p)) >= 9 )
+		goto tr174;
+	goto tr12;
+tr174:
+#line 82 "../src/parsers/map.c.rl"
+	{
+        SLICE_SET_END(f.cap[2], ( f.p));
+    }
+	goto st161;
+st161:
+	if ( ++( f.p) == ( f.pe) )
+		goto _test_eof161;
+case 161:
+#line 2340 "../src/parsers/map.c"
+	switch( (*( f.p)) ) {
+		case 32: goto st161;
+		case 44: goto st188;
+	}
+	if ( 9 <= (*( f.p)) && (*( f.p)) <= 13 )
+		goto st161;
 	goto tr12;
 	}
 	_test_eof1:  f.cs = 1; goto _test_eof; 
@@ -2175,10 +2353,10 @@ case 144:
 	_test_eof6:  f.cs = 6; goto _test_eof; 
 	_test_eof7:  f.cs = 7; goto _test_eof; 
 	_test_eof8:  f.cs = 8; goto _test_eof; 
-	_test_eof145:  f.cs = 145; goto _test_eof; 
+	_test_eof162:  f.cs = 162; goto _test_eof; 
 	_test_eof9:  f.cs = 9; goto _test_eof; 
-	_test_eof146:  f.cs = 146; goto _test_eof; 
-	_test_eof147:  f.cs = 147; goto _test_eof; 
+	_test_eof163:  f.cs = 163; goto _test_eof; 
+	_test_eof164:  f.cs = 164; goto _test_eof; 
 	_test_eof10:  f.cs = 10; goto _test_eof; 
 	_test_eof11:  f.cs = 11; goto _test_eof; 
 	_test_eof12:  f.cs = 12; goto _test_eof; 
@@ -2187,40 +2365,40 @@ case 144:
 	_test_eof15:  f.cs = 15; goto _test_eof; 
 	_test_eof16:  f.cs = 16; goto _test_eof; 
 	_test_eof17:  f.cs = 17; goto _test_eof; 
-	_test_eof148:  f.cs = 148; goto _test_eof; 
+	_test_eof165:  f.cs = 165; goto _test_eof; 
 	_test_eof18:  f.cs = 18; goto _test_eof; 
-	_test_eof149:  f.cs = 149; goto _test_eof; 
+	_test_eof166:  f.cs = 166; goto _test_eof; 
 	_test_eof19:  f.cs = 19; goto _test_eof; 
 	_test_eof20:  f.cs = 20; goto _test_eof; 
 	_test_eof21:  f.cs = 21; goto _test_eof; 
 	_test_eof22:  f.cs = 22; goto _test_eof; 
 	_test_eof23:  f.cs = 23; goto _test_eof; 
-	_test_eof150:  f.cs = 150; goto _test_eof; 
-	_test_eof151:  f.cs = 151; goto _test_eof; 
+	_test_eof167:  f.cs = 167; goto _test_eof; 
+	_test_eof168:  f.cs = 168; goto _test_eof; 
 	_test_eof24:  f.cs = 24; goto _test_eof; 
 	_test_eof25:  f.cs = 25; goto _test_eof; 
-	_test_eof152:  f.cs = 152; goto _test_eof; 
+	_test_eof169:  f.cs = 169; goto _test_eof; 
 	_test_eof26:  f.cs = 26; goto _test_eof; 
 	_test_eof27:  f.cs = 27; goto _test_eof; 
-	_test_eof153:  f.cs = 153; goto _test_eof; 
+	_test_eof170:  f.cs = 170; goto _test_eof; 
 	_test_eof28:  f.cs = 28; goto _test_eof; 
 	_test_eof29:  f.cs = 29; goto _test_eof; 
-	_test_eof154:  f.cs = 154; goto _test_eof; 
-	_test_eof155:  f.cs = 155; goto _test_eof; 
+	_test_eof171:  f.cs = 171; goto _test_eof; 
+	_test_eof172:  f.cs = 172; goto _test_eof; 
 	_test_eof30:  f.cs = 30; goto _test_eof; 
 	_test_eof31:  f.cs = 31; goto _test_eof; 
 	_test_eof32:  f.cs = 32; goto _test_eof; 
-	_test_eof156:  f.cs = 156; goto _test_eof; 
-	_test_eof157:  f.cs = 157; goto _test_eof; 
+	_test_eof173:  f.cs = 173; goto _test_eof; 
+	_test_eof174:  f.cs = 174; goto _test_eof; 
 	_test_eof33:  f.cs = 33; goto _test_eof; 
 	_test_eof34:  f.cs = 34; goto _test_eof; 
 	_test_eof35:  f.cs = 35; goto _test_eof; 
 	_test_eof36:  f.cs = 36; goto _test_eof; 
 	_test_eof37:  f.cs = 37; goto _test_eof; 
 	_test_eof38:  f.cs = 38; goto _test_eof; 
-	_test_eof158:  f.cs = 158; goto _test_eof; 
-	_test_eof159:  f.cs = 159; goto _test_eof; 
-	_test_eof160:  f.cs = 160; goto _test_eof; 
+	_test_eof175:  f.cs = 175; goto _test_eof; 
+	_test_eof176:  f.cs = 176; goto _test_eof; 
+	_test_eof177:  f.cs = 177; goto _test_eof; 
 	_test_eof39:  f.cs = 39; goto _test_eof; 
 	_test_eof40:  f.cs = 40; goto _test_eof; 
 	_test_eof41:  f.cs = 41; goto _test_eof; 
@@ -2278,7 +2456,7 @@ case 144:
 	_test_eof93:  f.cs = 93; goto _test_eof; 
 	_test_eof94:  f.cs = 94; goto _test_eof; 
 	_test_eof95:  f.cs = 95; goto _test_eof; 
-	_test_eof161:  f.cs = 161; goto _test_eof; 
+	_test_eof178:  f.cs = 178; goto _test_eof; 
 	_test_eof96:  f.cs = 96; goto _test_eof; 
 	_test_eof97:  f.cs = 97; goto _test_eof; 
 	_test_eof98:  f.cs = 98; goto _test_eof; 
@@ -2308,23 +2486,17 @@ case 144:
 	_test_eof122:  f.cs = 122; goto _test_eof; 
 	_test_eof123:  f.cs = 123; goto _test_eof; 
 	_test_eof124:  f.cs = 124; goto _test_eof; 
-	_test_eof162:  f.cs = 162; goto _test_eof; 
+	_test_eof179:  f.cs = 179; goto _test_eof; 
 	_test_eof125:  f.cs = 125; goto _test_eof; 
 	_test_eof126:  f.cs = 126; goto _test_eof; 
 	_test_eof127:  f.cs = 127; goto _test_eof; 
 	_test_eof128:  f.cs = 128; goto _test_eof; 
-	_test_eof163:  f.cs = 163; goto _test_eof; 
-	_test_eof164:  f.cs = 164; goto _test_eof; 
+	_test_eof180:  f.cs = 180; goto _test_eof; 
 	_test_eof129:  f.cs = 129; goto _test_eof; 
 	_test_eof130:  f.cs = 130; goto _test_eof; 
 	_test_eof131:  f.cs = 131; goto _test_eof; 
 	_test_eof132:  f.cs = 132; goto _test_eof; 
 	_test_eof133:  f.cs = 133; goto _test_eof; 
-	_test_eof165:  f.cs = 165; goto _test_eof; 
-	_test_eof166:  f.cs = 166; goto _test_eof; 
-	_test_eof167:  f.cs = 167; goto _test_eof; 
-	_test_eof168:  f.cs = 168; goto _test_eof; 
-	_test_eof169:  f.cs = 169; goto _test_eof; 
 	_test_eof134:  f.cs = 134; goto _test_eof; 
 	_test_eof135:  f.cs = 135; goto _test_eof; 
 	_test_eof136:  f.cs = 136; goto _test_eof; 
@@ -2334,16 +2506,40 @@ case 144:
 	_test_eof140:  f.cs = 140; goto _test_eof; 
 	_test_eof141:  f.cs = 141; goto _test_eof; 
 	_test_eof142:  f.cs = 142; goto _test_eof; 
-	_test_eof170:  f.cs = 170; goto _test_eof; 
-	_test_eof171:  f.cs = 171; goto _test_eof; 
 	_test_eof143:  f.cs = 143; goto _test_eof; 
 	_test_eof144:  f.cs = 144; goto _test_eof; 
+	_test_eof145:  f.cs = 145; goto _test_eof; 
+	_test_eof181:  f.cs = 181; goto _test_eof; 
+	_test_eof182:  f.cs = 182; goto _test_eof; 
+	_test_eof146:  f.cs = 146; goto _test_eof; 
+	_test_eof147:  f.cs = 147; goto _test_eof; 
+	_test_eof148:  f.cs = 148; goto _test_eof; 
+	_test_eof149:  f.cs = 149; goto _test_eof; 
+	_test_eof150:  f.cs = 150; goto _test_eof; 
+	_test_eof183:  f.cs = 183; goto _test_eof; 
+	_test_eof184:  f.cs = 184; goto _test_eof; 
+	_test_eof185:  f.cs = 185; goto _test_eof; 
+	_test_eof186:  f.cs = 186; goto _test_eof; 
+	_test_eof187:  f.cs = 187; goto _test_eof; 
+	_test_eof151:  f.cs = 151; goto _test_eof; 
+	_test_eof152:  f.cs = 152; goto _test_eof; 
+	_test_eof153:  f.cs = 153; goto _test_eof; 
+	_test_eof154:  f.cs = 154; goto _test_eof; 
+	_test_eof155:  f.cs = 155; goto _test_eof; 
+	_test_eof156:  f.cs = 156; goto _test_eof; 
+	_test_eof157:  f.cs = 157; goto _test_eof; 
+	_test_eof158:  f.cs = 158; goto _test_eof; 
+	_test_eof159:  f.cs = 159; goto _test_eof; 
+	_test_eof188:  f.cs = 188; goto _test_eof; 
+	_test_eof189:  f.cs = 189; goto _test_eof; 
+	_test_eof160:  f.cs = 160; goto _test_eof; 
+	_test_eof161:  f.cs = 161; goto _test_eof; 
 
 	_test_eof: {}
 	if ( ( f.p) == eof )
 	{
 	switch (  f.cs ) {
-	case 147: goto tr173;
+	case 164: goto tr193;
 	case 10: goto tr12;
 	case 11: goto tr12;
 	case 12: goto tr12;
@@ -2352,40 +2548,40 @@ case 144:
 	case 15: goto tr12;
 	case 16: goto tr12;
 	case 17: goto tr12;
-	case 148: goto tr173;
+	case 165: goto tr193;
 	case 18: goto tr12;
-	case 149: goto tr173;
+	case 166: goto tr193;
 	case 19: goto tr12;
 	case 20: goto tr12;
 	case 21: goto tr24;
 	case 22: goto tr24;
 	case 23: goto tr24;
-	case 150: goto tr176;
-	case 151: goto tr173;
+	case 167: goto tr196;
+	case 168: goto tr193;
 	case 24: goto tr12;
 	case 25: goto tr12;
-	case 152: goto tr180;
+	case 169: goto tr200;
 	case 26: goto tr12;
 	case 27: goto tr12;
-	case 153: goto tr182;
+	case 170: goto tr202;
 	case 28: goto tr12;
 	case 29: goto tr12;
-	case 154: goto tr184;
-	case 155: goto tr173;
+	case 171: goto tr204;
+	case 172: goto tr193;
 	case 30: goto tr12;
 	case 31: goto tr12;
 	case 32: goto tr12;
-	case 156: goto tr187;
-	case 157: goto tr173;
+	case 173: goto tr207;
+	case 174: goto tr193;
 	case 33: goto tr12;
 	case 34: goto tr12;
 	case 35: goto tr12;
 	case 36: goto tr12;
 	case 37: goto tr12;
 	case 38: goto tr12;
-	case 158: goto tr188;
-	case 159: goto tr190;
-	case 160: goto tr173;
+	case 175: goto tr208;
+	case 176: goto tr210;
+	case 177: goto tr193;
 	case 39: goto tr12;
 	case 40: goto tr12;
 	case 41: goto tr12;
@@ -2443,7 +2639,7 @@ case 144:
 	case 93: goto tr12;
 	case 94: goto tr12;
 	case 95: goto tr12;
-	case 161: goto tr196;
+	case 178: goto tr216;
 	case 96: goto tr101;
 	case 97: goto tr101;
 	case 98: goto tr101;
@@ -2473,23 +2669,17 @@ case 144:
 	case 122: goto tr12;
 	case 123: goto tr12;
 	case 124: goto tr12;
-	case 162: goto tr173;
+	case 179: goto tr193;
 	case 125: goto tr12;
 	case 126: goto tr12;
 	case 127: goto tr12;
 	case 128: goto tr12;
-	case 163: goto tr173;
-	case 164: goto tr173;
+	case 180: goto tr193;
 	case 129: goto tr12;
 	case 130: goto tr12;
 	case 131: goto tr12;
 	case 132: goto tr12;
 	case 133: goto tr12;
-	case 165: goto tr200;
-	case 166: goto tr204;
-	case 167: goto tr207;
-	case 168: goto tr200;
-	case 169: goto tr173;
 	case 134: goto tr12;
 	case 135: goto tr12;
 	case 136: goto tr12;
@@ -2499,23 +2689,47 @@ case 144:
 	case 140: goto tr12;
 	case 141: goto tr12;
 	case 142: goto tr12;
-	case 170: goto tr210;
-	case 171: goto tr212;
 	case 143: goto tr12;
 	case 144: goto tr12;
+	case 145: goto tr12;
+	case 181: goto tr193;
+	case 182: goto tr193;
+	case 146: goto tr12;
+	case 147: goto tr12;
+	case 148: goto tr12;
+	case 149: goto tr12;
+	case 150: goto tr12;
+	case 183: goto tr221;
+	case 184: goto tr225;
+	case 185: goto tr228;
+	case 186: goto tr221;
+	case 187: goto tr193;
+	case 151: goto tr12;
+	case 152: goto tr12;
+	case 153: goto tr12;
+	case 154: goto tr12;
+	case 155: goto tr12;
+	case 156: goto tr12;
+	case 157: goto tr12;
+	case 158: goto tr12;
+	case 159: goto tr12;
+	case 188: goto tr231;
+	case 189: goto tr233;
+	case 160: goto tr12;
+	case 161: goto tr12;
 	}
 	}
 
 	_out: {}
 	}
 
-#line 239 "../src/parsers/map.c.rl"
+#line 257 "../src/parsers/map.c.rl"
     f.cap[0].len = (size_t)(lmargin[f.branch] - f.cap[0].ptr);
     *fsm = f;
 
     if (f.cs == 0)
         return FSM_ERROR;
-    if (f.cs >= 145)
+    if (f.cs >= 162)
         return FSM_OK;
     return FSM_INCOMPLETE;
 }

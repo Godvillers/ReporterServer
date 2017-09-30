@@ -14,6 +14,13 @@ struct StringSlice
     alias arr this
 
 
+struct Player
+    StringSlice godName
+    StringSlice heroName
+    StringSlice curHp
+    StringSlice maxHp
+
+
 struct FsmState
     const(char)* p//inout
     const(char)* pe//in
@@ -23,6 +30,7 @@ struct FsmState
     int cs//internal
     ubyte branch//out
     StringSlice[4] cap//out
+    Player[4] players//out
 
 
 extern (C) nothrow pure @nogc

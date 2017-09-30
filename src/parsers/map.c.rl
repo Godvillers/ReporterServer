@@ -1,6 +1,6 @@
 #include "parsers/parsers.h"
 
-enum { BRANCHES = 10 };
+enum { BRANCHES = 11 };
 
 %%{
     machine map;
@@ -53,8 +53,16 @@ enum { BRANCHES = 10 };
         lmargin[10] = fpc;
     }
 
+    action setLMargin11 {
+        lmargin[11] = fpc;
+    }
+
     action setRMargin3 {
         rmargin3 = fpc;
+    }
+
+    action setRMargin11 {
+        rmargin11 = fpc;
     }
 
     action startCap1 {
@@ -62,7 +70,7 @@ enum { BRANCHES = 10 };
     }
 
     action endCap1 {
-        f.cap[1].len = (size_t)(fpc - f.cap[1].ptr);
+        SLICE_SET_END(f.cap[1], fpc);
         fexec f.cap[0].ptr;//Restart from the beginning.
         fgoto scan;
     }
@@ -72,7 +80,7 @@ enum { BRANCHES = 10 };
     }
 
     action endCap2 {
-        f.cap[2].len = (size_t)(fpc - f.cap[2].ptr);
+        SLICE_SET_END(f.cap[2], fpc);
     }
 
     action startCap3 {
@@ -80,7 +88,7 @@ enum { BRANCHES = 10 };
     }
 
     action endCap3 {
-        f.cap[3].len = (size_t)(fpc - f.cap[3].ptr);
+        SLICE_SET_END(f.cap[3], fpc);
     }
 
     action accept1 {
@@ -135,6 +143,12 @@ enum { BRANCHES = 10 };
         fbreak;
     }
 
+    action accept11 {
+        f.branch = 11;
+        fexec rmargin11;
+        fbreak;
+    }
+
     ws =
         space | '\r\n';
 
@@ -162,6 +176,7 @@ enum { BRANCHES = 10 };
 
         # Branch 4.
         # Replace distance in a hexagon tooltip.
+        # TODO: Handle the case when there is no <title>.
         '<title>' %setLMargin4 %startCap2
         [^<>]* %endCap2 :>> (/\([^<>()]*/ :> digit /[^<>()]*\)/ ws* '<') => accept4;
 
@@ -206,6 +221,11 @@ enum { BRANCHES = 10 };
             any* :>> ('</span>' ws* '</span>')
         ) >setLMargin10 => accept10;
 
+        # Branch 11.
+        # Remove eGUI+'s info from the header.
+        /block_title[^"]*"[^<>]*>[^<>]*/ :>> (ws* '(') >setLMargin11
+        any* :>> '</h2>' >setRMargin11 => accept11;
+
         any;
     *|;
 
@@ -230,6 +250,7 @@ int32_t cParseMapExec(Fsm* fsm) {
     const char* const eof = f.pe;
     const char* lmargin[BRANCHES + 1] = { f.pe };
     const char* rmargin3 = f.p;
+    const char* rmargin11 = f.p;
     f.branch = 0;
     f.cap[0].ptr = f.p;
     %% write exec;

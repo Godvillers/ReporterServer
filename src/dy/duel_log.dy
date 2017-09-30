@@ -81,10 +81,7 @@ struct DuelLog
                     _buffer ~= `" target="_blank">▶</a>`
                     break
 
-                //TODO: Move this to the style sheet.
-                case 2: _buffer ~= "175px"; break
-                case 3: _buffer ~= "12px"; break
-                case 4, 5: break
+                case 2, 3, 4: break
         })
 
         double scale = 1
@@ -126,7 +123,7 @@ struct DuelLog
 
                 case 5: _buffer ~= '5'; break
                 case 6: _buffer ~= '0'; break
-                case 7, 8, 9, 10: break
+                case 7, 8, 9, 10, 11: break
         })
 
         _process!(log, cParseLogInit, cParseLogExec, (br, c) { })

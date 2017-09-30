@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define SLICE_SET_END(slice, pointer) ((slice).len = (size_t)((pointer) - (slice).ptr))
+
 enum {
     FSM_OK         = 0,
     FSM_ERROR      = 1,
@@ -15,6 +17,13 @@ typedef struct {
 } StringSlice;
 
 typedef struct {
+    StringSlice godName;
+    StringSlice heroName;
+    StringSlice curHp;
+    StringSlice maxHp;
+} Player;
+
+typedef struct {
     const char* p;//inout
     const char* pe;//in
     const char* ts;//internal
@@ -23,6 +32,7 @@ typedef struct {
     int32_t cs;//internal
     uint8_t branch;//out
     StringSlice cap[4];//out
+    Player players[4];//out
 } Fsm;
 
 #ifdef __cplusplus
