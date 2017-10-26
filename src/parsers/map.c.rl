@@ -194,8 +194,8 @@ enum { BRANCHES = 11 };
         # Branch 7.
         (   # Replace .500xxx with .5.
             '.5' %setLMargin7 /00[0-9]*/
-            # Remove class="d_overlay" (possible move).
-        |   (ws? 'd_overlay') >setLMargin7
+            # Remove class="d_overlay" (possible move) and "e_ruler_anchor".
+        |   (ws? ('d_overlay' | 'e_ruler_anchor')) >setLMargin7
         ) => accept7;
 
         # Branch 8.
@@ -212,13 +212,15 @@ enum { BRANCHES = 11 };
         # Branch 10.
         (   # Remove empty <text> tags.
             /<text[^<>]*>/ ws* '</text>'
-            # Remove <line> tags (ark direction hint).
+            # Remove <line> tags (ark direction hint and eGUI+'s ruler).
         |   /<line.*/ :> '</line>'
             # Remove <div class="dir_resp"> tag (navigation response).
         |   /<div[^<>]*/ :>> 'dir_resp' any* :> '</div>'
             # Remove control buttons from the header.
         |   /<span[^<>]*class=[^<>=]*[lr]_slot[^<>]*>/
             any* :>> ('</span>' ws* '</span>')
+            # Remove eGUI+'s ruler tooltips.
+        |   /<g[^<>]*class=[^<>=]*e_ruler_tooltip[^<>]*>/ any* :>> '</g>'
         ) >setLMargin10 => accept10;
 
         # Branch 11.
