@@ -40,7 +40,7 @@ def configure(cnf):
     cnf.env.DEV = cnf.options.dev
     if cnf.env.DEV:
         cnf.load("ragel_c", tooldir="waftools")
-        cnf.find_program("coffee", var="COFFEE")
+        cnf.find_program("lsc", var="LSC")
         cnf.find_program("sass", var="SASS")
 
         cnf.env.append_value("RAGELFLAGS", "-G2")
@@ -50,9 +50,9 @@ def configure(cnf):
 def build(bld):
     if bld.env.DEV:
         bld(
-            name="coffee",
-            rule="${COFFEE} -co ../static ../coffee",
-            source=bld.path.ant_glob("coffee/**/*.coffee"),
+            name="livescript",
+            rule="${LSC} -co ../static ../live",
+            source=bld.path.ant_glob("live/**/*.ls"),
         )
         bld(
             name="sass",
