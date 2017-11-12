@@ -24,7 +24,8 @@ def configure(cnf):
     c_flags = """
         -std=c99 -O2
         -Wall -Wextra -pedantic -Wformat=2 -Wfloat-equal -Wredundant-decls
-        -Wconversion -Wcast-qual -Wcast-align -Wshadow -Wno-unused-const-variable
+        -Wconversion -Wcast-qual -Wcast-align -Wshadow
+        -Wno-unused-const-variable -Wno-implicit-fallthrough
     """.split()
 
     if cnf.env.COMPILER_CC != "clang":
@@ -42,7 +43,7 @@ def configure(cnf):
         cnf.find_program("sass", var="SASS")
 
         cnf.env.append_value("RAGELFLAGS", "-G2")
-        cnf.env.append_value("SASSFLAGS", ["--style=compressed", "--sourcemap=none"])
+        cnf.env.append_value("SASSFLAGS", ["--style=compressed", "--sourcemap=none", "--no-cache"])
 
 
 def build(bld):
