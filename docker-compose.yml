@@ -1,0 +1,12 @@
+version: '2.0'
+
+services:
+  gvrepsrv:
+    build: ./docker/context
+    image: gvrep/srv
+    container_name: gvrepsrv
+    # The container needs to run `dup upgrade`, so do not restrict networking.
+    network_mode: host
+    # ports: ['8000:8000']
+    volumes:
+    - .:/gvrepsrv

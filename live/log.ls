@@ -6,7 +6,7 @@ every = (ms, action) ->
 
 
 getTurn = ->
-    try +/\d+/.exec(document.querySelector '#m_fight_log .block_h .block_title' .data).0
+    try +/\d+/.exec(document.querySelector '#m_fight_log .block_h .block_title' .textContent).0
     catch => 0
 
 

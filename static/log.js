@@ -8,7 +8,7 @@
   getTurn = function(){
     var e;
     try {
-      return +/\d+/.exec(document.querySelector('#m_fight_log .block_h .block_title').data)[0];
+      return +/\d+/.exec(document.querySelector('#m_fight_log .block_h .block_title').textContent)[0];
     } catch (e$) {
       e = e$;
       return 0;

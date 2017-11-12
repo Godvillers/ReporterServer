@@ -24,12 +24,10 @@ def configure(cnf):
     c_flags = """
         -std=c99 -O2
         -Wall -Wextra -pedantic -Wformat=2 -Wfloat-equal -Wredundant-decls
-        -Wconversion -Wcast-qual -Wcast-align -Wshadow
+        -Wconversion -Wcast-qual -Wcast-align -Wshadow -Wno-unused-const-variable
     """.split()
 
-    if cnf.env.COMPILER_CC == "clang":
-        c_flags.append("-Wno-unused-const-variable")
-    else:
+    if cnf.env.COMPILER_CC != "clang":
         c_flags += cnf.select_flags("cflags", "-Wlogical-op")
     # Clang supports -fdiagnostics-color but ignores it, so try its -fcolor-diagnostics first.
     c_flags += cnf.select_flags("cflags", "-fcolor-diagnostics -fdiagnostics-color")
