@@ -31,20 +31,22 @@ struct SessionStorage
     @property bool empty() const nothrow pure @nogc
         return !_data.length
 
-    inout(Session)* opBinaryRight(string op: "in")(in char[ ] logId) inout nothrow pure @nogc
+    inout(Session)* opBinaryRight(string op: "in")(const(char)[ ] logId) inout nothrow pure @nogc
         return logId in _data
 
     SubmissionStatus submit(DuelLog dLog)
+        import preproc
+
         if (auto session = dLog.id in _data)
             if (dLog.turn <= session.dLog.turn)
                 return SubmissionStatus.ignored
-            dLog.process()
+            preprocessDuelLog(dLog)
             session.dLog = dLog
             session.lastUpdated = Clock.currTime()
             session.event.emit()
             return SubmissionStatus.updated
 
-        dLog.process()
+        preprocessDuelLog(dLog)
         _data[dLog.id] = Session(dLog, Clock.currTime(), createManualEvent())
         return SubmissionStatus.created
 

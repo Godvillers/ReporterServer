@@ -1,0 +1,215 @@
+import std.algorithm
+import std.array
+import std.conv
+import std.format
+import std.range
+import std.regex
+import std.string
+import std.typecons
+
+
+@safe:
+
+alias Stat = Tuple!(int, q{cur}, int, q{max})
+
+
+package template _rx(string pattern, string flags = "")
+    //Do not use compile-time regexes in debug mode to reduce compilation times.
+    debug
+        Regex!char _rx
+
+        static this()
+            _rx = regex(pattern, flags)
+    else
+        alias _rx = ctRegex!(pattern, flags)
+
+
+package Appender!(char[ ]) _app, _stableApp
+
+static this() nothrow
+    _app.reserve(256 << 10)
+    _stableApp.reserve(65_536)
+
+
+bool containsWord(const(char)[ ] haystack, const(char)[ ] needle) pure \
+in
+    import std.uni
+
+    assert(!needle.empty)
+    assert(!needle.canFind!isWhite())
+body
+    return haystack.splitter().canFind(needle)
+
+
+Tuple!(int, q{index}, const(char)[ ], q{heroName}) extractHeroIndexAndName(const(char)[ ] label) /+\
+pure+/
+    if (const c = label.matchFirst(_rx!(r"(\d+)\s*\.\s*(.*?)\s*", "s")))
+        int i
+        try
+            return typeof(return)((c[1].to!int - 1) & 0x3, c[2])
+        catch (ConvException) { }
+    return typeof(return)(-1, null)
+
+
+const(char)[ ] extractGodName(const(char)[ ] label) pure
+    //\( \s* (.*?) \s* \)
+    auto r = label.find('(')
+    if (!r.empty)
+        r = r[1 .. $].stripLeft()
+        const br1 = r.indexOf(')')
+        if (~br1)
+            return r[0 .. br1].stripRight()
+    return null
+
+
+Stat extractHeroHp(const(char)[ ] label) /+pure+/
+    if (const c = label.matchFirst(_rx!r"(\d+)\s*/\s*(\d+)"))
+        try
+            return Stat(c[1].to!int, c[2].to!int)
+        catch (ConvException) { }
+    return Stat.init
+
+
+const(char)[ ] formatProfileLink(const(char)[ ] host, const(char)[ ] godName) nothrow
+    const last = _stableApp.data.length
+    _stableApp ~= host
+    _stableApp ~= "/gods/"
+    _stableApp ~= godName
+    return _stableApp.data[last .. $]
+
+
+Tuple!(float, q{y}, float, q{x}) extractTileTranslation(const(char)[ ] s) pure \
+out (result)
+    import std.math
+
+    assert(result.y.isNaN == result.x.isNaN)
+body
+    import std.uni
+
+    float y, x
+    const invalid = typeof(return)(float.nan, float.nan)
+    //^ \s* translate \s* \( \s* ([\d.+-]+) \s* , \s* ([\d.+-]+) \s* \) \s* $
+    s.skipOver!isWhite()
+    if (!s.skipOver("translate"))
+        return invalid
+    s.skipOver!isWhite()
+    if (!s.skipOver('('))
+        return invalid
+    try
+        //s.skipOver!isWhite()
+        x = parse!float(s)
+        s.skipOver!isWhite()
+        if (!s.skipOver(','))
+            return invalid
+        //s.skipOver!isWhite()
+        y = parse!float(s)
+    catch (ConvException)
+        return invalid
+    s.skipOver!isWhite()
+    if (!s.skipOver(')'))
+        return invalid
+    if (!s.all!isWhite())
+        return invalid
+    return typeof(return)(y, x)
+
+
+const(char)[ ] formatTileTranslation(float y, float x)
+    const last = _stableApp.data.length
+    _stableApp.formattedWrite!"translate(%.1f,%.1f)"(x, y)
+    return _stableApp.data[last .. $]
+
+
+const(char)[ ] removePrivateTileClasses(const(char)[ ] classes)
+    import std.functional
+
+    alias isGoodClass = not!(among!("d_overlay", "d_selected", "hl", "e_ruler_anchor"))
+    size_t classesCount = 0
+    size_t newClassesCount = (
+        classes
+        .splitter()
+        .tee!(_ => classesCount++)
+        .filter!isGoodClass()
+        .walkLength()
+    )
+    if (newClassesCount == classesCount)
+        return classes
+    assert(newClassesCount < classesCount)
+    const last = _stableApp.data.length
+    _stableApp ~= classes.splitter().filter!isGoodClass().joiner(" ")
+    return _stableApp.data[last .. $]
+
+
+const(char)[ ] compressTileCoordinates(const(char)[ ] value)
+    import std.ascii: isDigit
+
+    value = value.strip()
+    auto s = value
+    const last = _stableApp.data.length
+    try
+        while (true)
+            auto r = s.find!(c => c.isDigit || c.among!('-', '+', '.'))
+            _stableApp ~= s[0 .. $ - r.length]
+            if (r.empty)
+                break
+            const x = parse!float(r)
+            if (x < 1e-6f && x > -1e-6f)
+                _stableApp ~= '0'
+            else
+                _stableApp.formattedWrite!"%.1f"(x)
+            s = r
+    catch (ConvException)
+        return value
+    return _stableApp.data[last .. $]
+
+
+const(char)[ ] extractEssentialsFromTooltip(const(char)[ ] msg) pure
+    msg = msg.strip()
+    //^ (.*?) \s* \( [^()]* \) $
+    if (msg.endsWith(')'))
+        const r = msg[0 .. $ - 1].retro().find!(among!('(', ')')).retro()
+        if (!r.empty && r[$ - 1] == '(')
+            return r[0 .. $ - 1].stripRight()
+    if (!msg.canFind("Рулить"))
+        return msg
+    return null
+
+
+void formatDistance(ref Appender!(char[ ]) sink, int dist) nothrow pure
+    import ru = l10n.russian
+
+    sink ~= '('
+    sink ~= dist.toChars()
+    final switch (ru.getNumber(dist)) with (ru.Number)
+        case plural:   sink ~= " клеток)"; break
+        case paucal:   sink ~= " клетки)"; break
+        case singular: sink ~= " клетка)"; break
+
+
+//Precalc distance-only tooltips.
+private immutable _tooltips = {
+    char[ ][25] texts
+    Appender!(char[ ]) a
+    a.reserve(416)
+    size_t last = 0
+    foreach (int i, ref t; texts)
+        formatDistance(a, i + 1)
+        t = a.data[last .. $]
+        last = a.data.length
+    assert(last == a.capacity)//A compile-time micro-optimization.
+    return texts
+}()
+
+
+const(char)[ ] formatDistanceTooltip(const(char)[ ] msg, int dist) nothrow
+    const last = _stableApp.data.length
+    if (!dist)
+        _stableApp ~= msg
+    else
+        if (!msg.empty)
+            _stableApp ~= msg
+            _stableApp ~= ' '
+        else if (dist >= 1 && dist <= _tooltips.length)
+            //Use a cached text.
+            return _tooltips[dist - 1]
+        formatDistance(_stableApp, dist)
+    return _stableApp.data[last .. $]

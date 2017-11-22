@@ -11,11 +11,11 @@ enum Number: ubyte
 
 
 Number getNumber(I)(I number) if (isIntegral!I)
-    number %= 100
+    auto x = number % 100
     static if (isSigned!I)
-        number = abs(number)
-    if (number <= 4 || number >= 21)
-        switch (number % 10)
+        x = abs(x)
+    if (x <= 4 || x >= 21)
+        switch (x % 10)
             case 2, 3, 4: return Number.paucal
             case 1: return Number.singular
             default: break

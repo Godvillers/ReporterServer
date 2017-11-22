@@ -1,0 +1,247 @@
+import std.algorithm
+import std.conv
+import std.range
+import std.regex
+import std.uni
+
+import html
+import vibe.core.log
+
+import duel_log
+import preproc.dom_utils
+import preproc.utils
+
+
+@safe:
+
+void preprocessDuelLog(ref DuelLog dLog) @trusted
+    import std.datetime
+
+    const start = Clock.currTime()
+    scope(success)
+        const end = Clock.currTime()
+        logDiagnostic("Processed %s in %s", dLog.id, end - start)
+
+    _Preprocessor p = { &dLog, };
+    dLog.allies = p.process!"Allies"(dLog.allies)
+    dLog.map = p.process!"Map"(dLog.map)
+    dLog.log = p.process!"Chronicle"(dLog.log)
+
+
+private:
+
+struct _Player
+    string godName, heroName
+    Stat hp
+
+
+struct _Preprocessor
+    @system:
+
+    DuelLog* dLog
+    _Player[4] players
+    float scale = 1
+
+    string process(string func)(string html)
+        import std.utf
+
+        try
+            auto doc = createDocument(html)
+            _stableApp.clear()
+            try
+                mixin(`process` ~ func ~ `(doc);`)
+            finally
+                destroyQueued()
+            _app.clear()
+            dumpHTML(_app, doc.root)
+            return _app.data.idup
+        catch (UTFException)
+            //TODO: Log that.
+            return html
+
+    void processAllies(ref Document doc)
+        removeEverythingDangerous(doc)
+        foreach (line; doc.querySelectorAll(_s!".oppl"))
+            //Remove a personal message (friend) link.
+            doc.querySelectorAll(_s!".pm_link", line).each!queueDestroy()
+
+            //Remove custom styles (including eGUI+'s blacklist styling) and a blacklist tooltip.
+            //TODO: Remove guildmates' styling.
+            foreach (node; line.descendants.filter!q{a.isElementNode})
+                node.removeAttr("style")
+                node.removeAttr("title")
+
+            if (const heroNode = doc.querySelector(_s!".opp_n", line))
+                //Extract player index and hero's name.
+                const info = extractHeroIndexAndName(_text(heroNode))
+                const i = info.index
+                if (i < 0)
+                    //Can't know which player it is, no reason to go further.
+                    continue
+                players[i].heroName = info.heroName.idup
+
+                //Extract HP.
+                if (const hpNode = doc.querySelector(_s!".opp_h", line))
+                    players[i].hp = extractHeroHp(_text(hpNode))
+
+                //Extract god's name.
+                if (const godNode = doc.querySelector(_s!".opp_ng", line))
+                    players[i].godName = extractGodName(_text(godNode)).idup
+
+                //Replace a drop-down button with a profile link.
+                replaceDropDown(doc, line, dLog.host, players[i].godName)
+
+        //Remove control buttons from the header.
+        if (auto header = findHeader(doc))
+            removeControlButtons(header)
+
+        //Remove eGUI+'s blacklist settings button.
+        if (auto button = doc.querySelector(_s!"#e_ally_blacklist_setup"))
+            button.destroy()
+
+        //Remove extra whitespace between tags.
+        removeExtraWhitespace(doc)
+
+    void processChronicle(ref Document doc)
+        removeEverythingDangerous(doc)
+        //Remove custom styling, showing partially hidden text.
+        foreach (node; doc.querySelectorAll(_s!".d_line"))
+            node.removeAttr("style")
+
+        //Remove control buttons from the header.
+        if (auto header = findHeader(doc))
+            removeControlButtons(header)
+
+        //Remove progress bar's title.
+        if (auto pbar = doc.querySelector(_s!".p_bar"))
+            pbar.removeAttr("title")
+
+        //Remove extra whitespace between tags.
+        removeExtraWhitespace(doc)
+
+    void processMap(ref Document doc)
+        import std.ascii: isDigit
+        import std.math
+
+        auto svgs = doc.elementsByTagName("svg")
+        if (svgs.empty)
+            return//Well, we might apply some transformations not affecting the SVG...
+        Node* svg = svgs.front
+
+        //Extract map scale.
+        const svgStyle = svg.attr("style")
+        if (auto c = svgStyle.matchFirst(_rx!r":\s*scale\s*\(\s*([\d.]+)\s*\)"))
+            try
+                scale = 1 / c[1].to!float
+            catch (ConvException) { }
+            svg.attr("style", c.pre ~ ":scale(1)" ~ c.post)
+
+        //Rescale the SVG.
+        const height = svg.attr("height")
+        const tail = height.find!(c => !c.isDigit && c != '.')
+        if (const newHeight = _rescale(height[0 .. $ - tail.length]))
+            svg.attr("height", newHeight ~ tail)
+
+        //Rescale the container.
+        foreach (node; svg.ancestors)
+            if (auto c = node.attr("style").matchFirst(_rx!r"\b(?<!-)height\s*:\s*([\d.]+)"))
+                if (const newHeight = _rescale(c[1]))
+                    node.attr("style", c.pre ~ "height:" ~ newHeight ~ c.post)
+
+        //Temporarily detach the map to prevent from scanning through it.
+        auto mapWrapper = svg.parent
+        svg.detach()
+        //removeEverythingDangerous(doc)
+
+        //Remove control buttons from the header.
+        if (auto header = findHeader(doc))
+            removeControlButtons(header)
+            if (auto title = doc.querySelector(_s!".block_title", header))
+                { }//TODO: Remove everything parenthized.
+
+        //Remove a navigation response.
+        if (auto node = doc.querySelector(_s!".dir_resp"))
+            node.destroy()
+
+        //Remove extra whitespace between tags.
+        removeExtraWhitespace(doc)
+
+        //Reattach the map.
+        mapWrapper.appendChild(svg)
+
+        Node* prevTile = null
+        float y, x
+        const(char)[ ][string] polygonCache
+        foreach (node; svg.descendants)
+            switch (node.tag)//`null` for non-elements.
+                case "g":
+                    const classes = node.attr("class")
+                    //Remove eGUI+'s ruler tooltips.
+                    if (classes.containsWord("e_ruler_tooltip"))
+                        queueDestroy(node)
+                        break
+
+                    //Remove various player-specific classes.
+                    node.attr("class", removePrivateTileClasses(classes))
+
+                    //Remember tiles' coordinates.
+                    const pos = extractTileTranslation(node.attr("transform"))
+                    if (pos.y.isNaN)
+                        break
+                    if (prevTile !is null)
+                        updateTileTooltip(doc, prevTile, y, x, null)
+                    y = pos.y
+                    x = pos.x
+                    node.attr("transform", formatTileTranslation(y, x))
+                    prevTile = node
+                    break
+
+                case "polygon":
+                    //Compress coordinates.
+                    const points = node.attr("points")
+                    if (const p = points in polygonCache)
+                        node.attr("points", *p)
+                    else
+                        const newPoints = compressTileCoordinates(points)
+                        polygonCache[points.idup] = newPoints//TODO: Get rid of `idup`.
+                        node.attr("points", newPoints)
+                    break
+
+                case "title":
+                    if (prevTile !is null)
+                        updateTileTooltip(doc, prevTile, y, x, node)
+                        prevTile = null
+                    break
+
+                case "text":
+                    //Remove empty <text> nodes.
+                    if (_text(node).all!isWhite())
+                        queueDestroy(node)
+                    else
+                        //TODO: Parse ark number.
+                        { }
+                    break
+
+                case "line":
+                    //Remove eGUI+'s ruler and ark direction hint.
+                    if (node.attr("id") == "e_ruler" ||
+                        node.attr("class").containsWord("dir_arrow"))
+                        queueDestroy(node)
+                    break
+
+                /+
+                case "defs":
+                    //TODO: Remove eGUI+'s SVG defs?
+                    break
+                +/
+
+                default: break
+
+        if (prevTile !is null)
+            updateTileTooltip(doc, prevTile, y, x, null)
+
+    private string _rescale(const(char)[ ] initialHeight) @safe
+        try
+            return text(initialHeight.to!float * scale)
+        catch (ConvException)
+            return null

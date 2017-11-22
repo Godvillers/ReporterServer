@@ -1,0 +1,170 @@
+/// This module is currently unused. It will be removed if a DOM processor performs fast enough.
+
+import std.array
+import std.range
+import std.typecons
+
+import html
+
+
+alias Attribute = Tuple!(const(char)[ ], q{name}, const(char)[ ], q{value})
+
+
+enum isHigherLevelHandler(Handler) = __traits(compiles, (ref Handler h) {
+    //Unless noted otherwise, you *must* make a copy of a string to use it later.
+    const(char)[ ] tagName, tag, text, decl, instr
+    const(Attribute)[ ] attrs
+    bool selfClosing
+
+    //Tag name and attribute *names* may be used without copying.
+    h.onOpen(tagName, attrs, tag, selfClosing)
+    //Tag name may be used without copying.
+    h.onClose(tagName)
+    h.onText(text)
+    //The string may be used without copying.
+    h.onDeclaration(decl)
+    //ditto
+    h.onProcessingInstruction(instr)
+    h.onDocumentEnd()
+})
+
+
+auto createLowLevelWrapper(HigherLevelHandler)() nothrow pure @safe \
+if (isHigherLevelHandler!HigherLevelHandler)
+    LLWrapper!HigherLevelHandler wrapper
+    wrapper._common.reserve(4096)
+    wrapper._tag.reserve(512)
+    wrapper._attrs.reserve(12)
+    return wrapper
+
+
+auto createLowLevelWrapper(HigherLevelHandler)(ref HigherLevelHandler handler) nothrow pure \
+if (isHigherLevelHandler!HigherLevelHandler)
+    auto wrapper = createLowLevelWrapper!HigherLevelHandler()
+    wrapper.handler = &handler
+    return wrapper
+
+
+void parseHTMLHigherLevel(HigherLevelHandler, size_t options = ParserOptions.Default)(
+    const(char)[ ] source, ref HigherLevelHandler handler) \
+if (isHigherLevelHandler!HigherLevelHandler)
+    auto wrapper = (() @trusted => createLowLevelWrapper(handler))()
+    parseHTML!(LLWrapper!HigherLevelHandler, options)(source, wrapper)
+
+
+struct LLWrapper(HigherLevelHandler) if (isHigherLevelHandler!HigherLevelHandler)
+    HigherLevelHandler* handler
+
+    private
+        Appender!(char[ ]) _common, _tag
+        Appender!(Attribute[ ]) _attrs
+        bool _insideTag
+        size_t _valuesLastPos
+        const(char)[ ] _tagName
+
+        void _emitText() \
+        out
+            assert(_common.data.empty)
+        body
+            if (!_common.data.empty)
+                handler.onText(_common.data)
+                _common.clear()
+
+    void reset()
+        _insideTag = false
+        _common.clear()
+
+    void onOpenStart(const(char)[ ] data)
+        assert(!_insideTag)
+        _emitText()
+        _valuesLastPos = 0
+        _insideTag = true
+        _tagName = data
+        _tag.clear()
+        _tag ~= '<'
+        _tag ~= _tagName
+        _attrs.clear()
+
+    void onAttrName(const(char)[ ] data)
+        assert(_insideTag)
+        _tag ~= ' '
+        _tag ~= data
+        _attrs ~= Attribute(data, null)
+
+    void onAttrValue(const(char)[ ] data)
+        assert(_insideTag)
+        _common ~= data
+
+    void onAttrEnd()
+        assert(_insideTag)
+        assert(!_attrs.data.empty)
+        _attrs.data.back.value = _common.data[_valuesLastPos .. $]
+        _tag ~= `="`
+        _tag ~= _attrs.data.back.value
+        _tag ~= '"'
+        _valuesLastPos = _common.data.length
+
+    void onOpenEnd(const(char)[ ] data)
+        assert(_insideTag)
+        //assert(data == _tagName)//Apparently, there is a bug in htmld.
+        assert(_valuesLastPos == _common.data.length)
+        _tag ~= '>'
+        _insideTag = false
+        handler.onOpen(_tagName, _attrs.data, _tag.data, false)
+        _common.clear()
+
+    void onSelfClosing()
+        assert(_insideTag)
+        assert(_valuesLastPos == _common.data.length)
+        _tag ~= "/>"
+        _insideTag = false
+        handler.onOpen(_tagName, _attrs.data, _tag.data, true)
+        _common.clear()
+
+    void onClose(const(char)[ ] data)
+        assert(!_insideTag)
+        _emitText()
+        handler.onClose(data)
+
+    void onText(const(char)[ ] data)
+        assert(!_insideTag)
+        _common ~= data
+
+    void onCDATA(const(char)[ ] data)
+        //assert(!_insideTag)
+        _common ~= "<![CDATA["
+        _common ~= data
+        _common ~= "]]>"
+
+    void onEntity(const(char)[ ] data, const(char)[ ] decoded)
+        import std.algorithm.comparison
+
+        bool needsEscaping = !!decoded.among!(`<`, `>`, `&`)
+        if (_insideTag)
+            needsEscaping = needsEscaping || decoded == `"`
+        if (needsEscaping)
+            _common ~= '&'
+            _common ~= data
+            _common ~= ';'
+        else
+            _common ~= decoded
+
+    void onDeclaration(const(char)[ ] data)
+        assert(!_insideTag)
+        _emitText()
+        handler.onDeclaration(data)
+
+    void onProcessingInstruction(const(char)[ ] data)
+        assert(!_insideTag)
+        _emitText()
+        handler.onProcessingInstruction(data)
+
+    void onDocumentEnd()
+        assert(!_insideTag)
+        _emitText()
+        handler.onDocumentEnd()
+
+    void onComment(const(char)[ ] data) { }
+    void onNamedEntity(const(char)[ ] data) { }
+    void onNumericEntity(const(char)[ ] data) { }
+    void onHexEntity(const(char)[ ] data) { }

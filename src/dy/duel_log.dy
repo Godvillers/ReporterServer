@@ -1,55 +1,4 @@
-import std.array
-import std.math
-import std.regex
-import vibe.core.log
-import geometry
-import parsers
-
-
 @safe:
-
-private Appender!(char[ ]) _buffer
-
-
-static this() nothrow
-    _buffer.reserve(170 << 10)
-
-
-private void _process(alias text, alias init, alias exec, alias callback)() /+nothrow+/ @trusted
-    FsmState fsm = { text.ptr, text.ptr + text.length, };
-    init(&fsm)
-    _buffer.clear()
-    while (fsm.p != fsm.pe)
-        if (exec(&fsm) == FsmStatus.error)
-            logError("Error while parsing HTML (" ~ __traits(identifier, text) ~ ')')
-            return
-        _buffer ~= fsm.cap[0]
-        if (fsm.branch)
-            callback(fsm.branch, fsm.cap[ ])
-
-    text = _buffer.data.idup
-
-
-private HexCoord _rectToHex(double y, double x) nothrow pure @nogc
-    enum scale = 1 / 19.05256
-
-    const t = y * (sqrt(3.) / 3)
-    const skew = t * (2 * scale)
-    const horiz = (x - t) * scale
-    return HexCoord(cast(int)lrint(skew), cast(int)lrint(horiz))
-
-
-private void _formatDistanceMsg(int value) nothrow
-    import std.conv
-    import ru = l10n.russian
-
-    _buffer ~= '('
-    _buffer ~= value.toChars()
-    final switch (ru.getNumber(value)) with (ru.Number)
-        case plural:   _buffer ~= " клеток)"; break
-        case paucal:   _buffer ~= " клетки)"; break
-        case singular: _buffer ~= " клетка)"; break
-
 
 struct DuelLog
     @safe:
@@ -59,88 +8,20 @@ struct DuelLog
     int turn
     string allies, map, log//HTML.
 
-    void process()
-        import std.algorithm.searching
-        import std.conv
-        import std.datetime
-        import std.format
-
-        const start = Clock.currTime()
-
-        scope(success)
-            const end = Clock.currTime()
-            logDiagnostic("Processed %s in %s", id, end - start)
-
-        _process!(allies, cParseAlliesInit, cParseAlliesExec, (br, c) {
-            final switch (br)
-                case 1:
-                    _buffer ~= `<a href="`
-                    _buffer ~= host
-                    _buffer ~= `/gods/`
-                    _buffer ~= c[1]
-                    _buffer ~= `" target="_blank">▶</a>`
-                    break
-
-                case 2, 3, 4: break
-        })
-
-        double scale = 1
-        HexCoord hc
-        _process!(map, cParseMapInit, cParseMapExec, (br, c) {
-            final switch (br)
-                case 1:
-                    if (c[1].len)
-                        try
-                            scale = 1 / c[1].arr.to!double
-                        catch (ConvException) { }
-                        c[1].len = 0
-                    try
-                        _buffer ~= lrint(c[2].arr.to!double * scale).toChars()
-                    catch (ConvException)
-                        _buffer ~= c[2]
-                    break
-
-                case 2: _buffer ~= '1'; break
-
-                case 3:
-                    try
-                        hc = _rectToHex(c[3].arr.to!double, c[2].arr.to!double)
-                    catch (ConvException)
-                        hc = HexCoord.init
-                    break
-
-                case 4:
-                    if (c[2].len && c[2][$ - 1] == ' ')
-                        c[2].len--
-                    if (hc == HexCoord.init)
-                        _buffer ~= c[2]
-                    else
-                        if (c[2].len && !c[2].arr.canFind("Рулить"))
-                            _buffer ~= c[2]
-                            _buffer ~= ' '
-                        _formatDistanceMsg(hc.dist)
-                    break
-
-                case 5: _buffer ~= '5'; break
-                case 6: _buffer ~= '0'; break
-                case 7, 8, 9, 10, 11: break
-        })
-
-        _process!(log, cParseLogInit, cParseLogExec, (br, c) { })
-
 
 DuelLog duelLog(string link, int turn, string allies, string map, string log) pure
-    import std.algorithm.searching
-    import std.range
+    import std.string
     import std.uri
 
     string host = "https://godville.net", id = "00000"
     const end = link.uriLength()
     if (end > 0)
-        link = link[0 .. end - link[0 .. end].find('#').length]
-        const firstSlash = link.length - link[8 .. $].find('/').length
-        host = link[0 .. firstSlash]
-        const lastSlash = firstSlash + link[firstSlash .. $].retro().find('/').retro().length
-        id = link[lastSlash .. $]
+        enum offset = "https://".length
+        auto pos = link[0 .. end].indexOf('#')
+        link = link[0 .. ~pos ? pos : end]
+        pos = link[offset .. $].indexOf('/')
+        host = link[0 .. ~pos ? offset + pos : $]
+        pos = link[0 .. $ - 1].lastIndexOf('/')
+        id = link[~pos ? pos + 1 : 0 .. $]
 
     return DuelLog(host, id, turn, allies, map, log)

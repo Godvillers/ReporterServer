@@ -5,15 +5,14 @@ copyright   "Copyright © 2017, Cordarion the Grey"
 license     "MIT"
 
 dependency "dython" version="~>0.1.0"
-dependency "semver" version="~>0.3.1"
+dependency "htmld" version="~>0.2.17"
+//dependency "semver" version="~>0.3.1"
 dependency "vibe-d" version="~>0.8.1"
 
 subConfiguration "vibe-d:tls" "notls"
 
 stringImportPaths "src/dy" "views"
 versions "VibeCustomMain"
-
-lflags "$PACKAGE_DIR/build/libparsers.a"
 
 buildType "debug" {
     buildOptions "debugMode" "debugInfo"

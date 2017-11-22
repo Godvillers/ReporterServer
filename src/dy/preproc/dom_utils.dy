@@ -1,0 +1,221 @@
+import std.algorithm
+import std.array
+import std.typecons
+
+import html
+
+import preproc.utils
+
+
+@system:
+
+private Appender!(Node*[ ]) _queued
+
+static this() nothrow @safe
+    _queued.reserve(2048)
+
+
+//Parse selectors at compile-time.
+package static _s(string selector) = Selector.parse(selector)
+
+
+package char[ ] _text(const(Node)* node) nothrow @safe \
+in
+    assert(node !is null)
+body
+    _app.clear()
+    node.text(_app)
+    return _app.data
+
+
+void queueDestroy(Node* node) \
+in
+    assert(node !is null)
+body
+    node.destroyChildren()
+    _queued ~= node
+
+
+void destroyQueued()
+    _queued.data.each!q{a.destroy()}
+    _queued.clear()
+
+
+bool destroyIfDangerous(Node* node) \
+in
+    assert(node !is null)
+body
+    switch (node.tag)
+        case \
+            "applet", "audio", "bgsound", "embed", "frame", "iframe", "img", "input", "object",
+            "script", "style", "video":
+        queueDestroy(node)
+        return true
+
+        default: return false
+
+
+void removeDangerousAttrs(Node* node) \
+in
+    assert(node !is null)
+body
+    foreach (name; node.attrs.byKey())
+        if (name.startsWith("on"))//HTML event handlers.
+            node.removeAttr(name)
+
+
+void removeEverythingDangerous(ref Document doc)
+    import std.functional
+
+    doc.nodes.filter!q{a.isElementNode}.filter!(not!destroyIfDangerous).each!removeDangerousAttrs()
+
+
+Node* findHeader(ref Document doc)
+    return doc.querySelector(_s!".block_h")
+
+
+void removeControlButtons(Node* header) \
+in
+    assert(header !is null)
+body
+    foreach (node; header.descendants)
+        if (node.attr("class").splitter().canFind!(among!("l_slot", "r_slot")))
+            //Do not destroy slot nodes themselves.
+            node.destroyChildren()
+
+
+void replaceDropDown(ref Document doc, Node* line, const(char)[ ] host, const(char)[ ] godName) \
+in
+    assert(line !is null)
+body
+    if (auto dropDown = doc.querySelector(_s!".opp_dropdown", line))
+        dropDown.destroyChildren()
+        auto link = doc.createElement("a", dropDown)
+        link.attr("href", formatProfileLink(host, godName))
+        link.attr("target", "_blank")
+        link.appendText("▶")
+
+
+void removeExtraWhitespace(ref Document doc)
+    import std.range
+    import std.uni
+    import std.utf
+
+    foreach (node; doc.nodes.filter!q{a.isTextNode})
+        const s = _text(node)
+        //If text is whitespace, only the first character should remain.
+        if (s.startsWith("\r\n"))
+            if (s.length > 2 && s[2 .. $].all!isWhite())
+                node.text = "\r\n"
+        else if (!s.empty)
+            if (s[0] == ' ')
+                //Common case; factored out to avoid allocations/copying.
+                if (s.length > 1 && s[1 .. $].all!isWhite())
+                    node.text = " "
+            else
+                const one = s.stride()
+                if (s.length > one && s.all!isWhite())
+                    const last = _stableApp.data.length
+                    _stableApp ~= s[0 .. one]
+                    node.text = _stableApp.data[last .. $]
+
+
+void updateTileTooltip(ref Document doc, Node* tile, double y, double x, Node* titleNode) \
+in
+    assert(tile !is null)
+body
+    import geometry
+
+    const(char)[ ] oldMsg
+    if (titleNode !is null)
+        oldMsg = extractEssentialsFromTooltip(_text(titleNode))
+
+    const tooltipText = formatDistanceTooltip(oldMsg, HexCoord.fromRect!11(y, x).dist)
+    if (titleNode !is null)
+        titleNode.text = tooltipText
+    else
+        doc.createElement("title", tile).appendText(tooltipText)
+
+
+void dumpHTMLChar(Flag!q{escapeQuotes} escapeQuotes)(ref Appender!(char[ ]) app, dchar c) pure @safe
+    switch (c)
+        static if (escapeQuotes)
+            case '"': app ~= "&#34;"; break
+        case '<': app ~= "&lt;";  break
+        case '>': app ~= "&gt;";  break
+        case '&': app ~= "&amp;"; break
+        default:  app ~= c
+
+
+void dumpHTMLString(Flag!q{escapeQuotes} escapeQuotes)(
+        ref Appender!(char[ ]) app, const(char)[ ] s) pure @safe
+    foreach (dchar c; s)
+        dumpHTMLChar!escapeQuotes(app, c)
+
+
+private struct _HTMLStringDumper
+    pure @safe:
+
+    private Appender!(char[ ])* _app
+
+    void put(dchar c)
+        dumpHTMLChar!(No.escapeQuotes)(*_app, c)
+
+    void put(const(char)[ ] s)
+        dumpHTMLString!(No.escapeQuotes)(*_app, s)
+
+
+//Default dumper replaces all non-ASCII characters with HTML entities.
+void dumpHTML(ref Appender!(char[ ]) app, const(Node)* node) pure @safe
+    _HTMLStringDumper dumper = { (() @trusted => &app)(), };
+    final switch (node.type) with (NodeTypes)
+        case Element:
+            app ~= '<'
+            app ~= node.tag
+            foreach (name, value; node.attrs)
+                app ~= ' '
+                app ~= name
+                app ~= `="`
+                dumpHTMLString!(Yes.escapeQuotes)(app, value)
+                app ~= '"'
+            if (node.isSelfClosing)
+                app ~= "/>"
+            else
+                app ~= '>'
+                if (node.tag.among!("script", "style"))
+                    node.text(app)
+                else
+                    foreach (child; node.children)
+                        dumpHTML(app, child)
+                app ~= "</"
+                app ~= node.tag
+                app ~= '>'
+            break
+
+        case Text:
+            node.text(dumper)
+            break
+
+        case CDATA:
+            app ~= "<![CDATA["
+            node.text(app)
+            app ~= "]]>"
+            break
+
+        case Comment:
+            app ~= "<!--"
+            node.text(app)
+            app ~= "-->"
+            break
+
+        case Declaration:
+            app ~= "<!"
+            node.text(app)
+            app ~= '>'
+            break
+
+        case ProcessingInstruction:
+            app ~= "<?"
+            node.text(app)
+            app ~= '>'
+            break

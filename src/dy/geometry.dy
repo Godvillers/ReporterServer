@@ -29,11 +29,19 @@ struct RectCoord
 
 
 struct HexCoord
+    nothrow pure @safe @nogc:
+
     int skew, horiz
+
+    static HexCoord fromRect(double scale)(double y, double x)
+        const t = y * (1 / (3. * scale))
+        const skew = t * 2
+        const horiz = x * (1 / (sqrt(3.) * scale)) - t
+        return HexCoord(cast(int)lrint(skew), cast(int)lrint(horiz))
 
     mixin _coordOps
 
-    @property int dist() const nothrow pure @safe @nogc \
+    @property int dist() const \
     out (result)
         assert(result >= 0)
     body
