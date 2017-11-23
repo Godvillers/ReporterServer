@@ -2,3 +2,4 @@
 *.dt linguist-language=Pug
 *.conf linguist-language=INI
 /static/*.css linguist-generated
+/static/* -diff

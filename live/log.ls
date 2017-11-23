@@ -5,6 +5,22 @@ every = (ms, action) ->
     setInterval action, ms
 
 
+timeIt = (title, action) ->
+    console.time title
+    try
+        action()
+    finally
+        console.timeEnd title
+
+
+decompress =
+    if window.TextDecoder?
+        # Faster.
+        (data) -> new TextDecoder \utf-8 .decode pako.inflate data
+    else
+        (data) -> pako.inflate data, to: \string
+
+
 getTurn = ->
     try +/\d+/.exec(document.querySelector '#m_fight_log .block_h .block_title' .textContent).0
     catch => 0
@@ -36,8 +52,10 @@ socket = null
 connect = !->
     socket := new WebSocket "ws://#{location.host}#{location.pathname}/ws"
     justConnected = true
+    socket.binaryType = \arraybuffer
     socket.onmessage = (msg) !->
-        response = JSON.parse msg.data
+        response = timeIt "Decompression", -> decompress msg.data
+        response = timeIt "JSON decoding", -> JSON.parse response
         if response.redirect?
             location.replace that
         else if response.turn > getTurn()

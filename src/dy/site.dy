@@ -1,4 +1,8 @@
+import zlib = std.zlib: ZlibException
+
+import vibe.data.json
 import vibe.vibe
+
 import duel_log
 import session_storage
 
@@ -52,29 +56,41 @@ final class Site
 
     @path("/duels/log/:id/ws") \
     void getWS(string _id, scope WebSocket socket)
-        import std.json
+        import std.array
 
-        auto response = JSONValue([
-            "turn":   JSONValue(),
-            "ago":    JSONValue(),
-            "allies": JSONValue(),
-            "map":    JSONValue(),
-            "log":    JSONValue(),
-        ])
+        auto response = Json.emptyObject
+        auto app = appender!(char[ ])
         auto session = _id in _storage
-        do
-            if (_id !in _storage || session.finished)
-                const host = session !is null ? session.dLog.host : "https://godville.net"
-                response = JSONValue(["redirect": host ~ "/duels/log/" ~ _id])
-                socket.send(response.toJSON())
-                return
+        try
+            do
+                if (_id !in _storage || session.finished)
+                    const host = session !is null ? session.dLog.host : "https://godville.net"
+                    app.clear()
+                    app.writeJsonString(Json(["redirect": Json(host ~ "/duels/log/" ~ _id)]))
+                    socket.send((() @trusted => zlib.compress(app.data, 0))())
+                    return
 
-            auto dLog = &session.dLog
-            response["turn"] = dLog.turn
-            response["ago"] = session.secondsSinceLastUpdated
-            response["allies"] = dLog.allies
-            response["map"] = dLog.map
-            response["log"] = dLog.log
-            socket.send(response.toJSON())
-            session.event.wait()
-        while (socket.connected)
+                auto dLog = &session.dLog
+                response["turn"] = dLog.turn
+                response["ago"] = session.secondsSinceLastUpdated
+                response["allies"] = dLog.allies
+                response["map"] = dLog.map
+                response["log"] = dLog.log
+
+                app.clear()
+                app.writeJsonString(response)
+                const start = Clock.currTime()
+                const compressed = (() @trusted => zlib.compress(app.data))()
+                const end = Clock.currTime()
+                logDiagnostic(
+                    "Compressed %.1f KB -> %.1f KB (%.1fx) in %s",
+                    app.data.length * (1. / 1024),
+                    compressed.length * (1. / 1024),
+                    float(app.data.length) / compressed.length,
+                    end - start)
+
+                socket.send(compressed)
+                session.event.wait()
+            while (socket.connected)
+        catch (ZlibException e)
+            logError("Zlib compression error: %s", e.msg)
