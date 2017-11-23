@@ -1,3 +1,4 @@
+import std.array
 import zlib = std.zlib: ZlibException
 
 import vibe.data.json
@@ -12,20 +13,47 @@ final class Site
 
     private SessionStorage _storage
 
-    void postSend(
-        string agent,
-        string link,
-        int    turn,
-        string cargo,
-        string allies,
-        string map,
-        string log,
-    ) @system
-        const dLog = duelLog(link, turn, allies, map, log)
+    private static Appender!(ubyte[ ]) _ubyteApp
+
+    static this() nothrow
+        _ubyteApp.reserve(32_768)
+
+    void postSend(string agent, string link, int turn, string cargo, string data) @system
+        import std.algorithm
+        import std.base64
+        import std.range
+
+        const(void)[ ] decoded = data
+        //Try to decode from Base64 first.
+        _ubyteApp.clear()
+        try
+            Base64.decode(data, _ubyteApp)
+            decoded = _ubyteApp.data
+        catch (Base64Exception e)
+            logDiagnostic("Base64 error: %s", e.msg)
+
+        string concatenated
+        try
+            //A cast to `immutable(char)[ ]` is safe as `uncompress` allocates a new buffer.
+            //We expect a compression ratio of about 20x-30x, so choose the buffer size accordingly.
+            concatenated = cast(string)zlib.uncompress(decoded, decoded.length << 5)
+        catch (ZlibException e)
+            logWarn("Zlib decompression error: %s", e.msg)
+            throw new HTTPStatusException(HTTPStatus.badRequest)
+
+        logDiagnostic(
+            "Decompressed %.1f KB -> %.1f KB (%.1fx)",
+            decoded.length * (1. / 1024),
+            concatenated.length * (1. / 1024),
+            float(concatenated.length) / decoded.length)
+
+        string[3] htmls//allies, map, log
+        concatenated.splitter("<&>").take(3).copy(htmls[ ])
+        const dLog = duelLog(link, turn, htmls[0], htmls[1], htmls[2])
         final switch (_storage.submit(dLog)) with (SubmissionStatus)
+            case updated: break
             case ignored: logDiagnostic("Ignoring duplicate %s", dLog.id); break
             case created: logInfo("Streaming %s", dLog.id); break
-            case updated: break
 
         //TODO: Check browser extension version.
         render!("send.dt", dLog)
@@ -56,8 +84,6 @@ final class Site
 
     @path("/duels/log/:id/ws") \
     void getWS(string _id, scope WebSocket socket)
-        import std.array
-
         auto response = Json.emptyObject
         auto app = appender!(char[ ])
         auto session = _id in _storage
@@ -79,15 +105,12 @@ final class Site
 
                 app.clear()
                 app.writeJsonString(response)
-                const start = Clock.currTime()
                 const compressed = (() @trusted => zlib.compress(app.data))()
-                const end = Clock.currTime()
                 logDiagnostic(
-                    "Compressed %.1f KB -> %.1f KB (%.1fx) in %s",
+                    "Compressed %.1f KB -> %.1f KB (%.1fx)",
                     app.data.length * (1. / 1024),
                     compressed.length * (1. / 1024),
-                    float(app.data.length) / compressed.length,
-                    end - start)
+                    float(app.data.length) / compressed.length)
 
                 socket.send(compressed)
                 session.event.wait()

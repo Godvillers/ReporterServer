@@ -12,7 +12,7 @@ struct Session
     @disable this(this)//ManualEvent is non-copyable.
 
     @property long secondsSinceLastUpdated() const @safe
-        return (Clock.currTime() - lastUpdated).total!"seconds"
+        return (Clock.currTime() - lastUpdated).total!q{seconds}
 
 
 enum SubmissionStatus: ubyte
