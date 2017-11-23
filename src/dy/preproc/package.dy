@@ -176,8 +176,8 @@ struct _Preprocessor
             switch (node.tag)//`null` for non-elements.
                 case "g":
                     const classes = node.attr("class")
-                    //Remove eGUI+'s ruler tooltips.
-                    if (classes.containsWord("e_ruler_tooltip"))
+                    //Remove eGUI+'s ruler tooltips and hints.
+                    if (classes.splitter().canFind!(among!("e_ruler_tooltip", "e_hint")))
                         queueDestroy(node)
                         break
 
