@@ -1,6 +1,10 @@
 "use strict"
 
 
+$id = -> document.getElementById it
+$q  = -> document.querySelector  it
+
+
 every = (ms, action) ->
     setInterval action, ms
 
@@ -22,12 +26,12 @@ decompress =
 
 
 getTurn = ->
-    try +/\d+/.exec(document.querySelector '#m_fight_log .block_h .block_title' .textContent).0
+    try +/\d+/.exec($q '#m_fight_log .block_h .block_title' .textContent).0
     catch => 0
 
 
 setProgress = (value) !->
-    try document.querySelector '#turn_pbar .p_bar div' .style.width = "#{value}%"
+    try $q '#turn_pbar .p_bar div' .style.width = "#{value}%"
 
 
 progressTimer = null
@@ -54,20 +58,19 @@ connect = !->
     justConnected = true
     socket.binaryType = \arraybuffer
     socket.onmessage = (msg) !->
-        response = timeIt "Decompression", -> decompress msg.data
-        response = timeIt "JSON decoding", -> JSON.parse response
+        response = timeIt "Decompression", -> JSON.parse decompress msg.data
         if response.redirect?
             location.replace that
         else if response.turn > getTurn()
-            document.getElementById \alls .outerHTML = response.allies
+            $id \alls .outerHTML = response.allies
 
-            map = document.getElementById \map_wrap
+            map = $id \map_wrap
             scrollValue = map.scrollLeft / map.scrollWidth
-            document.getElementById \s_map .outerHTML = response.map
-            map = document.getElementById \map_wrap
+            $id \s_map .outerHTML = response.map
+            map = $id \map_wrap
             map.scrollLeft = scrollValue * map.scrollWidth
 
-            document.getElementById \m_fight_log .outerHTML = response.log
+            $id \m_fight_log .outerHTML = response.log
 
             runProgressTimer if justConnected then response.ago else 0
 
