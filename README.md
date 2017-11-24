@@ -12,7 +12,8 @@ The Easy Way
 The server can be used inside a Docker container. The image is 500 MB in size, plus 80 MB for the
 Docker itself.
 
-Install `docker.io` and `docker-compose` (in Debian-based distributions).
+[Read this][mgmt], then `git submodule update --init --recursive`. Install `docker.io` and
+`docker-compose` (in Debian-based distributions), add yourself to `docker` group.
 
 * `mgmt/update.sh [-P | --no-pull]` takes care of everything: downloads the latest source
   (optionally), builds the image, compiles and restarts the server. It might fail, though, if you
@@ -22,6 +23,8 @@ Install `docker.io` and `docker-compose` (in Debian-based distributions).
 * `mgmt/log.sh [-F] [--tail <n>]` displays *build-time* logs (all other logs go to `logs/`). If `-F`
   is given, it will exit immediately instead of "following". If `--tail` is given, `<n>` last lines
   are shown (10 by default).
+
+[mgmt]: https://github.com/Godvillers/ReporterServerManagement
 
 
 The Hard way
