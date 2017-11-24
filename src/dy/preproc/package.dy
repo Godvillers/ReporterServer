@@ -5,7 +5,6 @@ import std.regex
 import std.uni
 
 import html
-import vibe.core.log
 
 import duel_log
 import preproc.dom_utils
@@ -16,6 +15,7 @@ import preproc.utils
 
 void preprocessDuelLog(ref DuelLog dLog) @trusted
     import std.datetime
+    import vibe.core.log
 
     const start = Clock.currTime()
     scope(success)
@@ -30,16 +30,11 @@ void preprocessDuelLog(ref DuelLog dLog) @trusted
 
 private:
 
-struct _Player
-    string godName, heroName
-    Stat hp
-
-
 struct _Preprocessor
     @system:
 
     DuelLog* dLog
-    _Player[4] players
+    Player[4] players
     float scale = 1
 
     string process(string func)(string html)
@@ -122,6 +117,7 @@ struct _Preprocessor
     void processMap(ref Document doc)
         import std.ascii: isDigit
         import std.math
+        import std.string
 
         auto svgs = doc.elementsByTagName("svg")
         if (svgs.empty)
@@ -169,8 +165,9 @@ struct _Preprocessor
         //Reattach the map.
         mapWrapper.appendChild(svg)
 
-        Node* prevTile = null
+        Node* prevTile, prevTitleNode
         float y, x
+        const(Player)* player
         const(char)[ ][string] polygonCache
         foreach (node; svg.descendants)
             switch (node.tag)//`null` for non-elements.
@@ -189,7 +186,9 @@ struct _Preprocessor
                     if (pos.y.isNaN)
                         break
                     if (prevTile !is null)
-                        updateTileTooltip(doc, prevTile, y, x, null)
+                        updateTileTooltip(doc, prevTile, y, x, prevTitleNode, player, dLog.cargo)
+                        prevTitleNode = null
+                        player = null
                     y = pos.y
                     x = pos.x
                     node.attr("transform", formatTileTranslation(y, x))
@@ -209,17 +208,20 @@ struct _Preprocessor
 
                 case "title":
                     if (prevTile !is null)
-                        updateTileTooltip(doc, prevTile, y, x, node)
-                        prevTile = null
+                        prevTitleNode = node
                     break
 
                 case "text":
-                    //Remove empty <text> nodes.
-                    if (_text(node).all!isWhite())
+                    const s = _text(node).strip()
+                    if (s.empty)
+                        //Remove empty <text> nodes.
                         queueDestroy(node)
-                    else
-                        //TODO: Parse ark number.
-                        { }
+                    else if (s[0].isDigit && prevTile !is null)
+                        //Parse ark number.
+                        try
+                            player = &players[(s.to!int - 1) & 0x3]
+                        catch (ConvException)
+                            player = null
                     break
 
                 case "line":
@@ -238,7 +240,7 @@ struct _Preprocessor
                 default: break
 
         if (prevTile !is null)
-            updateTileTooltip(doc, prevTile, y, x, null)
+            updateTileTooltip(doc, prevTile, y, x, prevTitleNode, player, dLog.cargo)
 
     private string _rescale(const(char)[ ] initialHeight) @safe
         try

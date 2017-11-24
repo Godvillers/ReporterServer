@@ -49,7 +49,7 @@ final class Site
 
         string[3] htmls//allies, map, log
         concatenated.splitter("<&>").take(3).copy(htmls[ ])
-        const dLog = duelLog(link, turn, htmls[0], htmls[1], htmls[2])
+        const dLog = duelLog(link, turn, cargo, htmls[0], htmls[1], htmls[2])
         final switch (_storage.submit(dLog)) with (SubmissionStatus)
             case updated: break
             case ignored: logDiagnostic("Ignoring duplicate %s", dLog.id); break

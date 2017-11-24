@@ -6,10 +6,11 @@ struct DuelLog
     string host
     string id//\w{5,}
     int turn
+    string cargo
     string allies, map, log//HTML.
 
 
-DuelLog duelLog(string link, int turn, string allies, string map, string log) pure
+DuelLog duelLog(string link, int turn, string cargo, string allies, string map, string log) pure
     import std.string
     import std.uri
 
@@ -24,4 +25,4 @@ DuelLog duelLog(string link, int turn, string allies, string map, string log) pu
         pos = link[0 .. $ - 1].lastIndexOf('/')
         id = link[~pos ? pos + 1 : 0 .. $]
 
-    return DuelLog(host, id, turn, allies, map, log)
+    return DuelLog(host, id, turn, cargo, allies, map, log)

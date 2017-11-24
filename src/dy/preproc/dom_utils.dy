@@ -120,17 +120,31 @@ void removeExtraWhitespace(ref Document doc)
                     node.text = _stableApp.data[last .. $]
 
 
-void updateTileTooltip(ref Document doc, Node* tile, double y, double x, Node* titleNode) \
+void updateTileTooltip(
+    ref Document doc,
+    Node* tile,
+    double y,
+    double x,
+    Node* titleNode,
+    const(Player)* player,
+    const(char)[ ] cargo) \
 in
     assert(tile !is null)
 body
     import geometry
 
-    const(char)[ ] oldMsg
+    const dist = HexCoord.fromRect!11(y, x).dist
+    const(char)[ ] oldMsg, tooltipText
     if (titleNode !is null)
-        oldMsg = extractEssentialsFromTooltip(_text(titleNode))
+        const s = _text(titleNode)
+        //`s.count!(among!(...))` does not compile on 2.077.0. (?)
+        if (player !is null && s.count!q{a == '[' || a == ']'} < 4)
+            tooltipText = formatPlayerTooltip(*player, cargo, dist)
+        else
+            oldMsg = extractEssentialsFromTooltip(s)
+    if (tooltipText.empty)
+        tooltipText = formatDistanceTooltip(oldMsg, dist)
 
-    const tooltipText = formatDistanceTooltip(oldMsg, HexCoord.fromRect!11(y, x).dist)
     if (titleNode !is null)
         titleNode.text = tooltipText
     else

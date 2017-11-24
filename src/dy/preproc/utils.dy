@@ -13,6 +13,11 @@ import std.typecons
 alias Stat = Tuple!(int, q{cur}, int, q{max})
 
 
+struct Player
+    string godName, heroName
+    Stat hp
+
+
 package template _rx(string pattern, string flags = "")
     //Do not use compile-time regexes in debug mode to reduce compilation times.
     debug
@@ -43,7 +48,7 @@ body
 
 Tuple!(int, q{index}, const(char)[ ], q{heroName}) extractHeroIndexAndName(const(char)[ ] label) /+\
 pure+/
-    if (const c = label.matchFirst(_rx!(r"(\d+)\s*\.\s*(.*?)\s*", "s")))
+    if (const c = label.matchFirst(_rx!(r"(\d+)\s*\.\s*(.*?)\s*$", "s")))
         int i
         try
             return typeof(return)((c[1].to!int - 1) & 0x3, c[2])
@@ -70,11 +75,9 @@ Stat extractHeroHp(const(char)[ ] label) /+pure+/
     return Stat.init
 
 
-const(char)[ ] formatProfileLink(const(char)[ ] host, const(char)[ ] godName) nothrow
+const(char)[ ] formatProfileLink(const(char)[ ] host, const(char)[ ] godName)
     const last = _stableApp.data.length
-    _stableApp ~= host
-    _stableApp ~= "/gods/"
-    _stableApp ~= godName
+    _stableApp.formattedWrite!"%s/gods/%s"(host, godName)
     return _stableApp.data[last .. $]
 
 
@@ -212,4 +215,12 @@ const(char)[ ] formatDistanceTooltip(const(char)[ ] msg, int dist) nothrow
             //Use a cached text.
             return _tooltips[dist - 1]
         formatDistance(_stableApp, dist)
+    return _stableApp.data[last .. $]
+
+
+const(char)[ ] formatPlayerTooltip(Player player, const(char)[ ] cargo, int dist)
+    const last = _stableApp.data.length
+    _stableApp.formattedWrite!"%s (%s), %d/%d, %s "(
+        player.heroName, player.godName, player.hp.cur, player.hp.max, cargo)
+    formatDistance(_stableApp, dist)
     return _stableApp.data[last .. $]
