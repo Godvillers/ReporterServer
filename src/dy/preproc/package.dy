@@ -5,6 +5,7 @@ import std.regex
 import std.uni
 
 import html
+import vibe.core.log
 
 import duel_log
 import preproc.dom_utils
@@ -15,7 +16,6 @@ import preproc.utils
 
 void preprocessDuelLog(ref DuelLog dLog) @trusted
     import std.datetime
-    import vibe.core.log
 
     const start = Clock.currTime()
     scope(success)
@@ -48,10 +48,10 @@ struct _Preprocessor
             finally
                 destroyQueued()
             _app.clear()
-            dumpHTML(_app, doc.root)
+            doc.root.innerHTML(_app)
             return _app.data.idup
         catch (UTFException)
-            //TODO: Log that.
+            logDiagnostic(`UTF error while processing "` ~ func ~ `"`)
             return html
 
     void processAllies(ref Document doc)

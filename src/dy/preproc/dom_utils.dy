@@ -67,7 +67,7 @@ body
 void removeEverythingDangerous(ref Document doc)
     import std.functional
 
-    doc.nodes.filter!q{a.isElementNode}.filter!(not!destroyIfDangerous).each!removeDangerousAttrs()
+    doc.elements.filter!(not!destroyIfDangerous).each!removeDangerousAttrs()
 
 
 Node* findHeader(ref Document doc)
@@ -149,87 +149,3 @@ body
         titleNode.text = tooltipText
     else
         doc.createElement("title", tile).appendText(tooltipText)
-
-
-void dumpHTMLChar(Flag!q{escapeQuotes} escapeQuotes)(ref Appender!(char[ ]) app, dchar c) pure @safe
-    switch (c)
-        static if (escapeQuotes)
-            case '"': app ~= "&#34;"; break
-        case '<': app ~= "&lt;";  break
-        case '>': app ~= "&gt;";  break
-        case '&': app ~= "&amp;"; break
-        default:  app ~= c
-
-
-void dumpHTMLString(Flag!q{escapeQuotes} escapeQuotes)(
-        ref Appender!(char[ ]) app, const(char)[ ] s) pure @safe
-    foreach (dchar c; s)
-        dumpHTMLChar!escapeQuotes(app, c)
-
-
-private struct _HTMLStringDumper
-    pure @safe:
-
-    private Appender!(char[ ])* _app
-
-    void put(dchar c)
-        dumpHTMLChar!(No.escapeQuotes)(*_app, c)
-
-    void put(const(char)[ ] s)
-        dumpHTMLString!(No.escapeQuotes)(*_app, s)
-
-
-//Default dumper replaces all non-ASCII characters with HTML entities.
-void dumpHTML(ref Appender!(char[ ]) app, const(Node)* node) pure @safe
-    _HTMLStringDumper dumper = { (() @trusted => &app)(), };
-    final switch (node.type) with (NodeTypes)
-        case Element:
-            app ~= '<'
-            app ~= node.tag
-            foreach (name, value; node.attrs)
-                app ~= ' '
-                app ~= name
-                app ~= `="`
-                dumpHTMLString!(Yes.escapeQuotes)(app, value)
-                app ~= '"'
-            if (node.isSelfClosing)
-                app ~= "/>"
-            else
-                app ~= '>'
-                if (node.tag.among!("script", "style"))
-                    node.text(app)
-                else
-                    foreach (child; node.children)
-                        dumpHTML(app, child)
-                app ~= "</"
-                app ~= node.tag
-                app ~= '>'
-            break
-
-        case Text:
-            node.text(dumper)
-            break
-
-        case CDATA:
-            app ~= "<![CDATA["
-            node.text(app)
-            app ~= "]]>"
-            break
-
-        case Comment:
-            app ~= "<!--"
-            node.text(app)
-            app ~= "-->"
-            break
-
-        case Declaration:
-            app ~= "<!"
-            node.text(app)
-            app ~= '>'
-            break
-
-        case ProcessingInstruction:
-            app ~= "<?"
-            node.text(app)
-            app ~= '>'
-            break
