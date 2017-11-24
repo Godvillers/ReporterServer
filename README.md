@@ -29,7 +29,7 @@ The Hard way
 
 ### Prerequisites ###
 
-`gcc libevent-dev libssl1.0-dev python`
+`gcc libevent-dev libssl1.0-dev python zlib1g-dev`
 
 This project is implemented in the [D Programming Language][dlang], so you'll need a
 [D Compiler][dmd-download] to build it. DMD is the easiest one to install.

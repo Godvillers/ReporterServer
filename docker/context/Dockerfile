@@ -3,10 +3,10 @@ FROM debian:stretch
 
 # Binutils and GCC are dependencies for DMD.
 # The D OpenSSL bindings have some deprecated functions bound, so force installing SSL 1.0.
-RUN set -eux;                                               \
-    apt-get update;                                         \
-    apt-get install -y                                      \
-        binutils gcc libevent-dev libssl1.0-dev supervisor; \
+RUN set -eux;                                                          \
+    apt-get update;                                                    \
+    apt-get install -y                                                 \
+        binutils gcc libevent-dev libssl1.0-dev supervisor zlib1g-dev; \
     rm -rf /var/lib/apt/lists/*
 
 ENV DMD_VERSION 2.077.0
