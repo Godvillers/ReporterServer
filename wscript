@@ -41,7 +41,6 @@ def dist(dst):
         src/
         static/
         views/**/[^_]*
-        docker-compose.yml
         dub.sdl
         gvrepsrv.conf
         LICENSE
