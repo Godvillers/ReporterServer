@@ -9,6 +9,9 @@ import session_storage
 import zlib = zlib: ZlibException, ZlibTooLarge
 
 
+private enum _expirationPeriod = 40.minutes
+
+
 final class Site
     @safe:
 
@@ -18,6 +21,9 @@ final class Site
 
     static this() nothrow
         _ubyteApp.reserve(32_768)
+
+    this() nothrow pure
+        _storage = sessionStorage()
 
     void postSend(string agent, string link, int turn, string cargo, string data) @system
         import std.algorithm
@@ -60,8 +66,7 @@ final class Site
         concatenated.splitter("<&>").take(3).copy(htmls[ ])
         //Do actual work.
         const dLog = duelLog(link, turn, cargo, htmls[0], htmls[1], htmls[2])
-        if (_storage.length > 100)
-            _storage.dropOldSessions(40.minutes)
+        _storage.dropOldSessions(_expirationPeriod)
         final switch (_storage.submit(dLog)) with (SubmissionStatus)
             case updated: break
             case ignored: logDiagnostic("Ignoring duplicate %s", dLog.id); break
@@ -84,7 +89,7 @@ final class Site
 
     @path("/duels/log/:id") \
     void getDuelsLog(string _id) @system
-        _storage.dropOldSessions(40.minutes)
+        _storage.dropOldSessions(_expirationPeriod)
         if (auto session = _id in _storage)
             const dLog = &session.dLog
             const ago = session.secondsSinceLastUpdated
@@ -101,12 +106,14 @@ final class Site
         auto session = _id in _storage
         try
             do
-                if (_id !in _storage || session.finished)
+                if (_id !in _storage || session.status == session_storage.Session.Status.finished)
                     const host = session !is null ? session.dLog.host : "https://godville.net"
                     app.clear()
                     app.writeJsonString(Json(["redirect": Json(host ~ "/duels/log/" ~ _id)]))
                     socket.send((() @trusted => zlib.compress(app.data, 0))())
                     return
+                if (session.status == session_storage.Session.Status.outOfMemory)
+                    return//TODO.
 
                 auto dLog = &session.dLog
                 response["turn"] = dLog.turn

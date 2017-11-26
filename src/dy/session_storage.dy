@@ -1,18 +1,37 @@
+import std.container.rbtree
 import std.datetime
+
 import vibe.core.sync
+
 import duel_log
 
 
+@safe:
+
 struct Session
+    @safe:
+
+    enum Status: ubyte
+        active,
+        finished,
+        outOfMemory,
+
     DuelLog dLog
     SysTime lastUpdated
     ManualEvent event
-    bool finished
+    Status status
 
     @disable this(this)//ManualEvent is non-copyable.
 
-    @property long secondsSinceLastUpdated() const @safe
+    @property long secondsSinceLastUpdated() const
         return (Clock.currTime() - lastUpdated).total!q{seconds}
+
+    pragma(inline, true) \
+    int opCmp()(auto ref const Session rhs) const nothrow pure /+@nogc+/
+        import std.typecons
+
+        //ID just for strict ordering in (rare) cases when timestamps match exactly.
+        return tuple(lastUpdated, dLog.id).opCmp(tuple(rhs.lastUpdated, rhs.dLog.id))
 
 
 enum SubmissionStatus: ubyte
@@ -21,44 +40,84 @@ enum SubmissionStatus: ubyte
     updated,
 
 
+auto sessionStorage() nothrow pure
+    return SessionStorage(new RedBlackTree!(Session*, q{*a < *b}))
+
+
 struct SessionStorage
     @safe:
 
-    private Session[string] _data
+    private
+        RedBlackTree!(Session*, q{*a < *b}) _tree
+        Session[string] _aa
+        size_t _totalSpace
+
+    invariant
+        assert(_tree.length == _aa.length)
 
     @disable this(this)
 
     @property size_t length() const nothrow pure @nogc
-        return _data.length
-
-    @property bool empty() const nothrow pure @nogc
-        return !length
+        return _aa.length
 
     inout(Session)* opBinaryRight(string op: "in")(const(char)[ ] logId) inout nothrow pure @nogc
-        return logId in _data
+        return logId in _aa
 
     SubmissionStatus submit(DuelLog dLog)
         import preproc
 
-        if (auto session = dLog.id in _data)
+        if (auto session = dLog.id in _aa)
             if (dLog.turn <= session.dLog.turn)
                 return SubmissionStatus.ignored
+
+            _removeFromTree(session)
+            _dropIfOutOfMemory()
             preprocessDuelLog(dLog)
             session.dLog = dLog
             session.lastUpdated = Clock.currTime()
+            _insertIntoTree(session)
+
             session.event.emit()
             return SubmissionStatus.updated
 
+        _dropIfOutOfMemory()
         preprocessDuelLog(dLog)
-        _data[dLog.id] = Session(dLog, Clock.currTime(), createManualEvent())
+        _aa[dLog.id] = Session(dLog, Clock.currTime(), createManualEvent())
+        _insertIntoTree(dLog.id in _aa)
         return SubmissionStatus.created
 
     void dropOldSessions(Duration maxAge)
-        if (!empty)
+        if (!_tree.empty)
             const thresholdPoint = Clock.currTime() - maxAge
-            foreach (ref session; _data)
-                if (session.lastUpdated <= thresholdPoint)
-                    session.finished = true
-                    session.event.emit()
-                    _data.remove(session.dLog.id)
-                    //`ref session` is now invalidated.
+            //The tree is sorted in such a way that older entries go first.
+            while (!_tree.empty && _tree.front.lastUpdated <= thresholdPoint)
+                auto session = _tree.front
+                session.status = Session.Status.finished
+                session.event.emit()
+                _removeTreeFront()
+                _aa.remove(session.dLog.id)
+
+    private:
+
+    void _insertIntoTree(Session* session) nothrow pure \
+    in
+        assert(session !is null)
+    body
+        const number = _tree.insert(session)
+        assert(number == 1)
+        _totalSpace += session.dLog.space
+
+    void _removeFromTree(Session* session) nothrow pure \
+    in
+        assert(session !is null)
+    body
+        _totalSpace -= session.dLog.space
+        const number = _tree.removeKey(session)
+        assert(number == 1)
+
+    void _removeTreeFront() nothrow pure @nogc
+        _totalSpace -= _tree.front.dLog.space
+        _tree.removeFront()
+
+    void _dropIfOutOfMemory()
+        { }//TODO.
