@@ -1,0 +1,50 @@
+public import std.zlib: compress, ZlibException
+import czlib = etc.c.zlib
+import std.algorithm.comparison
+import std.conv
+import std.exception
+
+
+class ZlibTooLarge: Exception
+    mixin basicExceptionCtors
+
+
+//Source taken from std.zlib and patched.
+void[ ] uncompress(const(void)[ ] src, size_t maxLen, size_t approxLen = 0, int winBits = 15)
+    int err
+    ubyte[ ] dest
+    size_t destLen = min(approxLen ? approxLen : src.length << 1 | 0x1, maxLen)
+
+    czlib.z_stream zs
+    zs.next_in = cast(typeof(zs.next_in))src.ptr
+    zs.avail_in = to!uint(src.length)
+    err = czlib.inflateInit2(&zs, winBits)
+    if (err)
+        throw new ZlibException(err)
+
+    size_t oldDestLen = 0
+    while (true)
+        dest.length = destLen
+        zs.next_out = cast(typeof(zs.next_out))&dest[oldDestLen]
+        zs.avail_out = to!uint(destLen - oldDestLen)
+        oldDestLen = destLen
+
+        err = czlib.inflate(&zs, czlib.Z_NO_FLUSH)
+        switch (err)
+            case czlib.Z_OK:
+                if (destLen >= maxLen)
+                    czlib.inflateEnd(&zs)
+                    throw new ZlibTooLarge("Uncompressed file is too large")
+                destLen = min(dest.length << 1, maxLen)
+                continue
+
+            case czlib.Z_STREAM_END:
+                dest.length = zs.total_out
+                err = czlib.inflateEnd(&zs)
+                if (err != czlib.Z_OK)
+                    throw new ZlibException(err)
+                return dest
+
+            default:
+                czlib.inflateEnd(&zs)
+                throw new ZlibException(err)

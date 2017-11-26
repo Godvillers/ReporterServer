@@ -28,8 +28,11 @@ struct SessionStorage
 
     @disable this(this)
 
+    @property size_t length() const nothrow pure @nogc
+        return _data.length
+
     @property bool empty() const nothrow pure @nogc
-        return !_data.length
+        return !length
 
     inout(Session)* opBinaryRight(string op: "in")(const(char)[ ] logId) inout nothrow pure @nogc
         return logId in _data

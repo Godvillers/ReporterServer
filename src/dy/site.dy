@@ -1,11 +1,12 @@
+import core.time
 import std.array
-import zlib = std.zlib: ZlibException
 
 import vibe.data.json
 import vibe.vibe
 
 import duel_log
 import session_storage
+import zlib = zlib: ZlibException, ZlibTooLarge
 
 
 final class Site
@@ -23,6 +24,11 @@ final class Site
         import std.base64
         import std.range
 
+        const headerLength = agent.length + link.length + cargo.length
+        if (headerLength > 256 || data.length > 60 << 10)
+            logDiagnostic("Declined a request of %.1f KB", (headerLength + data.length) / 1024.)
+            throw new HTTPStatusException(HTTPStatus.requestEntityTooLarge)
+
         const(void)[ ] decoded = data
         //Try to decode from Base64 first.
         _ubyteApp.clear()
@@ -36,10 +42,13 @@ final class Site
         try
             //A cast to `immutable(char)[ ]` is safe as `uncompress` allocates a new buffer.
             //We expect a compression ratio of about 20x-30x, so choose the buffer size accordingly.
-            concatenated = cast(string)zlib.uncompress(decoded, decoded.length << 5)
+            concatenated = cast(string)zlib.uncompress(decoded, 1 << 20, decoded.length << 5)
         catch (ZlibException e)
-            logWarn("Zlib decompression error: %s", e.msg)
+            logDiagnostic("Zlib decompression error: %s", e.msg)
             throw new HTTPStatusException(HTTPStatus.badRequest)
+        catch (ZlibTooLarge)
+            logDiagnostic("Declined a zip bomb of %.1f KB", data.length / 1024.)
+            throw new HTTPStatusException(HTTPStatus.requestEntityTooLarge)
 
         logDiagnostic(
             "Decompressed %.1f KB -> %.1f KB (%.1fx)",
@@ -50,10 +59,12 @@ final class Site
         string[3] htmls//allies, map, log
         concatenated.splitter("<&>").take(3).copy(htmls[ ])
         const dLog = duelLog(link, turn, cargo, htmls[0], htmls[1], htmls[2])
+        if (_storage.length > 100)
+            _storage.dropOldSessions(40.minutes)
         final switch (_storage.submit(dLog)) with (SubmissionStatus)
             case updated: break
             case ignored: logDiagnostic("Ignoring duplicate %s", dLog.id); break
-            case created: logInfo("Streaming %s", dLog.id); break
+            case created: logInfo("Streaming %s with %s", dLog.id, agent); break
 
         //TODO: Check browser extension version.
         render!("send.dt", dLog)
@@ -70,8 +81,6 @@ final class Site
 
     @path("/duels/log/:id") \
     void getDuelsLog(string _id) @system
-        import core.time
-
         _storage.dropOldSessions(40.minutes)
         if (auto session = _id in _storage)
             const dLog = &session.dLog
