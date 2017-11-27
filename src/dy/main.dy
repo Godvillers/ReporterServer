@@ -8,8 +8,15 @@ private ushort _port = 8000
 
 
 private void _parseArguments()
+    import std.algorithm.mutation
+    import std.range
+
     readOption("p|port", &_port, "Port to listen to (default: 8000).")
     readOption("prefix", &site_utils.prefix, "Prefix for site's root URL (default: <empty>)")
+
+    if (!site_utils.prefix.empty && site_utils.prefix[0] != '/')
+        throw new Exception("prefix must start with a '/'")
+    site_utils.prefix = site_utils.prefix.stripRight('/')
 
 
 private void _configure() @safe
@@ -25,7 +32,7 @@ private void _configure() @safe
         settings.options &= ~HTTPServerOption.errorStackTraces
 
     listenHTTP(settings,
-        (new URLRouter(site_utils.prefix))
+        new URLRouter(site_utils.prefix)
         .registerWebInterface(new Site)
         .get("/static/*", serveStaticFiles("."))
         .get("/favicon.ico", serveStaticFile("static/favicon.ico"))
