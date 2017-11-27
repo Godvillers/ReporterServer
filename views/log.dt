@@ -6,8 +6,6 @@ prepend title
 
 
 append head
-  include utils
-
   script(type="text/javascript",
     src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.6/pako_inflate.min.js")
   - script("log");

@@ -58,6 +58,7 @@ final class Site
 
         string[3] htmls//allies, map, log
         concatenated.splitter("<&>").take(3).copy(htmls[ ])
+        //Do actual work.
         const dLog = duelLog(link, turn, cargo, htmls[0], htmls[1], htmls[2])
         if (_storage.length > 100)
             _storage.dropOldSessions(40.minutes)

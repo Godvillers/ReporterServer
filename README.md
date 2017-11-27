@@ -27,7 +27,7 @@ Docker itself.
 [mgmt]: https://github.com/Godvillers/ReporterServerManagement
 
 
-The Hard way
+The Hard Way
 ------------
 
 ### Prerequisites ###
@@ -56,7 +56,7 @@ DFLAGS=-mcpu=native dub build -brelease-nobounds
 
 ### Running ###
 
-`./gvrepsrv [-p8000]`
+`./gvrepsrv [-p8000] [--prefix=/reporter]`
 
 However, the server is recommended to be run under [Supervisor][supervisor] so that it will
 auto-restart if/when crashing.

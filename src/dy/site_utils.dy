@@ -2,6 +2,9 @@ import std.conv
 import std.random
 
 
+string prefix = ""
+
+
 debug
     @property string seed() @safe
         return uniform!uint().to!string

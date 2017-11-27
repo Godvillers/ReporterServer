@@ -1,5 +1,7 @@
 import vibe.vibe
 
+static import site_utils
+
 
 private /+immutable+/ string[2] _addresses = ["::1", "127.0.0.1"]
 private ushort _port = 8000
@@ -7,6 +9,7 @@ private ushort _port = 8000
 
 private void _parseArguments()
     readOption("p|port", &_port, "Port to listen to (default: 8000).")
+    readOption("prefix", &site_utils.prefix, "Prefix for site's root URL (default: <empty>)")
 
 
 private void _configure() @safe
@@ -22,7 +25,7 @@ private void _configure() @safe
         settings.options &= ~HTTPServerOption.errorStackTraces
 
     listenHTTP(settings,
-        (new URLRouter)
+        (new URLRouter(site_utils.prefix))
         .registerWebInterface(new Site)
         .get("/static/*", serveStaticFiles("."))
         .get("/favicon.ico", serveStaticFile("static/favicon.ico"))

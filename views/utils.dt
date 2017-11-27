@@ -1,8 +1,9 @@
+- import site_utils;
+
+
 - void script(string src) @safe
-  - import random_seed;
-  script(type="text/javascript", src="/static/#{src}.js?a=#{seed}")
+  script(type="text/javascript", src="#{prefix}/static/#{src}.js?a=#{seed}")
 
 
 - void stylesheet(string href) @safe
-  - import random_seed;
-  link(rel="stylesheet", type="text/css", href="/static/#{href}.css?a=#{seed}")
+  link(rel="stylesheet", type="text/css", href="#{prefix}/static/#{href}.css?a=#{seed}")

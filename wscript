@@ -2,7 +2,6 @@ APPNAME = "gvrepsrv"
 VERSION = "0.1.0"
 
 
-
 def options(opt):
     opt.add_option(
         "-d", "--dev", action="store_true", default=False,
@@ -30,7 +29,7 @@ def build(bld):
             rule="${SASS} ${SASSFLAGS} ${SRC} ${TGT}",
             # TODO: Generalize.
             source="style/log.sass",
-            target="static/log.css",
+            target=bld.path.make_node("static/log.css"),
         )
 
 
