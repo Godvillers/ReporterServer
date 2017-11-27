@@ -31,10 +31,13 @@ private void _configure() @safe
     else
         settings.options &= ~HTTPServerOption.errorStackTraces
 
+    auto fsettings = new HTTPFileServerSettings
+    fsettings.serverPathPrefix = site_utils.prefix
+
     listenHTTP(settings,
         new URLRouter(site_utils.prefix)
         .registerWebInterface(new Site)
-        .get("/static/*", serveStaticFiles("."))
+        .get("/static/*", serveStaticFiles(".", fsettings))
         .get("/favicon.ico", serveStaticFile("static/favicon.ico"))
         .get("/robots.txt", serveStaticFile("static/robots.txt"))
     )
