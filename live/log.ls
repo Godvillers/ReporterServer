@@ -54,7 +54,11 @@ socket = null
 
 
 connect = !->
-    socket := new WebSocket "ws://#{location.host}#{location.pathname}/ws"
+    socket := new WebSocket do
+        "
+        #{if location.protocol == "https:" then "wss" else "ws"}://
+        #{location.host}#{location.pathname}/ws#{location.search}
+        "
     justConnected = true
     socket.binaryType = \arraybuffer
     socket.onmessage = (msg) !->

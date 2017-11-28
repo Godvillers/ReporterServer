@@ -64,7 +64,7 @@
   socket = null;
   connect = function(){
     var justConnected;
-    socket = new WebSocket("ws://" + location.host + location.pathname + "/ws");
+    socket = new WebSocket("" + (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + location.pathname + "/ws" + location.search + "");
     justConnected = true;
     socket.binaryType = 'arraybuffer';
     socket.onmessage = function(msg){
