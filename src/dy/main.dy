@@ -1,6 +1,8 @@
+import std.range
+
 import vibe.vibe
 
-static import site_utils
+import su = site_utils
 
 
 private /+immutable+/ string[2] _addresses = ["::1", "127.0.0.1"]
@@ -9,14 +11,13 @@ private ushort _port = 8000
 
 private void _parseArguments()
     import std.algorithm.mutation
-    import std.range
 
     readOption("p|port", &_port, "Port to listen to (default: 8000).")
-    readOption("prefix", &site_utils.prefix, "Prefix for site's root URL (default: <empty>)")
+    readOption("prefix", &su.prefix, "Prefix for site's root URL (default: /).")
 
-    if (!site_utils.prefix.empty && site_utils.prefix[0] != '/')
+    if (!su.prefix.empty && su.prefix[0] != '/')
         throw new Exception("prefix must start with a '/'")
-    site_utils.prefix = site_utils.prefix.stripRight('/')
+    su.prefix = su.prefix.stripRight('/')
 
 
 private void _configure() @safe
@@ -32,15 +33,24 @@ private void _configure() @safe
         settings.options &= ~HTTPServerOption.errorStackTraces
 
     auto fsettings = new HTTPFileServerSettings
-    fsettings.serverPathPrefix = site_utils.prefix
+    fsettings.serverPathPrefix = su.prefix
 
-    listenHTTP(settings,
-        new URLRouter(site_utils.prefix)
+    auto router = (
+        new URLRouter(su.prefix)
         .registerWebInterface(new Site)
         .get("/static/*", serveStaticFiles(".", fsettings))
         .get("/favicon.ico", serveStaticFile("static/favicon.ico"))
         .get("/robots.txt", serveStaticFile("static/robots.txt"))
     )
+    if (!su.prefix.empty)
+        //TODO: Find a way to handle the root page without a trailing slash.
+        router = (
+            (new URLRouter)
+            //For now, just temporarily redirect with 302 Found.
+            .get(su.prefix, staticRedirect(su.prefix ~ '/'))
+            .any("*", router)
+        )
+    listenHTTP(settings, router)
 
 
 int main()

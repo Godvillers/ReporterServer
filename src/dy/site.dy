@@ -74,11 +74,13 @@ final class Site
         render!"index.dt"
 
     void getDuels()
-        redirect("/")
+        import su = site_utils
+
+        redirect(su.prefix)
 
     @path("/duels/log") \
     void getDuelsLogRoot()
-        redirect("/")
+        getDuels()
 
     @path("/duels/log/:id") \
     void getDuelsLog(string _id) @system
