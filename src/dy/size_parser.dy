@@ -1,0 +1,24 @@
+long parseSize(const(char)[ ] spec) pure @safe
+    import std.conv
+    import std.range
+
+    ubyte shift
+    if (!spec.empty)
+        switch (spec[$ - 1])
+            case 'K', 'k': shift = 10; break
+            case 'M', 'm': shift = 20; break
+            case 'G', 'g': shift = 30; break
+            case 'T', 't': shift = 40; break
+            case 'P', 'p': shift = 50; break
+            case 'E', 'e': shift = 60; break
+            //Cannot be stored in a 63-bit integer:
+            //case 'Z', 'z': shift = 70; break
+            //case 'Y', 'y': shift = 80; break
+            default: break
+        if (shift)
+            spec = spec[0 .. $ - 1]
+
+    const number = spec.to!long
+    if (number >= 0 ? number > long.max >> shift : number < long.min >> shift)
+        throw new ConvOverflowException("Too large size")
+    return number << shift

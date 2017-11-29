@@ -7,17 +7,28 @@ import su = site_utils
 
 private /+immutable+/ string[2] _addresses = ["::1", "127.0.0.1"]
 private ushort _port = 8000
+private size_t _maxMemory
 
 
 private void _parseArguments()
     import std.algorithm.mutation
+    import std.conv
+
+    import size_parser
+
+    string maxMemory = "128M"
 
     readOption("p|port", &_port, "Port to listen to (default: 8000).")
     readOption("prefix", &su.prefix, "Prefix for site's root URL (default: /).")
+    readOption("max-memory", &maxMemory, "Limit for temporary log storage (default: 128M).")
 
     if (!su.prefix.empty && su.prefix[0] != '/')
         throw new Exception("prefix must start with a '/'")
     su.prefix = su.prefix.stripRight('/')
+
+    _maxMemory = parseSize(maxMemory).to!size_t
+    if (!_maxMemory)
+        throw new Exception("zero memory limit")
 
 
 private void _configure() @safe
@@ -37,7 +48,7 @@ private void _configure() @safe
 
     auto router = (
         new URLRouter(su.prefix)
-        .registerWebInterface(new Site)
+        .registerWebInterface(new Site(_maxMemory))
         .get("/static/*", serveStaticFiles(".", fsettings))
         .get("/favicon.ico", serveStaticFile("static/favicon.ico"))
         .get("/robots.txt", serveStaticFile("static/robots.txt"))

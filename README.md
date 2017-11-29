@@ -56,7 +56,7 @@ DFLAGS=-mcpu=native dub build -brelease-nobounds
 
 ### Running ###
 
-`./gvrepsrv [-p8000] [--prefix=/reporter]`
+`./gvrepsrv [-p8000] [--prefix=/reporter] [--max-memory=128M]`
 
 However, the server is recommended to be run under [Supervisor][supervisor] so that it will
 auto-restart if/when crashing.

@@ -1,5 +1,7 @@
 import core.time
+import std.algorithm
 import std.array
+import std.range
 
 import vibe.data.json
 import vibe.vibe
@@ -22,13 +24,11 @@ final class Site
     static this() nothrow
         _ubyteApp.reserve(32_768)
 
-    this() nothrow pure
-        _storage = sessionStorage()
+    this(size_t maxMemory) nothrow pure
+        _storage = SessionStorage(maxMemory)
 
     void postSend(string agent, string link, int turn, string cargo, string data) @system
-        import std.algorithm
         import std.base64
-        import std.range
 
         const headerLength = agent.length + link.length + cargo.length
         if (headerLength > 256 || data.length > 60 << 10)
@@ -112,12 +112,22 @@ final class Site
                     app.writeJsonString(Json(["redirect": Json(host ~ "/duels/log/" ~ _id)]))
                     socket.send((() @trusted => zlib.compress(app.data, 0))())
                     return
+                const ago = session.secondsSinceLastUpdated
                 if (session.status == session_storage.Session.Status.outOfMemory)
-                    return//TODO.
+                    //We have to delete this log now, but we hope it will be resubmitted later.
+                    app.clear()
+                    app.writeJsonString(Json([
+                        "stayHere":   Json(true),
+                        "retryAfter": Json(max(20 - ago, 1)),
+                        "retryEvery": Json(2),
+                        "retryCount": Json(5),
+                    ]))
+                    socket.send((() @trusted => zlib.compress(app.data, 0))())
+                    return
 
                 auto dLog = &session.dLog
                 response["turn"] = dLog.turn
-                response["ago"] = session.secondsSinceLastUpdated
+                response["ago"] = ago
                 response["allies"] = dLog.allies
                 response["map"] = dLog.map
                 response["log"] = dLog.log

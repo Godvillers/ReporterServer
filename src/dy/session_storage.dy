@@ -40,22 +40,26 @@ enum SubmissionStatus: ubyte
     updated,
 
 
-auto sessionStorage() nothrow pure
-    return SessionStorage(new RedBlackTree!(Session*, q{*a < *b}))
-
-
 struct SessionStorage
     @safe:
 
     private
         RedBlackTree!(Session*, q{*a < *b}) _tree
         Session[string] _aa
-        size_t _totalSpace
+        size_t _totalSpace, _maxMemory
 
     invariant
         assert(_tree.length == _aa.length)
 
+    @disable this()
     @disable this(this)
+
+    this(size_t maxMemory) nothrow pure \
+    in
+        assert(maxMemory > 0)
+    body
+        _tree = new typeof(_tree)
+        _maxMemory = maxMemory
 
     @property size_t length() const nothrow pure @nogc
         return _aa.length
@@ -91,11 +95,7 @@ struct SessionStorage
             const thresholdPoint = Clock.currTime() - maxAge
             //The tree is sorted in such a way that older entries go first.
             while (!_tree.empty && _tree.front.lastUpdated <= thresholdPoint)
-                auto session = _tree.front
-                session.status = Session.Status.finished
-                session.event.emit()
-                _removeTreeFront()
-                _aa.remove(session.dLog.id)
+                _dropOldest(Session.Status.finished)
 
     private:
 
@@ -111,13 +111,25 @@ struct SessionStorage
     in
         assert(session !is null)
     body
+        assert(_totalSpace >= session.dLog.space)
         _totalSpace -= session.dLog.space
         const number = _tree.removeKey(session)
         assert(number == 1)
 
-    void _removeTreeFront() nothrow pure @nogc
-        _totalSpace -= _tree.front.dLog.space
+    void _dropOldest(Session.Status status) \
+    in
+        assert(status != Session.Status.active)
+    body
+        auto session = _tree.front
+        assert(session.status == Session.Status.active)
+        session.status = status
+        session.event.emit()
+        assert(_totalSpace >= session.dLog.space)
+        _totalSpace -= session.dLog.space
         _tree.removeFront()
+        const existed = _aa.remove(session.dLog.id)
+        assert(existed)
 
     void _dropIfOutOfMemory()
-        { }//TODO.
+        while (_totalSpace >= _maxMemory)
+            _dropOldest(Session.Status.outOfMemory)

@@ -5,6 +5,10 @@ $id = -> document.getElementById it
 $q  = -> document.querySelector  it
 
 
+after = (ms, action) ->
+    setTimeout action, ms
+
+
 every = (ms, action) ->
     setInterval action, ms
 
@@ -51,6 +55,8 @@ runProgressTimer = (ago) !->
 
 
 socket = null
+retryEvery = 3
+retryCount = 0
 
 
 connect = !->
@@ -63,9 +69,23 @@ connect = !->
     socket.binaryType = \arraybuffer
     socket.onmessage = (msg) !->
         response = timeIt "Decompression", -> JSON.parse decompress msg.data
-        if response.redirect?
-            location.replace that
+        if response.stayHere
+            # The log is being deleted from the server, and we are asked to try fetching it later.
+            {retryEvery, retryCount} := response
+            socket.onclose = null
+            socket.close()
+            after response.retryAfter, connect
+        else if (url = response.redirect)?
+            if --retryCount > 0
+                # We were asked to ignore redirections for a while.
+                socket.onclose = null
+                socket.close()
+                after retryEvery, connect
+            else
+                location.replace url
         else if response.turn > getTurn()
+            retryCount := 0 # Reset the counter.
+
             $id \alls .outerHTML = response.allies
 
             map = $id \map_wrap
@@ -80,7 +100,7 @@ connect = !->
 
         justConnected := false
 
-    socket.onclose = !-> setTimeout connect, 3000
+    socket.onclose = !-> after 3000, connect
 
 
 <-! addEventListener \DOMContentLoaded

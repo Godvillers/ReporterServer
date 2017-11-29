@@ -10,7 +10,7 @@ struct DuelLog
     string allies, map, log//HTML.
 
     @property size_t space() const nothrow pure @nogc
-        return allies.length + map.length + log.length
+        return allies.length + map.length + log.length + 300
 
 
 DuelLog duelLog(string link, int turn, string cargo, string allies, string map, string log) pure
