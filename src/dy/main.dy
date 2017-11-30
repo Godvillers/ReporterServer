@@ -39,9 +39,6 @@ private void _configure() @safe
     auto settings = new HTTPServerSettings
     settings.bindAddresses = _addresses[ ]
     settings.port = _port
-    debug { }
-    else
-        settings.options &= ~HTTPServerOption.errorStackTraces
 
     auto fsettings = new HTTPFileServerSettings
     fsettings.serverPathPrefix = su.prefix
