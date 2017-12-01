@@ -147,13 +147,14 @@ struct _Preprocessor
         //Temporarily detach the map to prevent from scanning through it.
         auto mapWrapper = svg.parent
         svg.detach()
-        //removeEverythingDangerous(doc)
+        removeEverythingDangerous(doc)
 
         //Remove control buttons from the header.
         if (auto header = findHeader(doc))
             removeControlButtons(header)
-            if (auto title = doc.querySelector(_s!".block_title", header))
-                { }//TODO: Remove everything parenthized.
+            //Remove distance to the port and rim from the header.
+            if (auto info = doc.querySelector(_s!".e_dist_info", header))
+                info.destroy()
 
         //Remove a navigation response.
         if (auto node = doc.querySelector(_s!".dir_resp"))
@@ -208,7 +209,12 @@ struct _Preprocessor
 
                 case "title":
                     if (prevTile !is null)
-                        prevTitleNode = node
+                        //There can be multiple <title>s inside a single <g>,
+                        //but only the first one is relevant.
+                        if (prevTitleNode is null)
+                            prevTitleNode = node
+                        else
+                            queueDestroy(node)
                     break
 
                 case "text":

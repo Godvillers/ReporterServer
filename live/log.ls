@@ -84,6 +84,7 @@ connect = !->
             else
                 location.replace url
         else if response.turn > getTurn()
+            console.timeEnd "New turn"
             retryCount := 0 # Reset the counter.
 
             $id \alls .outerHTML = response.allies
@@ -97,6 +98,7 @@ connect = !->
             $id \m_fight_log .outerHTML = response.log
 
             runProgressTimer if justConnected then response.ago else 0
+            console.time "New turn"
 
         justConnected := false
 
@@ -106,4 +108,5 @@ connect = !->
 <-! addEventListener \DOMContentLoaded
 
 runProgressTimer updatedAgo
+console.time "New turn"
 connect()

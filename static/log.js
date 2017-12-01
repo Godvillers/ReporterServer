@@ -91,6 +91,7 @@
           location.replace(url);
         }
       } else if (response.turn > getTurn()) {
+        console.timeEnd("New turn");
         retryCount = 0;
         $id('alls').outerHTML = response.allies;
         map = $id('map_wrap');
@@ -100,6 +101,7 @@
         map.scrollLeft = scrollValue * map.scrollWidth;
         $id('m_fight_log').outerHTML = response.log;
         runProgressTimer(justConnected ? response.ago : 0);
+        console.time("New turn");
       }
       justConnected = false;
     };
@@ -109,6 +111,7 @@
   };
   addEventListener('DOMContentLoaded', function(){
     runProgressTimer(updatedAgo);
+    console.time("New turn");
     connect();
   });
 }).call(this);
