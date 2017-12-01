@@ -99,12 +99,12 @@ body
     if (!s.skipOver('('))
         return invalid
     try
-        //s.skipOver!isWhite()
+        s.skipOver!isWhite()
         x = parse!float(s)
         s.skipOver!isWhite()
         if (!s.skipOver(','))
             return invalid
-        //s.skipOver!isWhite()
+        s.skipOver!isWhite()
         y = parse!float(s)
     catch (ConvException)
         return invalid
