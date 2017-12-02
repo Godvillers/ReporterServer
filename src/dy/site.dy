@@ -19,13 +19,24 @@ final class Site
 
     private SessionStorage _storage
 
-    private static Appender!(ubyte[ ]) _ubyteApp
+    private static Appender!(ubyte[ ]) _ubyteApp//Used to decode a request when it is in Base64.
 
     static this() nothrow
         _ubyteApp.reserve(32_768)
 
     this(size_t maxMemory) nothrow pure
         _storage = SessionStorage(maxMemory)
+
+    private void _emitBasicCORSHeaders()
+        header("Access-Control-Allow-Origin", "*")
+
+    void optionsSend()
+        import std.conv
+
+        enum oneDay = 24.hours.total!q{seconds}.to!string
+        _emitBasicCORSHeaders()
+        header("Access-Control-Allow-Methods", "OPTIONS, POST")
+        header("Access-Control-Max-Age", oneDay)
 
     void postSend(string agent, string link, int turn, string cargo, string data) @system
         import std.base64
@@ -73,6 +84,7 @@ final class Site
             case created: logInfo("Streaming %s with %s", dLog.id, agent); break
 
         //TODO: Check browser extension version.
+        _emitBasicCORSHeaders()
         render!("send.dt", dLog)
 
     void get() @system
