@@ -14,18 +14,18 @@ import preproc.utils
 
 @safe:
 
-void preprocessDuelLog(ref DuelLog dLog) @trusted
+void preprocessDuelLog(ref DuelLog log) @trusted
     import std.datetime
 
     const start = Clock.currTime()
     scope(success)
         const end = Clock.currTime()
-        logDiagnostic("Processed %s in %s", dLog.id, end - start)
+        logDiagnostic("Processed %s in %s", log.id, end - start)
 
-    _Preprocessor p = { &dLog, };
-    dLog.allies = p.process!"Allies"(dLog.allies)
-    dLog.map = p.process!"Map"(dLog.map)
-    dLog.chronicle = p.process!"Chronicle"(dLog.chronicle)
+    _Preprocessor p = { &log, };
+    log.allies = p.process!"Allies"(log.allies)
+    log.map = p.process!"Map"(log.map)
+    log.chronicle = p.process!"Chronicle"(log.chronicle)
 
 
 private:
@@ -33,7 +33,7 @@ private:
 struct _Preprocessor
     @system:
 
-    DuelLog* dLog
+    DuelLog* log
     Player[4] players
     float scale = 1
 
@@ -84,7 +84,7 @@ struct _Preprocessor
                     players[i].godName = extractGodName(_text(godNode)).idup
 
                 //Replace a drop-down button with a profile link.
-                replaceDropDown(doc, line, dLog.host, players[i].godName)
+                replaceDropDown(doc, line, log.host, players[i].godName)
 
         //Remove control buttons from the header.
         if (auto header = findHeader(doc))
@@ -187,7 +187,7 @@ struct _Preprocessor
                     if (pos.y.isNaN)
                         break
                     if (prevTile !is null)
-                        updateTileTooltip(doc, prevTile, y, x, prevTitleNode, player, dLog.cargo)
+                        updateTileTooltip(doc, prevTile, y, x, prevTitleNode, player, log.cargo)
                         prevTitleNode = null
                         player = null
                     y = pos.y
@@ -246,7 +246,7 @@ struct _Preprocessor
                 default: break
 
         if (prevTile !is null)
-            updateTileTooltip(doc, prevTile, y, x, prevTitleNode, player, dLog.cargo)
+            updateTileTooltip(doc, prevTile, y, x, prevTitleNode, player, log.cargo)
 
     private string _rescale(const(char)[ ] initialHeight) @safe
         try

@@ -16,7 +16,7 @@ struct Session
         finished,
         outOfMemory,
 
-    DuelLog dLog
+    DuelLog log
     SysTime lastUpdated
     ManualEvent event
     Status status
@@ -31,7 +31,7 @@ struct Session
         import std.typecons
 
         //ID just for strict ordering in (rare) cases when timestamps match exactly.
-        return tuple(lastUpdated, dLog.id).opCmp(tuple(rhs.lastUpdated, rhs.dLog.id))
+        return tuple(lastUpdated, log.id).opCmp(tuple(rhs.lastUpdated, rhs.log.id))
 
 
 enum SubmissionStatus: ubyte
@@ -67,17 +67,17 @@ struct SessionStorage
     inout(Session)* opBinaryRight(string op: "in")(const(char)[ ] logId) inout nothrow pure @nogc
         return logId in _aa
 
-    SubmissionStatus submit(DuelLog dLog)
+    SubmissionStatus submit(DuelLog log)
         import preproc
 
-        if (auto session = dLog.id in _aa)
-            if (dLog.turn <= session.dLog.turn)
+        if (auto session = log.id in _aa)
+            if (log.turn <= session.log.turn)
                 return SubmissionStatus.ignored
 
             _removeFromTree(session)
             _dropIfOutOfMemory()
-            preprocessDuelLog(dLog)
-            session.dLog = dLog
+            preprocessDuelLog(log)
+            session.log = log
             session.lastUpdated = Clock.currTime()
             _insertIntoTree(session)
 
@@ -85,9 +85,9 @@ struct SessionStorage
             return SubmissionStatus.updated
 
         _dropIfOutOfMemory()
-        preprocessDuelLog(dLog)
-        _aa[dLog.id] = Session(dLog, Clock.currTime(), createManualEvent())
-        _insertIntoTree(dLog.id in _aa)
+        preprocessDuelLog(log)
+        _aa[log.id] = Session(log, Clock.currTime(), createManualEvent())
+        _insertIntoTree(log.id in _aa)
         return SubmissionStatus.created
 
     void dropOldSessions(Duration maxAge)
@@ -105,14 +105,14 @@ struct SessionStorage
     body
         const number = _tree.insert(session)
         assert(number == 1)
-        _totalSpace += session.dLog.space
+        _totalSpace += session.log.space
 
     void _removeFromTree(Session* session) nothrow pure \
     in
         assert(session !is null)
     body
-        assert(_totalSpace >= session.dLog.space)
-        _totalSpace -= session.dLog.space
+        assert(_totalSpace >= session.log.space)
+        _totalSpace -= session.log.space
         const number = _tree.removeKey(session)
         assert(number == 1)
 
@@ -124,10 +124,10 @@ struct SessionStorage
         assert(session.status == Session.Status.active)
         session.status = status
         session.event.emit()
-        assert(_totalSpace >= session.dLog.space)
-        _totalSpace -= session.dLog.space
+        assert(_totalSpace >= session.log.space)
+        _totalSpace -= session.log.space
         _tree.removeFront()
-        const existed = _aa.remove(session.dLog.id)
+        const existed = _aa.remove(session.log.id)
         assert(existed)
 
     void _dropIfOutOfMemory()

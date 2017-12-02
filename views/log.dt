@@ -2,7 +2,7 @@ extends base
 
 
 prepend title
-  | #{dLog.id} —
+  | #{log.id} —
 
 
 append head
@@ -16,13 +16,13 @@ append head
 block body
   #main_wrapper.page_wrapper: #hero_block
     .headnote
-      a(href="#{dLog.host}/duels/log/#{dLog.id}", target="_blank") Прямая трансляция
+      a(href="#{log.host}/duels/log/#{log.id}", target="_blank") Прямая трансляция
 
     #arena_columns
       .m_small_col.group_wrapper
-        != dLog.allies
-        != dLog.chronicle
+        != log.allies
+        != log.chronicle
       .m_large_col.group_wrapper
-        != dLog.map
+        != log.map
 
     .footnote Хроники хранятся 40 минут.

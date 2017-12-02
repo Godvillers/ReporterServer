@@ -76,16 +76,16 @@ final class Site
         string[3] htmls//allies, map, chronicle
         concatenated.splitter("<&>").take(3).copy(htmls[ ])
         //Do actual work.
-        const dLog = duelLog(link, turn, cargo, htmls[0], htmls[1], htmls[2])
+        const log = duelLog(link, turn, cargo, htmls[0], htmls[1], htmls[2])
         _storage.dropOldSessions(_expirationPeriod)
-        final switch (_storage.submit(dLog)) with (SubmissionStatus)
+        final switch (_storage.submit(log)) with (SubmissionStatus)
             case updated: break
-            case ignored: logDiagnostic("Ignoring duplicate %s", dLog.id); break
-            case created: logInfo("Streaming %s with %s", dLog.id, agent); break
+            case ignored: logDiagnostic("Ignoring duplicate %s", log.id); break
+            case created: logInfo("Streaming %s with %s", log.id, agent); break
 
         //TODO: Check browser extension version.
         _emitBasicCORSHeaders()
-        render!("send.dt", dLog)
+        render!("send.dt", log)
 
     void get() @system
         render!"index.dt"
@@ -103,9 +103,9 @@ final class Site
     void getDuelsLog(string _id) @system
         _storage.dropOldSessions(_expirationPeriod)
         if (auto session = _id in _storage)
-            const dLog = &session.dLog
+            const log = &session.log
             const ago = session.secondsSinceLastUpdated
-            render!("log.dt", dLog, ago)
+            render!("log.dt", log, ago)
         else
             //The sailing has apparently ended, and there is no way to know
             //if it was hosted on godville.net or on godvillegame.com.
@@ -119,7 +119,7 @@ final class Site
         try
             do
                 if (_id !in _storage || session.status == session_storage.Session.Status.finished)
-                    const host = session !is null ? session.dLog.host : "https://godville.net"
+                    const host = session !is null ? session.log.host : "https://godville.net"
                     app.clear()
                     app.writeJsonString(Json(["redirect": Json(host ~ "/duels/log/" ~ _id)]))
                     socket.send((() @trusted => zlib.compress(app.data, 0))())
@@ -137,12 +137,12 @@ final class Site
                     socket.send((() @trusted => zlib.compress(app.data, 0))())
                     return
 
-                auto dLog = &session.dLog
-                response["turn"] = dLog.turn
+                auto log = &session.log
+                response["turn"] = log.turn
                 response["ago"] = ago
-                response["allies"] = dLog.allies
-                response["map"] = dLog.map
-                response["chronicle"] = dLog.chronicle
+                response["allies"] = log.allies
+                response["map"] = log.map
+                response["chronicle"] = log.chronicle
 
                 app.clear()
                 app.writeJsonString(response)
