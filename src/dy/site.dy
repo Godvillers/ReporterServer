@@ -62,7 +62,7 @@ final class Site
             concatenated.length * (1. / 1024),
             float(concatenated.length) / decoded.length)
 
-        string[3] htmls//allies, map, log
+        string[3] htmls//allies, map, chronicle
         concatenated.splitter("<&>").take(3).copy(htmls[ ])
         //Do actual work.
         const dLog = duelLog(link, turn, cargo, htmls[0], htmls[1], htmls[2])
@@ -130,7 +130,7 @@ final class Site
                 response["ago"] = ago
                 response["allies"] = dLog.allies
                 response["map"] = dLog.map
-                response["log"] = dLog.log
+                response["chronicle"] = dLog.chronicle
 
                 app.clear()
                 app.writeJsonString(response)

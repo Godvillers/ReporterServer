@@ -21,7 +21,7 @@ block body
     #arena_columns
       .m_small_col.group_wrapper
         != dLog.allies
-        != dLog.log
+        != dLog.chronicle
       .m_large_col.group_wrapper
         != dLog.map
 

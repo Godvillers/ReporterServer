@@ -70,7 +70,10 @@
   connect = function(){
     var justConnected;
     socket = new WebSocket("" + (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + location.pathname + "/ws" + location.search + "");
-    justConnected = true;
+    socket.onclose = function(){
+      after(3000, connect);
+    };
+    justConnected = 1;
     socket.binaryType = 'arraybuffer';
     socket.onmessage = function(msg){
       var response, url, map, scrollValue;
@@ -99,14 +102,11 @@
         $id('s_map').outerHTML = response.map;
         map = $id('map_wrap');
         map.scrollLeft = scrollValue * map.scrollWidth;
-        $id('m_fight_log').outerHTML = response.log;
-        runProgressTimer(justConnected ? response.ago : 0);
+        $id('m_fight_log').outerHTML = response.chronicle;
+        runProgressTimer(justConnected && response.ago);
         console.time("New turn");
       }
-      justConnected = false;
-    };
-    socket.onclose = function(){
-      after(3000, connect);
+      justConnected = 0;
     };
   };
   addEventListener('DOMContentLoaded', function(){

@@ -25,7 +25,7 @@ void preprocessDuelLog(ref DuelLog dLog) @trusted
     _Preprocessor p = { &dLog, };
     dLog.allies = p.process!"Allies"(dLog.allies)
     dLog.map = p.process!"Map"(dLog.map)
-    dLog.log = p.process!"Chronicle"(dLog.log)
+    dLog.chronicle = p.process!"Chronicle"(dLog.chronicle)
 
 
 private:

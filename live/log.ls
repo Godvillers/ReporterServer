@@ -65,7 +65,8 @@ connect = !->
         #{if location.protocol == "https:" then "wss" else "ws"}://
         #{location.host}#{location.pathname}/ws#{location.search}
         "
-    justConnected = true
+    socket.onclose = !-> after 3000, connect
+    justConnected = 1 # true
     socket.binaryType = \arraybuffer
     socket.onmessage = (msg) !->
         response = timeIt "Decompression", -> JSON.parse decompress msg.data
@@ -95,14 +96,12 @@ connect = !->
             map = $id \map_wrap
             map.scrollLeft = scrollValue * map.scrollWidth
 
-            $id \m_fight_log .outerHTML = response.log
+            $id \m_fight_log .outerHTML = response.chronicle
 
-            runProgressTimer if justConnected then response.ago else 0
+            runProgressTimer justConnected && response.ago
             console.time "New turn"
 
-        justConnected := false
-
-    socket.onclose = !-> after 3000, connect
+        justConnected := 0 # false
 
 
 <-! addEventListener \DOMContentLoaded
