@@ -80,15 +80,15 @@ svg
     stroke: hsl(0, 0%, 70%)
     stroke-width: 0.5
 
-.imp polygon
-    pointer-events: visiblePainted
-    stroke: hsl(0, 0%, 70%)
-    stroke-width: 2.5
-
-.tile.imp.i1 polygon
-    fill: hsl(0, 90%, 92%)
-
 .imp
+    polygon
+        pointer-events: visiblePainted
+        stroke: hsl(0, 0%, 70%)
+        stroke-width: 2.5
+
+    &.tile.i1 polygon
+        fill: hsl(0, 90%, 92%)
+
     &.i2 polygon
         fill: hsl(39, 93%, 77%)
 
@@ -150,12 +150,6 @@ polygon:hover
     fill: hsl(200, 50%, 87%)
 
 .tile
-    &.d_overlay polygon
-        fill: hsl(200, 15%, 85%)
-
-    &.d_selected polygon
-        fill: hsl(200, 15%, 69%)
-
     &.unknown
         polygon
             fill: hsla(60, 10%, 95%, 0.5)
@@ -168,35 +162,14 @@ polygon:hover
             fill: hsla(60, 10%, 90%, 0.1)
             stroke: hsl(0, 0%, 70%)
 
-    &.border
-        polygon
-            fill: hsl(200, 40%, 70%)
+    &.border polygon
+        fill: hsl(200, 40%, 70%)
 
-        &.d_overlay polygon
-            fill: hsl(200, 40%, 58%)
+    &.island polygon
+        fill: hsl(53, 69%, 78%)
 
-        &.d_selected polygon
-            fill: hsl(200, 30%, 40%)
-
-    &.island
-        polygon
-            fill: hsl(53, 69%, 78%)
-
-        &.d_overlay polygon
-            fill: hsl(53, 35%, 70%)
-
-        &.d_selected polygon
-            fill: hsl(53, 35%, 50%)
-
-    &.reefs
-        polygon
-            fill: hsl(60, 40%, 94%)
-
-        &.d_overlay polygon
-            fill: hsl(60, 40%, 84%)
-
-        &.d_selected polygon
-            fill: hsl(60, 40%, 54%)
+    &.reefs polygon
+        fill: hsl(60, 40%, 94%)
 
     &.monster polygon
         fill: hsl(0, 28%, 87%)
@@ -227,29 +200,10 @@ polygon:hover
         fill: hsl(300, 80%, 50%)
         font-weight: bold
 
-.dir_arrow
-    stroke-width: 2
-
-    &.pl1
-        stroke: hsl(223, 51%, 30%)
-        fill: hsl(223, 51%, 30%)
-
-    &.pl2
-        stroke: hsl(0, 57%, 40%)
-        fill: hsl(0, 57%, 40%)
-
-    &.pl3
-        stroke: hsl(120, 50%, 40%)
-        fill: hsl(120, 50%, 40%)
-
-    &.pl4
-        stroke: hsl(169, 74%, 30%)
-        fill: hsl(169, 74%, 30%)
-
-.tile text
-    text-anchor: middle
-    font-size: 12px
-    pointer-events: none
+    text
+        text-anchor: middle
+        font-size: 10px
+        pointer-events: none
 
 .cpt4 text
     font-weight: bold
@@ -267,45 +221,17 @@ polygon:hover
     &.tr_pl4 polygon
         fill: hsla(169, 74%, 51%, 0.3)
 
-    &.pl1
-        polygon
-            fill: hsl(223, 51%, 76%)
+    &.pl1 polygon
+        fill: hsl(223, 51%, 76%)
 
-        &.d_overlay polygon
-            fill: hsl(223, 30%, 65%)
+    &.pl2 polygon
+        fill: hsl(25, 81%, 67%)
 
-        &.d_selected polygon
-            fill: hsl(223, 30%, 45%)
+    &.pl3 polygon
+        fill: hsl(120, 50%, 80%)
 
-    &.pl2
-        polygon
-            fill: hsl(25, 81%, 67%)
-
-        &.d_overlay polygon
-            fill: hsl(25, 55%, 67%)
-
-        &.d_selected polygon
-            fill: hsl(25, 55%, 47%)
-
-    &.pl3
-        polygon
-            fill: hsl(120, 50%, 80%)
-
-        &.d_overlay polygon
-            fill: hsl(120, 40%, 60%)
-
-        &.d_selected polygon
-            fill: hsl(120, 40%, 40%)
-
-    &.pl4
-        polygon
-            fill: hsl(169, 74%, 51%)
-
-        &.d_overlay polygon
-            fill: hsl(169, 57%, 40%)
-
-        &.d_selected polygon
-            fill: hsl(169, 57%, 30%)
+    &.pl4 polygon
+        fill: hsl(169, 74%, 51%)
 
     &.hl polygon
         stroke: hsla(264, 93%, 52%, 0.83)
@@ -734,33 +660,6 @@ div.p_val
 
 #m_fight_log > .d_content
     padding-top: 5px
-
-.tile
-    text
-        font-size: 10px
-
-    &.d_overlay:hover polygon
-        fill: hsl(200, 15%, 69%) !important
-
-    &.border.d_overlay:hover polygon
-        fill: hsl(200, 30%, 40%)
-
-#zoom_in
-    position: absolute
-    right: 23px
-    outline: none
-
-#zoom_out
-    position: absolute
-    right: 42px
-    outline: none
-
-#pop_out
-    position: absolute
-    right: 10px
-    outline: none
-    top: 0
-    font-size: 11px
 
 #s_map .r_slot
     width: 71px
