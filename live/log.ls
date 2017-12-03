@@ -41,12 +41,13 @@ setProgress = (value) !->
 progressTimer = null
 
 
-runProgressTimer = (ago) !->
+runProgressTimer = (ago, turnDuration) !->
+    percentsPerMillisecond = 0.1 / turnDuration
     basePoint = Date.now()
-    clearInterval that if progressTimer?
-    setProgress Math.min ago *= 5, 100
+    clearInterval progressTimer if progressTimer?
+    setProgress Math.min ago *= percentsPerMillisecond * 1000, 100
     progressTimer := every 250, !->
-        if (progress = ago + (Date.now() - basePoint) * 5e-3) < 100 - 1e-5
+        if (progress = ago + (Date.now() - basePoint) * percentsPerMillisecond) < 100 - 1e-5
             setProgress progress
         else
             setProgress 100
@@ -98,7 +99,7 @@ connect = !->
 
             $id \m_fight_log .outerHTML = response.chronicle
 
-            runProgressTimer justConnected && response.ago
+            runProgressTimer justConnected && response.ago, response.turnDuration
             console.time "New turn"
 
         justConnected := 0 # false
@@ -106,6 +107,6 @@ connect = !->
 
 <-! addEventListener \DOMContentLoaded
 
-runProgressTimer updatedAgo
+runProgressTimer gUpdatedAgo, gTurnDuration
 console.time "New turn"
 connect()

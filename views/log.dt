@@ -9,7 +9,7 @@ append head
   script(type="text/javascript",
     src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.6/pako_inflate.min.js")
   - script("log");
-  script(type="text/javascript") var updatedAgo = #{ago};
+  script(type="text/javascript") var gUpdatedAgo = #{ago}, gTurnDuration = #{log.turnDuration};
   - stylesheet("log");
 
 

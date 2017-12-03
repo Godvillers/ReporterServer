@@ -46,16 +46,17 @@
     } catch (e$) {}
   };
   progressTimer = null;
-  runProgressTimer = function(ago){
-    var basePoint, that;
+  runProgressTimer = function(ago, turnDuration){
+    var percentsPerMillisecond, basePoint;
+    percentsPerMillisecond = 0.1 / turnDuration;
     basePoint = Date.now();
-    if ((that = progressTimer) != null) {
-      clearInterval(that);
+    if (progressTimer != null) {
+      clearInterval(progressTimer);
     }
-    setProgress(Math.min(ago *= 5, 100));
+    setProgress(Math.min(ago *= percentsPerMillisecond * 1000, 100));
     progressTimer = every(250, function(){
       var progress;
-      if ((progress = ago + (Date.now() - basePoint) * 5e-3) < 100 - 1e-5) {
+      if ((progress = ago + (Date.now() - basePoint) * percentsPerMillisecond) < 100 - 1e-5) {
         setProgress(progress);
       } else {
         setProgress(100);
@@ -103,14 +104,14 @@
         map = $id('map_wrap');
         map.scrollLeft = scrollValue * map.scrollWidth;
         $id('m_fight_log').outerHTML = response.chronicle;
-        runProgressTimer(justConnected && response.ago);
+        runProgressTimer(justConnected && response.ago, response.turnDuration);
         console.time("New turn");
       }
       justConnected = 0;
     };
   };
   addEventListener('DOMContentLoaded', function(){
-    runProgressTimer(updatedAgo);
+    runProgressTimer(gUpdatedAgo, gTurnDuration);
     console.time("New turn");
     connect();
   });

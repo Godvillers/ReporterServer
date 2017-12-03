@@ -60,7 +60,7 @@ in
     assert(node !is null)
 body
     foreach (name; node.attrs.byKey())
-        if (name.startsWith("on"))//HTML event handlers.
+        if (name.startsWith("on") /+HTML event handlers.+/ || name.startsWith("data-vivaldi-"))
             node.removeAttr(name)
 
 

@@ -76,7 +76,7 @@ final class Site
         string[3] htmls//allies, map, chronicle
         concatenated.splitter("<&>").take(3).copy(htmls[ ])
         //Do actual work.
-        const log = duelLog(link, turn, cargo, htmls[0], htmls[1], htmls[2])
+        const log = duelLog(link, turn, 20, cargo, htmls[0], htmls[1], htmls[2])
         _storage.dropOldSessions(_expirationPeriod)
         final switch (_storage.submit(log)) with (SubmissionStatus)
             case updated: break
@@ -124,8 +124,11 @@ final class Site
                     app.writeJsonString(Json(["redirect": Json(host ~ "/duels/log/" ~ _id)]))
                     socket.send((() @trusted => zlib.compress(app.data, 0))())
                     return
+
+                auto log = &session.log
                 const ago = session.secondsSinceLastUpdated
                 if (session.status == session_storage.Session.Status.outOfMemory)
+                    logInfo("Out of memory; dropping %s at turn %d", log.id, log.turn)
                     //We have to delete this log now, but we hope it will be resubmitted later.
                     app.clear()
                     app.writeJsonString(Json([
@@ -137,9 +140,9 @@ final class Site
                     socket.send((() @trusted => zlib.compress(app.data, 0))())
                     return
 
-                auto log = &session.log
                 response["turn"] = log.turn
                 response["ago"] = ago
+                response["turnDuration"] = log.turnDuration
                 response["allies"] = log.allies
                 response["map"] = log.map
                 response["chronicle"] = log.chronicle
