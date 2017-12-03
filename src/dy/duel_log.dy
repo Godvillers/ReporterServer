@@ -7,6 +7,7 @@ struct DuelLog
     string id//\w{5,}
     int turn
     float turnDuration
+    float scale
     string cargo
     string allies, map, chronicle//HTML.
 
@@ -18,6 +19,7 @@ DuelLog duelLog(
     string link,
     int turn,
     float turnDuration,
+    float scale,
     string cargo,
     string allies,
     string map,
@@ -37,4 +39,4 @@ DuelLog duelLog(
         pos = link[0 .. $ - 1].lastIndexOf('/')
         id = link[~pos ? pos + 1 : 0 .. $]
 
-    return DuelLog(host, id, turn, turnDuration, cargo, allies, map, chronicle)
+    return DuelLog(host, id, turn, turnDuration, scale, cargo, allies, map, chronicle)

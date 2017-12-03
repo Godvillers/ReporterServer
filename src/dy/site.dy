@@ -76,7 +76,7 @@ final class Site
         string[3] htmls//allies, map, chronicle
         concatenated.splitter("<&>").take(3).copy(htmls[ ])
         //Do actual work.
-        const log = duelLog(link, turn, 20, cargo, htmls[0], htmls[1], htmls[2])
+        const log = duelLog(link, turn, 20, 11, cargo, htmls[0], htmls[1], htmls[2])
         _storage.dropOldSessions(_expirationPeriod)
         final switch (_storage.submit(log)) with (SubmissionStatus)
             case updated: break

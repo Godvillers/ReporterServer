@@ -187,7 +187,8 @@ struct _Preprocessor
                     if (pos.y.isNaN)
                         break
                     if (prevTile !is null)
-                        updateTileTooltip(doc, prevTile, y, x, prevTitleNode, player, log.cargo)
+                        updateTileTooltip(
+                            doc, prevTile, y, x, log.scale, prevTitleNode, player, log.cargo)
                         prevTitleNode = null
                         player = null
                     y = pos.y
@@ -246,7 +247,7 @@ struct _Preprocessor
                 default: break
 
         if (prevTile !is null)
-            updateTileTooltip(doc, prevTile, y, x, prevTitleNode, player, log.cargo)
+            updateTileTooltip(doc, prevTile, y, x, log.scale, prevTitleNode, player, log.cargo)
 
     private string _rescale(const(char)[ ] initialHeight) @safe
         try

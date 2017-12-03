@@ -125,6 +125,7 @@ void updateTileTooltip(
     Node* tile,
     double y,
     double x,
+    double scale,
     Node* titleNode,
     const(Player)* player,
     const(char)[ ] cargo) \
@@ -133,7 +134,7 @@ in
 body
     import geometry
 
-    const dist = HexCoord.fromRect!11(y, x).dist
+    const dist = HexCoord.fromRect(y, x, scale).dist
     const(char)[ ] oldMsg, tooltipText
     if (titleNode !is null)
         const s = _text(titleNode)
