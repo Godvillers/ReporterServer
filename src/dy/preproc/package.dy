@@ -111,6 +111,10 @@ struct _Preprocessor
         if (auto pbar = doc.querySelector(_s!".p_bar"))
             pbar.removeAttr("title")
 
+        //Remove streaming links.
+        if (auto block = doc.querySelector(_s!"#e_streaming"))
+            block.destroy()
+
         //Remove extra whitespace between tags.
         removeExtraWhitespace(doc)
 
