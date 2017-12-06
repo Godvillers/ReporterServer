@@ -128,7 +128,7 @@ final class Site
                 auto log = &session.log
                 const ago = session.secondsSinceLastUpdated
                 if (session.status == session_storage.Session.Status.outOfMemory)
-                    logInfo("Out of memory; dropping %s at turn %d", log.id, log.turn)
+                    logInfo("Out of memory; dropping %s at step %d", log.id, log.step)
                     //We have to delete this log now, but we hope it will be resubmitted later.
                     app.clear()
                     app.writeJsonString(Json([
@@ -140,9 +140,9 @@ final class Site
                     socket.send((() @trusted => zlib.compress(app.data, 0))())
                     return
 
-                response["turn"] = log.turn
+                response["step"] = log.step
                 response["ago"] = ago
-                response["turnDuration"] = log.turnDuration
+                response["stepDuration"] = log.stepDuration
                 response["allies"] = log.allies
                 response["map"] = log.map
                 response["chronicle"] = log.chronicle

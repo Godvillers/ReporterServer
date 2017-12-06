@@ -71,7 +71,7 @@ struct SessionStorage
         import preproc
 
         if (auto session = log.id in _aa)
-            if (log.turn <= session.log.turn)
+            if (log.step <= session.log.step)
                 return SubmissionStatus.ignored
 
             _removeFromTree(session)

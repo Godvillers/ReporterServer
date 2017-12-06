@@ -29,7 +29,7 @@ decompress =
         (data) -> pako.inflate data, to: \string
 
 
-getTurn = ->
+getStep = ->
     try +/\d+/.exec($q '#m_fight_log .block_h .block_title' .textContent).0
     catch => 0
 
@@ -41,8 +41,8 @@ setProgress = (value) !->
 progressTimer = null
 
 
-runProgressTimer = (ago, turnDuration) !->
-    percentsPerMillisecond = 0.1 / turnDuration
+runProgressTimer = (ago, stepDuration) !->
+    percentsPerMillisecond = 0.1 / stepDuration
     basePoint = Date.now()
     clearInterval progressTimer if progressTimer?
     setProgress Math.min ago *= percentsPerMillisecond * 1000, 100
@@ -85,8 +85,8 @@ connect = !->
                 after retryEvery, connect
             else
                 location.replace url
-        else if response.turn > getTurn()
-            console.timeEnd "New turn"
+        else if response.step > getStep()
+            console.timeEnd "New step"
             retryCount := 0 # Reset the counter.
 
             $id \alls .outerHTML = response.allies
@@ -99,14 +99,14 @@ connect = !->
 
             $id \m_fight_log .outerHTML = response.chronicle
 
-            runProgressTimer justConnected && response.ago, response.turnDuration
-            console.time "New turn"
+            runProgressTimer justConnected && response.ago, response.stepDuration
+            console.time "New step"
 
         justConnected := 0 # false
 
 
 <-! addEventListener \DOMContentLoaded
 
-runProgressTimer gUpdatedAgo, gTurnDuration
-console.time "New turn"
+runProgressTimer gUpdatedAgo, gStepDuration
+console.time "New step"
 connect()
