@@ -42,7 +42,7 @@
 .e_smonster_tre
   font-weight: bold
 
-g.e_visited text
+svg .e_visited text
   opacity: 0.33
 
 
@@ -251,33 +251,34 @@ img
   display: table
   margin: 0 auto
   height: auto
+  width: 95%
   min-width: 995px
 
 #hero_block
   font-size: 0.96em
 
-.c_col, .s_col
+.c_col, .s_col, .m_large_col, .m_small_col
   float: left
   padding: 0 0.4em
 
-$c_col_width: 448px
-$s_col_width: 234px
-$m_large_col_width: 920px
-$m_small_col_width: 270px
+.m_large_col, .m_small_col
+  box-sizing: border-box
 
-.c_col
-  width: $c_col_width
-
-.s_col
-  width: $s_col_width
+$m_small_col_width: 22%
 
 .m_large_col
-  @extend .c_col
-  width: $m_large_col_width
+  width: 100% - $m_small_col_width
 
 .m_small_col
-  @extend .s_col
   width: $m_small_col_width
+  max-width: 270px
+
+//Unused now.
+.c_col
+  width: 448px
+
+.s_col
+  width: 234px
 
 .block
   clear: both
@@ -332,14 +333,6 @@ $m_small_col_width: 270px
   font-size: 1em
   margin: 0 auto
 
-  .s_col &
-    margin-left: 40px
-    margin-right: 40px
-    width: $s_col_width - 88px
-
-  .m_small_col &
-    width: $m_small_col_width - 88px
-
 .block_content
   padding: 10px 5px 5px 5px
   clear: both
@@ -392,22 +385,24 @@ $m_small_col_width: 270px
     word-wrap: break-word
     white-space: pre-wrap
 
-.s_col .d_msg
-  text-align: left
-  padding-left: 5px
-  word-wrap: break-word
+.s_col, .m_small_col
+  .d_msg
+    text-align: left
+    padding-left: 5px
+    word-wrap: break-word
 
 .m_infl
   color: #38599A
 
-.s_col .d_time
-  display: inline
+.s_col, .m_small_col
+  .d_time
+    display: inline
 
 .d_line
   padding: 4px 5px 7px 0
   position: relative
 
-div.p_bar
+.p_bar
   float: right
   border: #999 1px solid
   width: 99%
@@ -415,7 +410,7 @@ div.p_bar
   +border-radius(4px)
   background-color: #FFF
 
-div.p_val
+.p_val
   background-color: #777
   width: 100%
   height: 8px
@@ -522,8 +517,8 @@ div.p_val
   margin: 0
   padding: 0
 
-.s_col
-  #diary, #m_fight_log
+.s_col, .m_small_col
+  #m_fight_log
     .b_handle, .sort_ch
       padding: 0
 
@@ -631,10 +626,11 @@ div.p_val
 .hp_red
   color: red
 
-.s_col .hp_diff
-  position: absolute
-  top: 18px
-  right: 33px
+.s_col, .m_small_col
+  .hp_diff
+    position: absolute
+    top: 18px
+    right: 33px
 
 .saild_1
   background-color: rgba(163, 180, 225, 0.25)
@@ -648,14 +644,15 @@ div.p_val
 .saild_4
   background-color: rgba(38, 223, 189, 0.25)
 
-#m_fight_log > .block_content
-  padding: 10px 0 5px
+#m_fight_log >
+  .block_content
+    padding: 10px 0 5px
+
+  .d_content
+    padding-top: 5px
 
 #turn_pbar
   padding: 7px 10px 19px 9px
-
-#m_fight_log > .d_content
-  padding-top: 5px
 
 #s_map .r_slot
   width: 71px
