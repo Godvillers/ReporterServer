@@ -47,6 +47,7 @@ private void _configure() @safe
         new URLRouter(su.prefix)
         .registerWebInterface(new Site(_maxMemory))
         .get("/static/*", serveStaticFiles(".", fsettings))
+        .get("/api.json", serveStaticFile("static/api.json"))
         .get("/version", serveStaticFile("static/version.txt"))
         .get("/favicon.ico", serveStaticFile("static/favicon.ico"))
         .get("/robots.txt", serveStaticFile("static/robots.txt"))

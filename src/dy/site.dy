@@ -39,15 +39,19 @@ final class Site
         header("Access-Control-Max-Age", oneDay)
 
     void postSend(
+        int    protocolVersion,
         string agent,
         string link,
-        int    turn,
+        float  stepDuration,
+        float  scale,
+        int    step,
         int    playerIndex,//1-based.
         string cargo,
         string data,
     ) @system
         import std.base64
 
+        //TODO: Check `protocolVersion`.
         const headerLength = agent.length + link.length + cargo.length
         if (headerLength > 256 || data.length > 60 << 10)
             logDiagnostic("Declined a request of %.1f KB", (headerLength + data.length) / 1024.)
@@ -84,7 +88,7 @@ final class Site
         concatenated.splitter("<&>").take(3).copy(htmls[ ])
         //Do actual work.
         const log = duelLog(
-            link, turn, playerIndex - 1, 20, 11, cargo, htmls[0], htmls[1], htmls[2])
+            link, step, playerIndex - 1, stepDuration, scale, cargo, htmls[0], htmls[1], htmls[2])
         _storage.dropOldSessions(_expirationPeriod)
         final switch (_storage.submit(log)) with (SubmissionStatus)
             case updated: break
