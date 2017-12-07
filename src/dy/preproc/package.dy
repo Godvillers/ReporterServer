@@ -98,10 +98,21 @@ struct _Preprocessor
         removeExtraWhitespace(doc)
 
     void processChronicle(ref Document doc)
+        import std.format
+
         removeEverythingDangerous(doc)
-        //Remove custom styling, showing partially hidden text.
+
         foreach (node; doc.querySelectorAll(_s!".d_line"))
+            //Remove custom styling, showing partially hidden text.
             node.removeAttr("style")
+            //Assign streamer's color to white entries.
+            if (log.streamerIndex >= 0)
+                const classes = node.attr("class")
+                if (!classes.splitter().canFind!(cls => cls.startsWith("saild_")))
+                    const last = _stableApp.data.length
+                    _stableApp ~= classes
+                    _stableApp.formattedWrite!" saild_%s"(log.streamerIndex + 1)
+                    node.attr("class", _stableApp.data[last .. $])
 
         //Remove control buttons from the header.
         if (auto header = findHeader(doc))

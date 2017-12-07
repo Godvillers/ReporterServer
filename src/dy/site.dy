@@ -38,7 +38,14 @@ final class Site
         header("Access-Control-Allow-Methods", "OPTIONS, POST")
         header("Access-Control-Max-Age", oneDay)
 
-    void postSend(string agent, string link, int turn, string cargo, string data) @system
+    void postSend(
+        string agent,
+        string link,
+        int    turn,
+        int    playerIndex,//1-based.
+        string cargo,
+        string data,
+    ) @system
         import std.base64
 
         const headerLength = agent.length + link.length + cargo.length
@@ -76,7 +83,8 @@ final class Site
         string[3] htmls//allies, map, chronicle
         concatenated.splitter("<&>").take(3).copy(htmls[ ])
         //Do actual work.
-        const log = duelLog(link, turn, 20, 11, cargo, htmls[0], htmls[1], htmls[2])
+        const log = duelLog(
+            link, turn, playerIndex - 1, 20, 11, cargo, htmls[0], htmls[1], htmls[2])
         _storage.dropOldSessions(_expirationPeriod)
         final switch (_storage.submit(log)) with (SubmissionStatus)
             case updated: break
