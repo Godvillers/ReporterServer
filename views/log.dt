@@ -1,9 +1,7 @@
 extends base
 
-
 prepend title
   | #{log.id} —
-
 
 append head
   script(type="text/javascript",
@@ -11,7 +9,6 @@ append head
   - script("log");
   script(type="text/javascript") var gUpdatedAgo = #{ago}, gStepDuration = #{log.stepDuration};
   - stylesheet("log");
-
 
 block body
   #main_wrapper.page_wrapper: #hero_block

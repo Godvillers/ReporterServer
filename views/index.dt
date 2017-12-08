@@ -1,9 +1,59 @@
 extends base
 
+append head
+  //-Is moving styles to a separate file worth it?..
+  style.
+    body {
+      width: 90%;
+      margin: 1.5em 0 0 5%;
+      background-color: #F5F5F5;
+    }
+
+    p {
+      text-align: justify;
+      font-size: 1.05em;
+    }
+
+    a, a:visited {
+      color: #05B;
+    }
+
+    a:hover {
+      color: #DA251D;
+      text-decoration: none;
+    }
 
 block body
   p.
-    Годвилльский Репортёр — это расширение для браузера, транслирующее хронику заплыва
-    (с картой!), чтобы зрители могли наблюдать за ней в реальном времени. Также #[em планируется]
-    поддержка и других типов хроник (тренировки/арены/банды/рейды/подземелья).
-  p #[a(href="https://github.com/Godvillers/Reporter/releases", target="_blank") Скачать].
+    "Репортёр" предназначен для трансляции
+    #[a(href="https://godville.net", target="_blank") годвилльских] хроник в реальном времени,
+    чтобы зрители могли следить за приключениями с тем же удобством, что и участники. Мы пока умеем
+    показывать только морские заплывы, но запланирована поддержка и других дуэльных режимов
+    (тренировки/арены/банды/рейды/подземелья).
+  p.
+    Чтобы запустить трансляцию, установите #[a(href="https://gv.erinome.net") Erinome Godville UI+],
+    отплывите и нажмите кнопку "Транслировать" в блоке хроники.
+  p.
+    Со всеми вопросами, предложениями и ошибками обращайтесь к
+    #[a(href="https://godville.net/gods/Кордарион%20Пасмурный") Кордариону Пасмурному].
+  p.
+    Проект живёт на #[a(href="https://github.com/Godvillers/ReporterServer") Гитхабе], если кому-то
+    это интересно.
+
+  hr
+
+  p.
+    The Reporter is a service for broadcasting
+    #[a(href="https://godvillegame.com", target="_blank") Godville] duel logs in real-time to make
+    watching adventures as convinient as when participating in them yourselves. We can only deal
+    with sailing now, but there is planned support for other heroic activities too
+    (challenges/Arena/gangs/raids/dungeons). And yes, some labels aren't translated yet. Sorry.
+  p.
+    To start using it, install #[a(href="https://gv.erinome.net") Erinome Godville UI+], go sailing
+    and click the "Stream" button in the "Chronicle" block.
+  p.
+    If you have any questions, suggestions, or error reports, please, drop
+    #[a(href="https://godvillegame.com/gods/El%20Kreono") El Kreono] a line.
+  p.
+    The sources are available on #[a(href="https://github.com/Godvillers/ReporterServer") Github],
+    if anyone cares.
