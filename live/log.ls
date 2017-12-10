@@ -5,12 +5,12 @@ $id = -> document.getElementById it
 $q  = -> document.querySelector  it
 
 
-after = (ms, action) ->
-    setTimeout action, ms
+after = (seconds, action) ->
+    setTimeout action, seconds * 1000
 
 
-every = (ms, action) ->
-    setInterval action, ms
+every = (seconds, action) ->
+    setInterval action, seconds * 1000
 
 
 timeIt = (title, action) ->
@@ -46,7 +46,7 @@ runProgressTimer = (ago, stepDuration) !->
     basePoint = Date.now!
     clearInterval progressTimer if progressTimer?
     setProgress Math.min ago *= percentsPerMillisecond * 1000, 100
-    progressTimer := every 250, !->
+    progressTimer := every 0.25, !->
         if (progress = ago + (Date.now! - basePoint) * percentsPerMillisecond) < 100 - 1e-5
             setProgress progress
         else
@@ -91,7 +91,7 @@ connect = !->
         "
     socket.onclose = !->
         socket := null
-        after 3000, connect
+        after 3, connect
     justConnected = 1 # true
     socket.binaryType = \arraybuffer
     socket.onmessage = (msg) !->

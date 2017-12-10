@@ -8,11 +8,11 @@
   $q = function(it){
     return document.querySelector(it);
   };
-  after = function(ms, action){
-    return setTimeout(action, ms);
+  after = function(seconds, action){
+    return setTimeout(action, seconds * 1000);
   };
-  every = function(ms, action){
-    return setInterval(action, ms);
+  every = function(seconds, action){
+    return setInterval(action, seconds * 1000);
   };
   timeIt = function(title, action){
     console.time(title);
@@ -54,7 +54,7 @@
       clearInterval(progressTimer);
     }
     setProgress(Math.min(ago *= percentsPerMillisecond * 1000, 100));
-    progressTimer = every(250, function(){
+    progressTimer = every(0.25, function(){
       var progress;
       if ((progress = ago + (Date.now() - basePoint) * percentsPerMillisecond) < 100 - 1e-5) {
         setProgress(progress);
@@ -95,7 +95,7 @@
     socket = new WebSocket("" + (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + location.pathname + "/ws" + location.search + "");
     socket.onclose = function(){
       socket = null;
-      after(3000, connect);
+      after(3, connect);
     };
     justConnected = 1;
     socket.binaryType = 'arraybuffer';
