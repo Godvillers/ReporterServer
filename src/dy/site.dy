@@ -145,11 +145,12 @@ final class Site
                     app.clear()
                     app.writeJsonString(Json([
                         "stayHere":   Json(true),
-                        "retryAfter": Json(max(20 - ago, 1)),
+                        "retryAfter": Json(max(log.stepDuration - ago, 1)),
                         "retryEvery": Json(2),
                         "retryCount": Json(5),
                     ]))
                     socket.send((() @trusted => zlib.compress(app.data, 0))())
+                    socket.close(1013)//Try Again Later
                     return
 
                 response["step"] = log.step

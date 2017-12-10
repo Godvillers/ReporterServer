@@ -123,10 +123,10 @@ const(char)[ ] formatTileTranslation(float y, float x)
 
 
 const(char)[ ] removePrivateTileClasses(const(char)[ ] classes)
-    import std.functional
-
-    alias isGoodClass = not!(among!(
-        "d_overlay", "d_selected", "hl", "e_hint", "e_hint_r", "e_hint_p", "e_ruler_anchor"))
+    alias isGoodClass = cls => !cls.startsWith("e_hint", "e_poi") && !cls.among!(
+        "d_overlay", "d_selected", "hl",
+        "e_clickable", "hovered", "e_ruler_anchor",
+    )
     size_t classesCount = 0
     size_t newClassesCount = (
         classes
