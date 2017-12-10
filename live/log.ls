@@ -24,7 +24,7 @@ timeIt = (title, action) ->
 decompress =
     if window.TextDecoder?
         # Faster.
-        (data) -> new TextDecoder \utf-8 .decode pako.inflate data
+        (data) -> new TextDecoder!.decode pako.inflate data
     else
         (data) -> pako.inflate data, to: \string
 

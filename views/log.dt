@@ -11,7 +11,7 @@ append head
   - stylesheet("log");
 
 block body
-  #main_wrapper.page_wrapper: #hero_block
+  .page_wrapper: #hero_block
     .headnote
       a(href="#{log.host}/duels/log/#{log.id}", target="_blank") Прямая трансляция
 

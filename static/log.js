@@ -24,7 +24,7 @@
   };
   decompress = window.TextDecoder != null
     ? function(data){
-      return new TextDecoder('utf-8').decode(pako.inflate(data));
+      return new TextDecoder().decode(pako.inflate(data));
     }
     : function(data){
       return pako.inflate(data, {
