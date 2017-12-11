@@ -56,8 +56,8 @@ private void _configure() @safe
         //TODO: Find a way to handle the root page without a trailing slash.
         router = (
             (new URLRouter)
-            //For now, just temporarily redirect with 302 Found.
-            .get(su.prefix, staticRedirect(su.prefix ~ '/'))
+            //For now, just return 307 Temporary Redirect.
+            .any(su.prefix, staticRedirect(su.prefix ~ '/', HTTPStatus.temporaryRedirect))
             .any("*", router)
         )
     listenHTTP(settings, router)
