@@ -46,21 +46,21 @@ body
 
 
 auto filterIfDiffers(alias pred, R)(R range) \
-if (isForwardRange!R && __traits(compiles, filter!pred(range)))
+if (isForwardRange!R && __traits(compiles, range.filter!pred()))
     size_t count = 0
     size_t newCount = range.save.tee!(_ => count++).filter!pred().walkLength()
     auto result = range.filter!pred()//Correct due to lazy evaluation.
     return newCount != count ? nullable(result) : Nullable!(typeof(result)).init
 
 
-const(char)[ ] splitFilterJoin(alias splitter, alias pred, JoinArgs...)(
-    const(char)[ ] s, JoinArgs joinArgs) \
-if (__traits(compiles, splitter(s).filter!pred().joiner(joinArgs)))
+const(char)[ ] splitFilterJoin(alias splitter, alias pred, JoinerArgs...)(
+    const(char)[ ] s, auto ref JoinerArgs joinerArgs) \
+if (__traits(compiles, splitter(s).filter!pred().joiner(joinerArgs)))
     auto result = splitter(s).filterIfDiffers!pred()
     if (result.isNull)
         return s
     const last = _stableApp.data.length
-    _stableApp ~= result.get.joiner(joinArgs)
+    _stableApp ~= result.get.joiner(joinerArgs)
     return _stableApp.data[last .. $]
 
 
