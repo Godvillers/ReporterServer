@@ -6,6 +6,7 @@ import std.range
 import std.regex
 import std.string
 import std.typecons
+import std.uni
 
 
 @safe:
@@ -38,12 +39,29 @@ static this() nothrow
 
 bool containsWord(const(char)[ ] haystack, const(char)[ ] needle) pure \
 in
-    import std.uni
-
     assert(!needle.empty)
     assert(!needle.canFind!isWhite())
 body
     return haystack.splitter().canFind(needle)
+
+
+auto filterIfDiffers(alias pred, R)(R range) \
+if (isForwardRange!R && __traits(compiles, filter!pred(R.init)))
+    size_t count = 0
+    size_t newCount = range.save.tee!(_ => count++).filter!pred().walkLength()
+    auto result = range.filter!pred()//Correct due to lazy evaluation.
+    return newCount != count ? nullable(result) : Nullable!(typeof(result)).init
+
+
+const(char)[ ] splitFilterJoin(alias splitter, alias pred, JoinArgs...)(
+    const(char)[ ] s, JoinArgs joinArgs) \
+if (__traits(compiles, splitter("")))
+    auto result = splitter(s).filterIfDiffers!pred()
+    if (result.isNull)
+        return s
+    const last = _stableApp.data.length
+    _stableApp ~= result.get.joiner(joinArgs)
+    return _stableApp.data[last .. $]
 
 
 Tuple!(int, q{index}, const(char)[ ], q{heroName}) extractHeroIndexAndName(const(char)[ ] label) /+\
@@ -87,8 +105,6 @@ out (result)
 
     assert(result.y.isNaN == result.x.isNaN)
 body
-    import std.uni
-
     float y, x
     const invalid = typeof(return)(float.nan, float.nan)
     //^ \s* translate \s* \( \s* ([\d.+-]+) \s* , \s* ([\d.+-]+) \s* \) \s* $
@@ -123,24 +139,13 @@ const(char)[ ] formatTileTranslation(float y, float x)
 
 
 const(char)[ ] removePrivateTileClasses(const(char)[ ] classes)
-    alias isGoodClass = cls => !cls.startsWith("e_hint", "e_poi") && !cls.among!(
-        "d_overlay", "d_selected", "hl",
-        "e_clickable", "hovered", "e_ruler_anchor",
-    )
-    size_t classesCount = 0
-    size_t newClassesCount = (
-        classes
-        .splitter()
-        .tee!(_ => classesCount++)
-        .filter!isGoodClass()
-        .walkLength()
-    )
-    if (newClassesCount == classesCount)
-        return classes
-    assert(newClassesCount < classesCount)
-    const last = _stableApp.data.length
-    _stableApp ~= classes.splitter().filter!isGoodClass().joiner(" ")
-    return _stableApp.data[last .. $]
+    return classes.splitFilterJoin!(
+        splitter,
+        cls => !cls.startsWith("e_hint", "e_poi") && !cls.among!(
+            "d_overlay", "d_selected", "hl",
+            "e_clickable", "hovered", "e_ruler_anchor",
+        ),
+    )(" ")
 
 
 const(char)[ ] compressTileCoordinates(const(char)[ ] value)
@@ -166,16 +171,17 @@ const(char)[ ] compressTileCoordinates(const(char)[ ] value)
     return _stableApp.data[last .. $]
 
 
-const(char)[ ] extractEssentialsFromTooltip(const(char)[ ] msg) pure
-    msg = msg.strip()
+const(char)[ ] extractEssentialsFromTooltip(const(char)[ ] msg)
+    msg = msg.strip().splitFilterJoin!(
+        msg => msg.splitter(',').map!strip(),
+        part => sicmp(part, "Рулить в этом направлении") && sicmp(part, "Sail in this direction"),
+    )(", ")
     //^ (.*?) \s* \( [^()]* \) $
     if (msg.endsWith(')'))
         const r = msg[0 .. $ - 1].retro().find!(among!('(', ')')).retro()
         if (!r.empty && r[$ - 1] == '(')
             return r[0 .. $ - 1].stripRight()
-    if (!msg.canFind("Рулить") && !msg.canFind("Sail in"))
-        return msg
-    return null
+    return msg
 
 
 void formatDistance(ref Appender!(char[ ]) sink, int dist) nothrow pure
