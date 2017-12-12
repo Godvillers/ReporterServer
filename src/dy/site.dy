@@ -30,13 +30,17 @@ final class Site
     private void _emitBasicCORSHeaders()
         header("Access-Control-Allow-Origin", "*")
 
-    void optionsSend()
+    //vibe.d does not auto-generate OPTIONS handler from a method name (?!).
+    @method(HTTPMethod.OPTIONS) \
+    @path("/send") \
+    void optionsSend(scope HTTPServerResponse res)
         import std.conv
 
         enum oneDay = 24.hours.total!q{seconds}.to!string
         _emitBasicCORSHeaders()
         header("Access-Control-Allow-Methods", "OPTIONS, POST")
         header("Access-Control-Max-Age", oneDay)
+        res.writeVoidBody()//Otherwise 404 is emitted.
 
     void postSend(
         int    protocolVersion,
