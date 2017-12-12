@@ -128,11 +128,12 @@ final class Site
             redirect("https://godville.net/duels/log/" ~ _id)
 
     @path("/duels/log/:id/ws") \
-    void getWS(string _id, scope WebSocket socket)
-        auto response = Json.emptyObject
+    void getWS(string _id, scope WebSocket socket) nothrow
         auto app = appender!(char[ ])
         auto session = _id in _storage
         try
+            scope(failure) socket.close(1011)//Internal Error
+            auto response = Json.emptyObject
             do
                 if (_id !in _storage || session.status == session_storage.Session.Status.finished)
                     const host = session !is null ? session.log.host : "https://godville.net"
@@ -178,3 +179,5 @@ final class Site
             while (socket.connected)
         catch (ZlibException e)
             logError("Zlib compression error: %s", e.msg)
+        catch (Exception e)
+            logError("Unexpected exception during WebSocket handling: %s", e.msg)
