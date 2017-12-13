@@ -61,7 +61,6 @@ struct _Preprocessor
             doc.querySelectorAll(_s!".pm_link", line).each!queueDestroy()
 
             //Remove custom styles (including eGUI+'s blacklist styling) and a blacklist tooltip.
-            //TODO: Remove guildmates' styling.
             foreach (node; line.descendants.filter!q{a.isElementNode})
                 node.removeAttr("style")
                 node.removeAttr("title")
@@ -80,8 +79,11 @@ struct _Preprocessor
                     players[i].hp = extractHeroHp(_text(hpNode))
 
                 //Extract god's name.
-                if (const godNode = doc.querySelector(_s!".opp_ng", line))
+                if (auto godNode = doc.querySelector(_s!".opp_ng", line))
                     players[i].godName = extractGodName(_text(godNode)).idup
+                    //Remove guildmates' styling.
+                    if (auto nameNode = doc.querySelector(_s!".opp_g", godNode))
+                        nameNode.removeAttr("class")
 
                 //Replace a drop-down button with a profile link.
                 replaceDropDown(doc, line, log.host, players[i].godName)
@@ -117,6 +119,9 @@ struct _Preprocessor
         //Remove control buttons from the header.
         if (auto header = findHeader(doc))
             removeControlButtons(header)
+            //Reset header's width.
+            foreach (node; header.children)
+                node.removeAttr("style")
 
         //Remove progress bar's title.
         if (auto pbar = doc.querySelector(_s!".p_bar"))
