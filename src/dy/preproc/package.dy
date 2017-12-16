@@ -78,8 +78,8 @@ struct _Preprocessor
                 if (const hpNode = doc.querySelector(_s!".opp_h", line))
                     players[i].hp = extractHeroHp(_text(hpNode))
 
-                //Extract god's name.
                 if (auto godNode = doc.querySelector(_s!".opp_ng", line))
+                    //Extract god's name.
                     players[i].godName = extractGodName(_text(godNode)).idup
                     //Remove guildmates' styling.
                     if (auto nameNode = doc.querySelector(_s!".opp_g", godNode))
@@ -116,8 +116,8 @@ struct _Preprocessor
                     _stableApp.formattedWrite!" saild_%s"(log.streamerIndex + 1)
                     node.attr("class", _stableApp.data[last .. $])
 
-        //Remove control buttons from the header.
         if (auto header = findHeader(doc))
+            //Remove control buttons from the header.
             removeControlButtons(header)
             //Reset header's width.
             foreach (node; header.children)
@@ -141,7 +141,7 @@ struct _Preprocessor
 
         auto svgs = doc.elementsByTagName("svg")
         if (svgs.empty)
-            return//Well, we might apply some transformations not affecting the SVG...
+            return//Well, we could apply some transformations not affecting the SVG...
         Node* svg = svgs.front
 
         //Extract map scale.
@@ -193,14 +193,24 @@ struct _Preprocessor
         foreach (node; svg.descendants)
             switch (node.tag)//`null` for non-elements.
                 case "g":
-                    const classes = node.attr("class")
+                    auto classes = node.attr("class")
                     //Remove eGUI+'s simplified hints and ruler tooltips.
                     if (classes.splitter().canFind!(among!("epl", "e_ruler_tooltip")))
                         queueDestroy(node)
                         break
 
                     //Remove various player-specific classes.
-                    node.attr("class", removePrivateTileClasses(classes))
+                    classes = removePrivateTileClasses(classes)
+                    node.attr("class", classes)
+
+                    //Parse ark number.
+                    player = null
+                    foreach (cls; classes.splitter())
+                        if (cls.startsWith("pl"))
+                            try
+                                player = &players[(cls[2 .. $].to!int - 1) & 0x3]
+                                break
+                            catch (ConvException) { }
 
                     //Remember tiles' coordinates.
                     const pos = extractTileTranslation(node.attr("transform"))
@@ -243,12 +253,10 @@ struct _Preprocessor
                     if (s.empty)
                         //Remove empty <text> nodes.
                         queueDestroy(node)
-                    else if (s[0].isDigit && prevTile !is null)
-                        //Parse ark number.
-                        try
-                            player = &players[(s.to!int - 1) & 0x3]
-                        catch (ConvException)
-                            player = null
+                    else if (s == "@" && player !is null)
+                        //Replace '@' with an ark number.
+                        _stableApp ~= cast(char)(player - players.ptr + '1')
+                        node.text = _stableApp.data[$ - 1 .. $]
                     break
 
                 case "line":
