@@ -203,15 +203,6 @@ struct _Preprocessor
                     classes = removePrivateTileClasses(classes)
                     node.attr("class", classes)
 
-                    //Parse ark number.
-                    player = null
-                    foreach (cls; classes.splitter())
-                        if (cls.startsWith("pl"))
-                            try
-                                player = &players[(cls[2 .. $].to!int - 1) & 0x3]
-                                break
-                            catch (ConvException) { }
-
                     //Remember tiles' coordinates.
                     const pos = extractTileTranslation(node.attr("transform"))
                     if (pos.y.isNaN)
@@ -220,11 +211,19 @@ struct _Preprocessor
                         updateTileTooltip(
                             doc, prevTile, y, x, log.scale, prevTitleNode, player, log.cargo)
                         prevTitleNode = null
-                        player = null
                     y = pos.y
                     x = pos.x
                     node.attr("transform", formatTileTranslation(y, x))
                     prevTile = node
+
+                    //Parse ark number.
+                    player = null
+                    foreach (cls; classes.splitter())
+                        if (cls.skipOver("pl"))
+                            try
+                                player = &players[(cls.to!int - 1) & 0x3]
+                                break
+                            catch (ConvException) { }
                     break
 
                 case "polygon":
