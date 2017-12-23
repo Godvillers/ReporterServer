@@ -18,11 +18,10 @@ private enum _expirationPeriod = 40.minutes
 
 
 private struct _StepUploadRequest
-    int    protocolVersion
     string agent
     string link
     float  stepDuration
-    float  scale
+    float  scale = 0//Zero means "auto-detect".
     int    step
     int    playerIndex
     string cargo
@@ -56,27 +55,34 @@ private _StepUploadRequest _parseRequest(scope HTTPServerRequest req)
     import std.exception
 
     const f = req.form
-    _StepUploadRequest r = { f.get("protocolVersion").to!int.ifThrown!ConvException(0), };
-    switch (r.protocolVersion)
+    const v = f.get("protocolVersion").to!int.ifThrown!ConvException(0)
+    if (v < 1 || v > 2)
+        _httpEnforce(HTTPStatus.notImplemented, "Unsupported protocol version")
+
+    _StepUploadRequest r = {
+        agent:        f._load("agent"),
+        link:         f._load("link"),
+        stepDuration: f._load!float("stepDuration"),
+        step:         f._load!int("step"),
+        cargo:        f._load("cargo"),
+        data:         f._load("data"),
+    };
+    final switch (v)
         case 1:
-            r.agent        = f._load("agent")
-            r.link         = f._load("link")
-            r.stepDuration = f._load!float("stepDuration")
-            r.scale        = f._load!float("scale")
-            r.step         = f._load!int("step")
-            r.playerIndex  = f._load!int("playerIndex") - 1
-            r.cargo        = f._load("cargo")
-            r.data         = f._load("data")
+            r.scale       = f._load!float("scale")
+            r.playerIndex = f._load!int("playerIndex") - 1
+            _httpEnforce(r.scale >= 1e-6f, "'scale' must be positive")
             break
 
-        default: _httpEnforce(HTTPStatus.notImplemented, "Unsupported protocol version")
+        case 2:
+            r.playerIndex = f._load!int("playerNumber") - 1
+            break
 
     //Be careful to handle NaNs.
-    _httpEnforce(r.stepDuration > 1e-6f, "'stepDuration' must be positive")
-    _httpEnforce(r.scale > 1e-6f, "'scale' must be positive")
+    _httpEnforce(r.stepDuration >= 1e-6f, "'stepDuration' must be positive")
     _httpEnforce(r.step > 0, "'step' must be positive")
     //Note: (int.max + 1 >= 0) == false.
-    _httpEnforce(r.playerIndex + 1 >= 0, "'playerIndex' must be non-negative")
+    _httpEnforce(r.playerIndex + 1 >= 0, "'playerNumber' must be non-negative")
     return r
 
 

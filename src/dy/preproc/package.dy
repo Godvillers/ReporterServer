@@ -144,6 +144,27 @@ struct _Preprocessor
             return//Well, we could apply some transformations not affecting the SVG...
         Node* svg = svgs.front
 
+        float tileSize = log.scale
+        if (tileSize < 1e-6f)
+            //Extract tile size.
+            if (const tile = doc.querySelector(_s!".tile polygon", svg))
+                const(char)[ ][8] p
+                if (!tile.attr("points")
+                    .splitter!(c => c == ',' || c.isSpace)
+                    .take(8)
+                    .copy(p[ ])
+                    .length
+                )
+                    try
+                        //Take two opposite vertices.
+                        const x0 = p[0].to!double
+                        const y0 = p[1].to!double
+                        const x1 = p[6].to!double
+                        const y1 = p[7].to!double
+                        //A tile size is defined as half the distance between them.
+                        tileSize = cast(float)(hypot(x0 - x1, y0 - y1) * .5)
+                    catch (ConvException) { }
+
         //Extract map scale.
         const svgStyle = svg.attr("style")
         if (auto c = svgStyle.matchFirst(_rx!r":\s*scale\s*\(\s*([\d.]+)\s*\)"))
@@ -209,7 +230,7 @@ struct _Preprocessor
                         break
                     if (prevTile !is null)
                         updateTileTooltip(
-                            doc, prevTile, y, x, log.scale, prevTitleNode, player, log.cargo)
+                            doc, prevTile, y, x, tileSize, prevTitleNode, player, log.cargo)
                         prevTitleNode = null
                     y = pos.y
                     x = pos.x
@@ -274,7 +295,7 @@ struct _Preprocessor
                 default: break
 
         if (prevTile !is null)
-            updateTileTooltip(doc, prevTile, y, x, log.scale, prevTitleNode, player, log.cargo)
+            updateTileTooltip(doc, prevTile, y, x, tileSize, prevTitleNode, player, log.cargo)
 
     private string _rescale(const(char)[ ] initialHeight) @safe
         try
