@@ -1,6 +1,7 @@
 import core.time
 import std.algorithm
 import std.array
+import std.conv
 import std.range
 
 import vibe.data.json
@@ -11,7 +12,72 @@ import session_storage
 import zlib = zlib: ZlibException, ZlibTooLarge
 
 
+@safe:
+
 private enum _expirationPeriod = 40.minutes
+
+
+private struct _StepUploadRequest
+    int    protocolVersion
+    string agent
+    string link
+    float  stepDuration
+    float  scale
+    int    step
+    int    playerIndex
+    string cargo
+    string data
+
+
+private void _httpEnforce(HTTPStatus status, string msg)
+    throw new HTTPStatusException(status, msg)
+
+
+private void _httpEnforce(string msg)
+    _httpEnforce(HTTPStatus.badRequest, msg)
+
+
+private void _httpEnforce(bool condition, lazy string msg)
+    if (!condition)
+        _httpEnforce(msg)
+
+
+private T _load(T = string, Dict)(auto ref const Dict dict, string field)
+    const p = field in dict
+    _httpEnforce(p !is null, "Missing field '" ~ field ~ '\'')
+    try
+        return (*p).to!T
+    catch (ConvException)
+        _httpEnforce("Field '" ~ field ~ "' has an invalid value")
+        assert(false)
+
+
+private _StepUploadRequest _parseRequest(scope HTTPServerRequest req)
+    import std.exception
+
+    const f = req.form
+    _StepUploadRequest r = { f.get("protocolVersion").to!int.ifThrown!ConvException(0), };
+    switch (r.protocolVersion)
+        case 1:
+            r.agent        = f._load("agent")
+            r.link         = f._load("link")
+            r.stepDuration = f._load!float("stepDuration")
+            r.scale        = f._load!float("scale")
+            r.step         = f._load!int("step")
+            r.playerIndex  = f._load!int("playerIndex") - 1
+            r.cargo        = f._load("cargo")
+            r.data         = f._load("data")
+            break
+
+        default: _httpEnforce(HTTPStatus.notImplemented, "Unsupported protocol version")
+
+    //Be careful to handle NaNs.
+    _httpEnforce(r.stepDuration > 1e-6f, "'stepDuration' must be positive")
+    _httpEnforce(r.scale > 1e-6f, "'scale' must be positive")
+    _httpEnforce(r.step > 0, "'step' must be positive")
+    //Note: (int.max + 1 >= 0) == false.
+    _httpEnforce(r.playerIndex + 1 >= 0, "'playerIndex' must be non-negative")
+    return r
 
 
 final class Site
@@ -34,38 +100,26 @@ final class Site
     @method(HTTPMethod.OPTIONS) \
     @path("/send") \
     void optionsSend(scope HTTPServerResponse res)
-        import std.conv
-
         enum oneDay = 24.hours.total!q{seconds}.to!string
         _emitBasicCORSHeaders()
         header("Access-Control-Allow-Methods", "OPTIONS, POST")
         header("Access-Control-Max-Age", oneDay)
         res.writeVoidBody()//Otherwise, 404 is emitted.
 
-    void postSend(
-        int    protocolVersion,
-        string agent,
-        string link,
-        float  stepDuration,
-        float  scale,
-        int    step,
-        int    playerIndex,//1-based.
-        string cargo,
-        string data,
-    ) @system
+    void postSend(scope HTTPServerRequest req) @system
         import std.base64
 
-        //TODO: Check `protocolVersion`.
-        const headerLength = agent.length + link.length + cargo.length
-        if (headerLength > 256 || data.length > 60 << 10)
-            logDiagnostic("Declined a request of %.1f KB", (headerLength + data.length) / 1024.)
+        const r = _parseRequest(req)
+        const headerLength = r.agent.length + r.link.length + r.cargo.length
+        if (headerLength > 256 || r.data.length > 60 << 10)
+            logDiagnostic("Declined a request of %.1f KB", (headerLength + r.data.length) / 1024.)
             throw new HTTPStatusException(HTTPStatus.requestEntityTooLarge)
 
-        const(void)[ ] decoded = data
+        const(void)[ ] decoded = r.data
         //Try to decode from Base64 first.
         _ubyteApp.clear()
         try
-            Base64.decode(data, _ubyteApp)
+            Base64.decode(r.data, _ubyteApp)
             decoded = _ubyteApp.data
         catch (Base64Exception e)
             logDiagnostic("Base64 error: %s", e.msg)
@@ -79,7 +133,7 @@ final class Site
             logDiagnostic("Zlib decompression error: %s", e.msg)
             throw new HTTPStatusException(HTTPStatus.badRequest)
         catch (ZlibTooLarge)
-            logDiagnostic("Declined a zip bomb of %.1f KB", data.length / 1024.)
+            logDiagnostic("Declined a zip bomb of %.1f KB", r.data.length / 1024.)
             throw new HTTPStatusException(HTTPStatus.requestEntityTooLarge)
 
         logDiagnostic(
@@ -92,12 +146,14 @@ final class Site
         concatenated.splitter("<&>").take(3).copy(htmls[ ])
         //Do actual work.
         const log = duelLog(
-            link, step, playerIndex - 1, stepDuration, scale, cargo, htmls[0], htmls[1], htmls[2])
+            r.link, r.step, r.playerIndex, r.stepDuration, r.scale, r.cargo,
+            htmls[0], htmls[1], htmls[2],
+        )
         _storage.dropOldSessions(_expirationPeriod)
         final switch (_storage.submit(log)) with (SubmissionStatus)
             case updated: break
             case ignored: logDiagnostic("Ignoring duplicate %s", log.id); break
-            case created: logInfo("Streaming %s with %s", log.id, agent); break
+            case created: logInfo("Streaming %s with %s", log.id, r.agent); break
 
         //TODO: Check browser extension version.
         _emitBasicCORSHeaders()
