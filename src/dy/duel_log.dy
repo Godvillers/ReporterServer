@@ -5,6 +5,7 @@ struct DuelLog
 
     string host
     string id//\w{5,}
+    int timezone
     int step
     int streamerIndex//0-based.
     float stepDuration
@@ -18,6 +19,7 @@ struct DuelLog
 
 DuelLog duelLog(
     string link,
+    int timezone,
     int step,
     int streamerIndex,
     float stepDuration,
@@ -42,4 +44,4 @@ DuelLog duelLog(
         id = link[~pos ? pos + 1 : 0 .. $]
 
     return DuelLog(
-        host, id, step, streamerIndex, stepDuration, scale, cargo, allies, map, chronicle)
+        host, id, timezone, step, streamerIndex, stepDuration, scale, cargo, allies, map, chronicle)

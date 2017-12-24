@@ -2,6 +2,7 @@ import std.algorithm
 import std.conv
 import std.range
 import std.regex
+import std.string
 import std.uni
 
 import html
@@ -116,6 +117,20 @@ struct _Preprocessor
                     _stableApp.formattedWrite!" saild_%s"(log.streamerIndex + 1)
                     node.attr("class", _stableApp.data[last .. $])
 
+        if (log.timezone)
+            //Convert time to UTC.
+            foreach (timeNode; doc.querySelectorAll(_s!".d_time"))
+                int minutes = 0
+                try
+                    foreach (part; _text(timeNode).splitter(':').take(2))
+                        minutes = minutes * 60 + part.strip().to!int
+                catch (ConvException)
+                    continue
+                minutes = ((minutes - log.timezone) % (24 * 60) + 24 * 60) % (24 * 60)
+                const last = _stableApp.data.length
+                _stableApp.formattedWrite!"%02d:%02d"(minutes / 60, minutes % 60)
+                timeNode.text = _stableApp.data[last .. $]
+
         if (auto header = findHeader(doc))
             //Remove control buttons from the header.
             removeControlButtons(header)
@@ -137,7 +152,6 @@ struct _Preprocessor
     void processMap(ref Document doc)
         import std.ascii: isDigit
         import std.math
-        import std.string
 
         auto svgs = doc.elementsByTagName("svg")
         if (svgs.empty)

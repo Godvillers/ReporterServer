@@ -22,6 +22,7 @@ private struct _StepUploadRequest
     string link
     float  stepDuration
     float  scale = 0//Zero means "auto-detect".
+    int    timezone
     int    step
     int    playerIndex
     string cargo
@@ -75,6 +76,7 @@ private _StepUploadRequest _parseRequest(scope HTTPServerRequest req)
             break
 
         case 2:
+            r.timezone    = f._load!int("timezone")
             r.playerIndex = f._load!int("playerNumber") - 1
             break
 
@@ -152,7 +154,7 @@ final class Site
         concatenated.splitter("<&>").take(3).copy(htmls[ ])
         //Do actual work.
         const log = duelLog(
-            r.link, r.step, r.playerIndex, r.stepDuration, r.scale, r.cargo,
+            r.link, r.timezone, r.step, r.playerIndex, r.stepDuration, r.scale, r.cargo,
             htmls[0], htmls[1], htmls[2],
         )
         _storage.dropOldSessions(_expirationPeriod)

@@ -12,6 +12,8 @@ fields are missing or have invalid values, the server responds with *400 Bad Req
 determine which versions are supported by querying [`/api.json`][api.json].
 
 [api.json]: https://github.com/Godvillers/ReporterServer/blob/master/static/api.json
+[v1]: #v1
+[v2]: #v2
 
 
 ## v1 ##
@@ -31,3 +33,18 @@ determine which versions are supported by querying [`/api.json`][api.json].
   together with `<&>`, then compressed with *deflate* or *gzip* algorithm, then Base64-encoded.
   *Higher compression rates are achieved when concatenating everything together. `<&>` was chosen as
   a delimiter because it cannot occur in HTMLs.*
+
+
+## v2 ##
+
++ __protocolVersion__ *(int)*: `2`.
++ __agent__ *(string)*: See [v1][].
++ __link__ *(string)*: See [v1][].
++ __stepDuration__ *(float)*: See [v1][].
++ <strike>__scale__ *(float)*</strike>
++ __timezone__ *(int)*: Streamer's local time's offset from UTC, in minutes. E.g., MSK (which is
+  UTC+3) should have a *timezone* equal to `180`.
++ __step__ *(int)*: See [v1][].
++ __playerNumber__ *(int)*: Renamed __playerIndex__ from [v1][].
++ __cargo__ *(string)*: See [v1][].
++ __data__ *(string)*: See [v1][].

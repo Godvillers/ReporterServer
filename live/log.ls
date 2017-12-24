@@ -24,7 +24,7 @@ timeIt = (title, action) ->
 decompress =
     if window.TextDecoder?
         # Faster.
-        (data) -> new TextDecoder!.decode pako.inflate data
+        (data) -> new TextDecoder!decode pako.inflate data
     else
         (data) -> pako.inflate data, to: \string
 
@@ -65,6 +65,21 @@ updatePage = ({allies, map, chronicle}) !->
     wrapper.scrollLeft = scrollValue * wrapper.scrollWidth
 
     $id \m_fight_log .outerHTML = chronicle
+
+
+format02d = (n) ->
+    "0#{n}".slice -2
+
+
+formatTime = (minutes) ->
+    "#{format02d Math.floor minutes / 60}:#{format02d minutes % 60}"
+
+
+postprocessPage = !->
+    offset = new Date!getTimezoneOffset!
+    for node in document.getElementsByClassName \d_time
+        if (//(\d*) \s* : \s* (\d*)//.exec node.textContent)?
+            node.textContent = formatTime (+that.1 * 60 + +that.2 - offset) %% (24 * 60)
 
 
 socket = null
@@ -112,6 +127,7 @@ connect = !->
             console.timeEnd "New step"
             retryCount := 0 # Reset the counter.
             updatePage response
+            postprocessPage!
             runProgressTimer justConnected && response.ago, response.stepDuration
             console.time "New step"
 
@@ -122,6 +138,7 @@ addEventListener \unload, !-> disconnect 1001 # Going Away
 
 <-! addEventListener \DOMContentLoaded
 
+postprocessPage!
 runProgressTimer gUpdatedAgo, gStepDuration
 console.time "New step"
 connect!
