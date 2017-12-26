@@ -87,16 +87,16 @@ retryEvery = 3
 retryCount = 0
 
 
-disconnect = (code) !->
+disconnect = !->
     if socket?
         socket.onclose = null
-        socket.close code
+        socket.close!
         socket := null
 
 
 connect = !->
     if socket?
-        console.log "An old socket still existed"
+        console.warn "An old socket still existed"
         disconnect!
 
     socket := new WebSocket do
@@ -134,7 +134,9 @@ connect = !->
         justConnected := 0 # false
 
 
-addEventListener \unload, !-> disconnect 1001 # Going Away
+# Chrome does not support closing a WebSocket connection with a code other than 1000 or 3000...4999,
+# so we can't use 1001 Going Away.
+addEventListener \unload, disconnect
 
 <-! addEventListener \DOMContentLoaded
 

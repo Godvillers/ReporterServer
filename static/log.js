@@ -95,17 +95,17 @@
   socket = null;
   retryEvery = 3;
   retryCount = 0;
-  disconnect = function(code){
+  disconnect = function(){
     if (socket != null) {
       socket.onclose = null;
-      socket.close(code);
+      socket.close();
       socket = null;
     }
   };
   connect = function(){
     var justConnected;
     if (socket != null) {
-      console.log("An old socket still existed");
+      console.warn("An old socket still existed");
       disconnect();
     }
     socket = new WebSocket("" + (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + location.pathname + "/ws" + location.search + "");
@@ -142,9 +142,7 @@
       justConnected = 0;
     };
   };
-  addEventListener('unload', function(){
-    disconnect(1001);
-  });
+  addEventListener('unload', disconnect);
   addEventListener('DOMContentLoaded', function(){
     postprocessPage();
     runProgressTimer(gUpdatedAgo, gStepDuration);
