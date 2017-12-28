@@ -5,6 +5,18 @@ $id = -> document.getElementById it
 $q  = -> document.querySelector  it
 
 
+contains = (haystack, needle) ->
+    !!~haystack.indexOf needle
+
+
+format02d = (n) ->
+    "0#{n}".slice -2
+
+
+formatTime = (minutes) ->
+    "#{format02d Math.floor minutes / 60}:#{format02d minutes % 60}"
+
+
 after = (seconds, action) ->
     setTimeout action, seconds * 1000
 
@@ -58,28 +70,55 @@ runProgressTimer = (ago, stepDuration) !->
 updatePage = ({allies, map, chronicle}) !->
     $id \alls .outerHTML = allies
 
-    wrapper = $id \map_wrap
-    scrollValue = wrapper.scrollLeft / wrapper.scrollWidth
+    $id \map_wrap
+        scrollValue = ..scrollLeft / ..scrollWidth
     $id \s_map .outerHTML = map
-    wrapper = $id \map_wrap
-    wrapper.scrollLeft = scrollValue * wrapper.scrollWidth
+    $id \map_wrap
+        ..scrollLeft = scrollValue * ..scrollWidth
 
     $id \m_fight_log .outerHTML = chronicle
 
 
-format02d = (n) ->
-    "0#{n}".slice -2
+checksumCache = { }
+
+calcSymbolChecksum = (c) ->
+    return that if checksumCache[c]?
+
+    canvas = document.createElement \canvas
+    return 0 unless canvas.getContext? && (context = canvas.getContext \2d)? && context.fillText?
+    context
+        ..textBaseline = \top
+        ..font = "32px Arial"
+        ..fillText c, 0, 0
+        img = ..getImageData 0, 0, 32, 32
+
+    return 0 unless img?
+    result = 0; [result += .. for img.data]
+    checksumCache[c] = result
 
 
-formatTime = (minutes) ->
-    "#{format02d Math.floor minutes / 60}:#{format02d minutes % 60}"
+shouldUseCustomFont =
+    if !window.MSStream? && /iP[ao]d|iPhone/.test navigator.userAgent
+        -> no
+    else if \
+        (navigator.userAgent `contains` \Firefox && ! navigator.userAgent `contains` \Macintosh) ||
+        !(undrawableChecksum = calcSymbolChecksum '\uFFFF')
+        -> yes
+    else
+        -> it && ("↖↗←→↙↘↑↓" `contains` it || calcSymbolChecksum(it) == undrawableChecksum)
 
 
 postprocessPage = !->
+    # Localize the time.
     offset = new Date!getTimezoneOffset!
     for node in document.getElementsByClassName \d_time
-        if (//(\d*) \s* : \s* (\d*)//.exec node.textContent)?
-            node.textContent = formatTime (+that.1 * 60 + +that.2 - offset) %% (24 * 60)
+    when (//(\d*) \s* : \s* (\d*)//.exec node.textContent)?
+        node.textContent = formatTime (+that.1 * 60 + +that.2 - offset) %% (24 * 60)
+
+    # Change font on the map where needed.
+    for tile in document.getElementsByClassName \tile
+    when (text = tile.getElementsByTagName \text .0)? && shouldUseCustomFont text.textContent.trim!
+        tile.classList.add \em_font
 
 
 socket = null
@@ -124,12 +163,10 @@ connect = !->
             else
                 location.replace url # `disconnect` is called from the `unload` handler.
         else if response.step > getStep!
-            console.timeEnd "New step"
             retryCount := 0 # Reset the counter.
             updatePage response
             postprocessPage!
             runProgressTimer justConnected && response.ago, response.stepDuration
-            console.time "New step"
 
         justConnected := 0 # false
 
@@ -142,5 +179,4 @@ addEventListener \unload, disconnect
 
 postprocessPage!
 runProgressTimer gUpdatedAgo, gStepDuration
-console.time "New step"
 connect!
