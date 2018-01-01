@@ -4,7 +4,7 @@ import std.typecons
 
 import html
 
-import preproc.utils
+import u = preproc.utils
 
 
 @system:
@@ -23,9 +23,9 @@ package char[ ] _text(const(Node)* node) nothrow @safe \
 in
     assert(node !is null)
 body
-    _app.clear()
-    node.text(_app)
-    return _app.data
+    u._app.clear()
+    node.text(u._app)
+    return u._app.data
 
 
 void queueDestroy(Node* node) \
@@ -91,7 +91,7 @@ body
     if (auto dropDown = doc.querySelector(_s!".opp_dropdown", line))
         dropDown.destroyChildren()
         auto link = doc.createElement("a", dropDown)
-        link.attr("href", formatProfileLink(host, godName))
+        link.attr("href", u.formatProfileLink(host, godName))
         link.attr("target", "_blank")
         link.appendText("▶")
 
@@ -115,9 +115,9 @@ void removeExtraWhitespace(ref Document doc)
             else
                 const one = s.stride()
                 if (s.length > one && s.all!isWhite())
-                    const last = _stableApp.data.length
-                    _stableApp ~= s[0 .. one]
-                    node.text = _stableApp.data[last .. $]
+                    const last = u._stableApp.data.length
+                    u._stableApp ~= s[0 .. one]
+                    node.text = u._stableApp.data[last .. $]
 
 
 void updateTileTooltip(
@@ -127,7 +127,7 @@ void updateTileTooltip(
     double x,
     double scale,
     Node* titleNode,
-    const(Player)* player,
+    const(u.Player)* player,
     const(char)[ ] cargo) \
 in
     assert(tile !is null)
@@ -140,11 +140,11 @@ body
         const s = _text(titleNode)
         //`s.count!(among!(...))` does not compile on 2.077.0. (?)
         if (player !is null && s.count!q{a == '[' || a == ']'} < 4)
-            tooltipText = formatPlayerTooltip(*player, cargo, dist)
+            tooltipText = u.formatPlayerTooltip(*player, cargo, dist)
         else
-            oldMsg = extractEssentialsFromTooltip(s)
+            oldMsg = u.extractEssentialsFromTooltip(s)
     if (tooltipText.empty)
-        tooltipText = formatDistanceTooltip(oldMsg, dist)
+        tooltipText = u.formatDistanceTooltip(oldMsg, dist)
 
     if (titleNode !is null)
         titleNode.text = tooltipText

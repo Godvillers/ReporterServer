@@ -10,8 +10,8 @@ import vibe.core.log
 
 import duel_log
 import duel_snapshot.model
-import preproc.dom_utils
-import preproc.utils
+import du = preproc.dom_utils: _s, _text
+import u  = preproc.utils: containsWord, _rx, _stableApp
 
 
 @safe:
@@ -41,7 +41,7 @@ struct _Preprocessor
 
     //DuelLog* log//Unused for now.
     const(DuelSnapshot)* snap
-    Player[4] players
+    u.Player[4] players
     float scale = 1
 
     string process(string func)(string html)
@@ -53,19 +53,19 @@ struct _Preprocessor
             try
                 mixin(`process` ~ func ~ `(doc);`)
             finally
-                destroyQueued()
-            _app.clear()
-            doc.root.innerHTML(_app)
-            return _app.data.idup
+                du.destroyQueued()
+            u._app.clear()
+            doc.root.innerHTML(u._app)
+            return u._app.data.idup
         catch (UTFException)
             logDiagnostic(`UTF error while processing "` ~ func ~ `"`)
             return html
 
     void processAllies(ref Document doc)
-        removeEverythingDangerous(doc)
+        du.removeEverythingDangerous(doc)
         foreach (line; doc.querySelectorAll(_s!".oppl"))
             //Remove a personal message (friend) link.
-            doc.querySelectorAll(_s!".pm_link", line).each!queueDestroy()
+            doc.querySelectorAll(_s!".pm_link", line).each!(du.queueDestroy)
 
             //Remove custom styles (including eGUI+'s blacklist styling) and a blacklist tooltip.
             foreach (node; line.descendants.filter!q{a.isElementNode})
@@ -74,7 +74,7 @@ struct _Preprocessor
 
             if (const heroNode = doc.querySelector(_s!".opp_n", line))
                 //Extract player index and hero's name.
-                const info = extractHeroIndexAndName(_text(heroNode))
+                const info = u.extractHeroIndexAndName(_text(heroNode))
                 const i = info.index
                 if (i < 0)
                     //Can't know which player it is, no reason to go further.
@@ -83,33 +83,33 @@ struct _Preprocessor
 
                 //Extract HP.
                 if (const hpNode = doc.querySelector(_s!".opp_h", line))
-                    players[i].hp = extractHeroHp(_text(hpNode))
+                    players[i].hp = u.extractHeroHp(_text(hpNode))
 
                 if (auto godNode = doc.querySelector(_s!".opp_ng", line))
                     //Extract god's name.
-                    players[i].godName = extractGodName(_text(godNode)).idup
+                    players[i].godName = u.extractGodName(_text(godNode)).idup
                     //Remove guildmates' styling.
                     if (auto nameNode = doc.querySelector(_s!".opp_g", godNode))
                         nameNode.removeAttr("class")
 
                 //Replace a drop-down button with a profile link.
-                replaceDropDown(doc, line, snap.host, players[i].godName)
+                du.replaceDropDown(doc, line, snap.host, players[i].godName)
 
         //Remove control buttons from the header.
-        if (auto header = findHeader(doc))
-            removeControlButtons(header)
+        if (auto header = du.findHeader(doc))
+            du.removeControlButtons(header)
 
         //Remove eGUI+'s blacklist settings button.
         if (auto button = doc.querySelector(_s!"#e_ally_blacklist_setup"))
             button.destroy()
 
         //Remove extra whitespace between tags.
-        removeExtraWhitespace(doc)
+        du.removeExtraWhitespace(doc)
 
     void processChronicle(ref Document doc)
         import std.format
 
-        removeEverythingDangerous(doc)
+        du.removeEverythingDangerous(doc)
 
         foreach (node; doc.querySelectorAll(_s!".d_line"))
             //Remove custom styling, showing partially hidden text.
@@ -137,9 +137,9 @@ struct _Preprocessor
                 _stableApp.formattedWrite!"%02d:%02d"(minutes / 60, minutes % 60)
                 timeNode.text = _stableApp.data[last .. $]
 
-        if (auto header = findHeader(doc))
+        if (auto header = du.findHeader(doc))
             //Remove control buttons from the header.
-            removeControlButtons(header)
+            du.removeControlButtons(header)
             //Reset header's width.
             foreach (node; header.children)
                 node.removeAttr("style")
@@ -153,7 +153,7 @@ struct _Preprocessor
             block.destroy()
 
         //Remove extra whitespace between tags.
-        removeExtraWhitespace(doc)
+        du.removeExtraWhitespace(doc)
 
     void processMap(ref Document doc)
         import std.ascii: isDigit
@@ -208,11 +208,11 @@ struct _Preprocessor
         //Temporarily detach the map to prevent from scanning through it.
         auto mapWrapper = svg.parent
         svg.detach()
-        removeEverythingDangerous(doc)
+        du.removeEverythingDangerous(doc)
 
         //Remove control buttons from the header.
-        if (auto header = findHeader(doc))
-            removeControlButtons(header)
+        if (auto header = du.findHeader(doc))
+            du.removeControlButtons(header)
             //Remove distance to the port and rim from the header.
             if (auto info = doc.querySelector(_s!".e_dist_info", header))
                 info.destroy()
@@ -222,14 +222,14 @@ struct _Preprocessor
             node.destroy()
 
         //Remove extra whitespace between tags.
-        removeExtraWhitespace(doc)
+        du.removeExtraWhitespace(doc)
 
         //Reattach the map.
         mapWrapper.appendChild(svg)
 
         Node* prevTile, prevTitleNode
         float y, x
-        const(Player)* player
+        const(u.Player)* player
         const(char)[ ][string] polygonCache
         foreach (node; svg.descendants)
             switch (node.tag)//`null` for non-elements.
@@ -237,24 +237,24 @@ struct _Preprocessor
                     auto classes = node.attr("class")
                     //Remove eGUI+'s simplified hints and ruler tooltips.
                     if (classes.splitter().canFind!(among!("epl", "e_ruler_tooltip")))
-                        queueDestroy(node)
+                        du.queueDestroy(node)
                         break
 
                     //Remove various player-specific classes.
-                    classes = removePrivateTileClasses(classes)
+                    classes = u.removePrivateTileClasses(classes)
                     node.attr("class", classes)
 
                     //Remember tiles' coordinates.
-                    const pos = extractTileTranslation(node.attr("transform"))
+                    const pos = u.extractTileTranslation(node.attr("transform"))
                     if (pos.y.isNaN)
                         break
                     if (prevTile !is null)
-                        updateTileTooltip(
+                        du.updateTileTooltip(
                             doc, prevTile, y, x, tileSize, prevTitleNode, player, snap.cargo)
                         prevTitleNode = null
                     y = pos.y
                     x = pos.x
-                    node.attr("transform", formatTileTranslation(y, x))
+                    node.attr("transform", u.formatTileTranslation(y, x))
                     prevTile = node
 
                     //Parse ark number.
@@ -275,7 +275,7 @@ struct _Preprocessor
                     else
                         //TODO: Get rid of `idup`.
                         node.attr("points",
-                            (polygonCache[points.idup] = compressTileCoordinates(points)))
+                            (polygonCache[points.idup] = u.compressTileCoordinates(points)))
                     break
 
                 case "title":
@@ -285,14 +285,14 @@ struct _Preprocessor
                         if (prevTitleNode is null)
                             prevTitleNode = node
                         else
-                            queueDestroy(node)
+                            du.queueDestroy(node)
                     break
 
                 case "text":
                     const s = _text(node).strip()
                     if (s.empty)
                         //Remove empty <text> nodes.
-                        queueDestroy(node)
+                        du.queueDestroy(node)
                     else if (s == "@" && player !is null)
                         //Replace '@' with an ark number.
                         _stableApp ~= cast(char)(player - players.ptr + '1')
@@ -303,7 +303,7 @@ struct _Preprocessor
                     //Remove eGUI+'s ruler and ark direction hint.
                     if (node.attr("id") == "e_ruler" ||
                         node.attr("class").containsWord("dir_arrow"))
-                        queueDestroy(node)
+                        du.queueDestroy(node)
                     break
 
                 /+
@@ -315,7 +315,7 @@ struct _Preprocessor
                 default: break
 
         if (prevTile !is null)
-            updateTileTooltip(doc, prevTile, y, x, tileSize, prevTitleNode, player, snap.cargo)
+            du.updateTileTooltip(doc, prevTile, y, x, tileSize, prevTitleNode, player, snap.cargo)
 
     private string _rescale(const(char)[ ] initialHeight) @safe
         try
