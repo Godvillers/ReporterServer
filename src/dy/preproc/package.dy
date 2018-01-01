@@ -9,24 +9,29 @@ import html
 import vibe.core.log
 
 import duel_log
+import duel_snapshot.model
 import preproc.dom_utils
 import preproc.utils
 
 
 @safe:
 
-void preprocessDuelLog(ref DuelLog log) @trusted
+void applySnapshot(ref DuelLog log, ref const DuelSnapshot snap) @trusted
     import std.datetime
 
     const start = Clock.currTime()
     scope(success)
         const end = Clock.currTime()
-        logDiagnostic("Processed %s in %s", log.id, end - start)
+        logDiagnostic("Processed %s in %s", snap.id, end - start)
 
-    _Preprocessor p = { &log, };
-    log.allies = p.process!"Allies"(log.allies)
-    log.map = p.process!"Map"(log.map)
-    log.chronicle = p.process!"Chronicle"(log.chronicle)
+    _Preprocessor p = { /+&log,+/ &snap, };
+    log.host = snap.host
+    log.id = snap.id
+    log.step = snap.step
+    log.stepDuration = snap.stepDuration
+    log.allies = p.process!`Allies`(snap.allies)
+    log.map = p.process!`Map`(snap.map)
+    log.chronicle = p.process!`Chronicle`(snap.chronicle)
 
 
 private:
@@ -34,7 +39,8 @@ private:
 struct _Preprocessor
     @system:
 
-    DuelLog* log
+    //DuelLog* log//Unused for now.
+    const(DuelSnapshot)* snap
     Player[4] players
     float scale = 1
 
@@ -87,7 +93,7 @@ struct _Preprocessor
                         nameNode.removeAttr("class")
 
                 //Replace a drop-down button with a profile link.
-                replaceDropDown(doc, line, log.host, players[i].godName)
+                replaceDropDown(doc, line, snap.host, players[i].godName)
 
         //Remove control buttons from the header.
         if (auto header = findHeader(doc))
@@ -109,15 +115,15 @@ struct _Preprocessor
             //Remove custom styling, showing partially hidden text.
             node.removeAttr("style")
             //Assign streamer's color to white entries.
-            if (log.streamerIndex >= 0)
+            if (!snap.streamerIndex.isNull)
                 const classes = node.attr("class")
                 if (!classes.splitter().canFind!(cls => cls.startsWith("saild_")))
                     const last = _stableApp.data.length
                     _stableApp ~= classes
-                    _stableApp.formattedWrite!" saild_%s"(log.streamerIndex + 1)
+                    _stableApp.formattedWrite!" saild_%s"(snap.streamerIndex.get + 1)
                     node.attr("class", _stableApp.data[last .. $])
 
-        if (log.timezone)
+        if (snap.timezone)
             //Convert time to UTC.
             foreach (timeNode; doc.querySelectorAll(_s!".d_time"))
                 int minutes = 0
@@ -126,7 +132,7 @@ struct _Preprocessor
                         minutes = minutes * 60 + part.strip().to!int
                 catch (ConvException)
                     continue
-                minutes = ((minutes - log.timezone) % (24 * 60) + 24 * 60) % (24 * 60)
+                minutes = ((minutes - snap.timezone) % (24 * 60) + 24 * 60) % (24 * 60)
                 const last = _stableApp.data.length
                 _stableApp.formattedWrite!"%02d:%02d"(minutes / 60, minutes % 60)
                 timeNode.text = _stableApp.data[last .. $]
@@ -158,8 +164,8 @@ struct _Preprocessor
             return//Well, we could apply some transformations not affecting the SVG...
         Node* svg = svgs.front
 
-        float tileSize = log.scale
-        if (tileSize < 1e-6f)
+        float tileSize = snap.scale.get(1)
+        if (snap.scale.isNull)
             //Extract tile size.
             if (const tile = doc.querySelector(_s!".tile polygon", svg))
                 const(char)[ ][8] p
@@ -244,7 +250,7 @@ struct _Preprocessor
                         break
                     if (prevTile !is null)
                         updateTileTooltip(
-                            doc, prevTile, y, x, tileSize, prevTitleNode, player, log.cargo)
+                            doc, prevTile, y, x, tileSize, prevTitleNode, player, snap.cargo)
                         prevTitleNode = null
                     y = pos.y
                     x = pos.x
@@ -267,9 +273,9 @@ struct _Preprocessor
                     if (const p = points in polygonCache)
                         node.attr("points", *p)
                     else
-                        const newPoints = compressTileCoordinates(points)
-                        polygonCache[points.idup] = newPoints//TODO: Get rid of `idup`.
-                        node.attr("points", newPoints)
+                        //TODO: Get rid of `idup`.
+                        node.attr("points",
+                            (polygonCache[points.idup] = compressTileCoordinates(points)))
                     break
 
                 case "title":
@@ -309,7 +315,7 @@ struct _Preprocessor
                 default: break
 
         if (prevTile !is null)
-            updateTileTooltip(doc, prevTile, y, x, tileSize, prevTitleNode, player, log.cargo)
+            updateTileTooltip(doc, prevTile, y, x, tileSize, prevTitleNode, player, snap.cargo)
 
     private string _rescale(const(char)[ ] initialHeight) @safe
         try

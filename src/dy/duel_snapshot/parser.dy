@@ -1,0 +1,140 @@
+import std.array
+import std.conv
+import std.typecons
+
+import vibe.vibe
+
+import duel_snapshot.model
+
+
+@safe:
+
+DuelSnapshot parse(scope HTTPServerRequest req)
+    import std.exception
+
+    DuelSnapshot snap
+    const f = req.form
+    switch (f.get("protocolVersion").to!int.ifThrown!ConvException(0))
+        case 1:
+            snap.scale         = f._load!float("scale")
+            snap.streamerIndex = f._load!int("playerIndex") - 1
+            _httpEnforce(snap.scale.get >= 1e-6f, "'scale' must be positive")
+            break
+
+        case 2:
+            snap.timezone      = f._load!int("timezone")
+            snap.streamerIndex = f._load!int("playerNumber") - 1
+            break
+
+        default: _httpEnforce(HTTPStatus.notImplemented, "Unsupported protocol version")
+
+    //Fields common for all versions:
+    const rawLink     = f._load("link")
+    const link        = _splitLink(rawLink)
+    snap.agent        = f._load("agent")
+    snap.host         = link.host
+    snap.id           = link.id
+    snap.stepDuration = f._load!float("stepDuration")
+    snap.step         = f._load!int("step")
+    snap.cargo        = f._load("cargo")
+
+    const payload = f._load("data")
+    const headerLength = snap.agent.length + rawLink.length + snap.cargo.length
+    if (headerLength > 256 || payload.length > 60 << 10)
+        logDiagnostic("Declined a request of %.1f KB", (headerLength + payload.length) / 1024.)
+        throw new HTTPStatusException(HTTPStatus.requestEntityTooLarge)
+    (() @trusted => _decodePayload(snap, payload, Yes.useBase64))()
+
+    //Be careful to handle NaNs.
+    _httpEnforce(snap.stepDuration >= 1e-6f, "'stepDuration' must be positive")
+    _httpEnforce(snap.step > 0, "'step' must be positive")
+    if (!snap.streamerIndex.isNull)
+        _httpEnforce(snap.streamerIndex.get >= 0, "'playerNumber' must be non-negative")
+    return snap
+
+
+private:
+
+Appender!(ubyte[ ]) _ubyteApp//Used to decode a request when it is in Base64.
+
+static this() nothrow
+    _ubyteApp.reserve(32_768)
+
+
+void _httpEnforce(HTTPStatus status, string msg)
+    throw new HTTPStatusException(status, msg)
+
+void _httpEnforce(string msg)
+    _httpEnforce(HTTPStatus.badRequest, msg)
+
+void _httpEnforce(bool condition, lazy string msg)
+    if (!condition)
+        _httpEnforce(msg)
+
+
+T _load(T = string, Dict)(auto ref const Dict dict, string field) \
+if (__traits(compiles, dict[field].to!T))
+    const p = field in dict
+    _httpEnforce(p !is null, "Missing field '" ~ field ~ '\'')
+    try
+        return (*p).to!T
+    catch (ConvException)
+        _httpEnforce("Field '" ~ field ~ "' has an invalid value")
+        assert(false)
+
+
+Tuple!(string, q{host}, string, q{id}) _splitLink(string link) pure
+    import std.string
+    import std.uri
+
+    const end = link.uriLength()
+    if (end <= 0)
+        return typeof(return)("https://godville.net", "00000")
+    enum offset = "https://".length
+    auto pos = link[0 .. end].indexOf('#')
+    link = link[0 .. ~pos ? pos : end]
+    pos = link[offset .. $].indexOf('/')
+    const host = link[0 .. ~pos ? offset + pos : $]
+    pos = link[0 .. $ - 1].lastIndexOf('/')
+    return typeof(return)(host, link[~pos ? pos + 1 : 0 .. $])
+
+
+void _decodePayload(ref DuelSnapshot snap, const(char)[ ] raw, Flag!q{useBase64} useBase64) @system
+    import std.algorithm
+    import std.base64
+    import std.range
+    import zlib = zlib: ZlibException, ZlibTooLarge
+
+    const(void)[ ] decoded = raw
+    if (useBase64)
+        _ubyteApp.clear()
+        try
+            Base64.decode(raw, _ubyteApp)
+            decoded = _ubyteApp.data
+        catch (Base64Exception e)
+            logDiagnostic("Base64 error: %s", e.msg)
+            throw new HTTPStatusException(HTTPStatus.badRequest)
+
+    string concatenated
+    try
+        //A cast to `immutable(char)[ ]` is safe as `uncompress` allocates a new buffer.
+        //We expect a compression ratio of about 20x-30x, so choose the buffer size accordingly.
+        concatenated = cast(string)zlib.uncompress(decoded, 1 << 20, decoded.length << 5)
+    catch (ZlibException e)
+        logDiagnostic("Zlib decompression error: %s", e.msg)
+        throw new HTTPStatusException(HTTPStatus.badRequest)
+    catch (ZlibTooLarge)
+        logDiagnostic("Declined a zip bomb of %.1f KB", raw.length / 1024.)
+        throw new HTTPStatusException(HTTPStatus.requestEntityTooLarge)
+
+    logDiagnostic(
+        "Decompressed %.1f KB -> %.1f KB (%.1fx)",
+        decoded.length * (1. / 1024),
+        concatenated.length * (1. / 1024),
+        float(concatenated.length) / decoded.length)
+
+    string[3] htmls
+    concatenated.splitter("<&>").take(3).copy(htmls[ ])
+    snap.allies    = htmls[0]
+    snap.map       = htmls[1]
+    snap.chronicle = htmls[2]

@@ -4,6 +4,7 @@ import std.datetime
 import vibe.core.sync
 
 import duel_log
+import duel_snapshot.model
 
 
 @safe:
@@ -16,15 +17,15 @@ struct Session
         finished,
         outOfMemory,
 
-    DuelLog log
     SysTime lastUpdated
     ManualEvent event
+    DuelLog log
     Status status
 
     @disable this(this)//ManualEvent is non-copyable.
 
-    @property long secondsSinceLastUpdated() const
-        return (Clock.currTime() - lastUpdated).total!q{seconds}
+    @property Duration sinceLastUpdated() const
+        return Clock.currTime() - lastUpdated
 
     pragma(inline, true) \
     int opCmp()(auto ref const Session rhs) const nothrow pure /+@nogc+/
@@ -44,12 +45,12 @@ struct SessionStorage
     @safe:
 
     private
-        RedBlackTree!(Session*, q{*a < *b}) _tree
         Session[string] _aa
+        RedBlackTree!(Session*, q{*a < *b}) _tree
         size_t _totalSpace, _maxMemory
 
     invariant
-        assert(_tree.length == _aa.length)
+        assert(_aa.length == _tree.length)
 
     @disable this()
     @disable this(this)
@@ -67,27 +68,26 @@ struct SessionStorage
     inout(Session)* opBinaryRight(string op: "in")(const(char)[ ] logId) inout nothrow pure @nogc
         return logId in _aa
 
-    SubmissionStatus submit(DuelLog log)
+    SubmissionStatus submit(ref const DuelSnapshot snap)
         import preproc
 
-        if (auto session = log.id in _aa)
-            if (log.step <= session.log.step)
+        if (auto session = snap.id in _aa)
+            if (snap.step <= session.log.step)
                 return SubmissionStatus.ignored
 
             _removeFromTree(session)
-            _dropIfOutOfMemory()
-            preprocessDuelLog(log)
-            session.log = log
+            _dropWhileOutOfMemory()
+            session.log.applySnapshot(snap)
             session.lastUpdated = Clock.currTime()
             _insertIntoTree(session)
 
             session.event.emit()
             return SubmissionStatus.updated
 
-        _dropIfOutOfMemory()
-        preprocessDuelLog(log)
-        _aa[log.id] = Session(log, Clock.currTime(), createManualEvent())
-        _insertIntoTree(log.id in _aa)
+        _dropWhileOutOfMemory()
+        auto session = &(_aa[snap.id] = Session(Clock.currTime(), createManualEvent()))
+        session.log.applySnapshot(snap)
+        _insertIntoTree(session)
         return SubmissionStatus.created
 
     void dropOldSessions(Duration maxAge)
@@ -130,6 +130,6 @@ struct SessionStorage
         const existed = _aa.remove(session.log.id)
         assert(existed)
 
-    void _dropIfOutOfMemory()
+    void _dropWhileOutOfMemory()
         while (_totalSpace >= _maxMemory)
             _dropOldest(Session.Status.outOfMemory)

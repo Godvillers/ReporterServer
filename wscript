@@ -1,5 +1,4 @@
 APPNAME = "gvrepsrv"
-VERSION = "0.1.0"
 
 
 def options(opt):

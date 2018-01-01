@@ -58,7 +58,7 @@ runProgressTimer = (ago, stepDuration) !->
     basePoint = Date.now!
     clearInterval progressTimer if progressTimer?
     setProgress Math.min ago *= percentsPerMillisecond * 1000, 100
-    progressTimer := every 0.25, !->
+    progressTimer := every 0.25s, !->
         if (progress = ago + (Date.now! - basePoint) * percentsPerMillisecond) < 100 - 1e-5
             setProgress progress
         else
@@ -89,8 +89,8 @@ calcSymbolChecksum = (c) ->
     context
         ..textBaseline = \top
         ..font = "32px Arial"
-        ..fillText c, 0, 0
-        img = ..getImageData 0, 0, 32, 32
+        ..fillText c, 0px 0px
+        img = ..getImageData 0px 0px, 32px 32px
 
     return 0 unless img?
     result = 0; [result += .. for img.data]
@@ -122,7 +122,7 @@ postprocessPage = !->
 
 
 socket = null
-retryEvery = 3
+retryEvery = 3s
 retryCount = 0
 
 
@@ -145,7 +145,7 @@ connect = !->
         "
     socket.onclose = !->
         socket := null
-        after 3, connect
+        after 3s, connect
     justConnected = 1 # true
     socket.binaryType = \arraybuffer
     socket.onmessage = (msg) !->

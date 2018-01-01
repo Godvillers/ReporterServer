@@ -2,6 +2,5 @@ extends base
 
 block body
   p.
-    #[a(href="#{prefix}/duels/log/#{log.id}", target="_blank") Идёт трансляция].
+    #[a(href="#{prefix}/duels/log/#{snap.id}", target="_blank") Идёт трансляция].
     Пожалуйста, не закрывайте это окно до окончания заплыва.
-  //-TODO: Check browser extension version.

@@ -1,0 +1,13 @@
+import std.typecons
+
+
+struct DuelSnapshot
+    string agent
+    string host, id
+    float  stepDuration = 0
+    Nullable!float scale
+    int    timezone
+    int    step
+    Nullable!(int, -1) streamerIndex
+    string cargo
+    string allies, map, chronicle//HTML.

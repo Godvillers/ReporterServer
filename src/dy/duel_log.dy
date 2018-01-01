@@ -1,47 +1,9 @@
-@safe:
-
 struct DuelLog
-    @safe:
-
     string host
     string id//\w{5,}
-    int timezone
     int step
-    int streamerIndex//0-based.
     float stepDuration
-    float scale
-    string cargo
     string allies, map, chronicle//HTML.
 
-    @property size_t space() const nothrow pure @nogc
+    @property size_t space() const nothrow pure @safe @nogc
         return allies.length + map.length + chronicle.length + 300
-
-
-DuelLog duelLog(
-    string link,
-    int timezone,
-    int step,
-    int streamerIndex,
-    float stepDuration,
-    float scale,
-    string cargo,
-    string allies,
-    string map,
-    string chronicle,
-) pure
-    import std.string
-    import std.uri
-
-    string host = "https://godville.net", id = "00000"
-    const end = link.uriLength()
-    if (end > 0)
-        enum offset = "https://".length
-        auto pos = link[0 .. end].indexOf('#')
-        link = link[0 .. ~pos ? pos : end]
-        pos = link[offset .. $].indexOf('/')
-        host = link[0 .. ~pos ? offset + pos : $]
-        pos = link[0 .. $ - 1].lastIndexOf('/')
-        id = link[~pos ? pos + 1 : 0 .. $]
-
-    return DuelLog(
-        host, id, timezone, step, streamerIndex, stepDuration, scale, cargo, allies, map, chronicle)

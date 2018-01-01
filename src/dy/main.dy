@@ -5,12 +5,14 @@ import vibe.vibe
 import su = site_utils
 
 
+@safe:
+
 private /+immutable+/ string[2] _addresses = ["::1", "127.0.0.1"]
 private ushort _port = 8000
 private size_t _maxMemory
 
 
-private void _parseArguments()
+private void _parseArguments() @system
     import std.algorithm.mutation
     import std.conv
 
@@ -31,7 +33,7 @@ private void _parseArguments()
         throw new Exception("zero memory limit")
 
 
-private void _configure() @safe
+private void _configure()
     import site
 
     setLogFormat(FileLogger.Format.threadTime, FileLogger.Format.threadTime)
@@ -46,11 +48,11 @@ private void _configure() @safe
     auto router = (
         new URLRouter(su.prefix)
         .registerWebInterface(new Site(_maxMemory))
-        .get("/static/*", serveStaticFiles(".", fsettings))
-        .get("/api.json", serveStaticFile("static/api.json"))
-        .get("/version", serveStaticFile("static/version.txt"))
+        .get("/static/*",    serveStaticFiles(".", fsettings))
+        .get("/api.json",    serveStaticFile("static/api.json"))
+        .get("/version",     serveStaticFile("static/version.txt"))
         .get("/favicon.ico", serveStaticFile("static/favicon.ico"))
-        .get("/robots.txt", serveStaticFile("static/robots.txt"))
+        .get("/robots.txt",  serveStaticFile("static/robots.txt"))
     )
     if (!su.prefix.empty)
         //TODO: Find a way to handle the root page without a trailing slash.
@@ -63,7 +65,7 @@ private void _configure() @safe
     listenHTTP(settings, router)
 
 
-int main()
+int main() @system
     import std.encoding
 
     version (DigitalMars)
