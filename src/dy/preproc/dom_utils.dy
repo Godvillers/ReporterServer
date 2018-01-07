@@ -22,7 +22,7 @@ package static _s(string selector) = Selector.parse(selector)
 package char[ ] _text(const(Node)* node) nothrow @safe \
 in
     assert(node !is null)
-body
+do
     u._app.clear()
     node.text(u._app)
     return u._app.data
@@ -31,7 +31,7 @@ body
 void queueDestroy(Node* node) \
 in
     assert(node !is null)
-body
+do
     node.destroyChildren()
     _queued ~= node
 
@@ -44,7 +44,7 @@ void destroyQueued()
 bool destroyIfDangerous(Node* node) \
 in
     assert(node !is null)
-body
+do
     switch (node.tag)
         case \
             "applet", "audio", "bgsound", "embed", "frame", "iframe", "img", "input", "object",
@@ -58,7 +58,7 @@ body
 void removeDangerousAttrs(Node* node) \
 in
     assert(node !is null)
-body
+do
     foreach (name; node.attrs.byKey())
         if (name.startsWith("on") /+HTML event handlers.+/ || name.startsWith("data-vivaldi-"))
             node.removeAttr(name)
@@ -77,7 +77,7 @@ Node* findHeader(ref Document doc)
 void removeControlButtons(Node* header) \
 in
     assert(header !is null)
-body
+do
     foreach (node; header.descendants)
         if (node.attr("class").splitter().canFind!(among!("l_slot", "r_slot")))
             //Do not destroy slot nodes themselves.
@@ -87,7 +87,7 @@ body
 void replaceDropDown(ref Document doc, Node* line, const(char)[ ] host, const(char)[ ] godName) \
 in
     assert(line !is null)
-body
+do
     if (auto dropDown = doc.querySelector(_s!".opp_dropdown", line))
         dropDown.destroyChildren()
         auto link = doc.createElement("a", dropDown)
@@ -131,7 +131,7 @@ void updateTileTooltip(
     const(char)[ ] cargo) \
 in
     assert(tile !is null)
-body
+do
     import geometry
 
     const dist = HexCoord.fromRect(y, x, scale).dist

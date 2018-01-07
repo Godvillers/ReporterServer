@@ -58,7 +58,7 @@ struct SessionStorage
     this(size_t maxMemory) nothrow pure \
     in
         assert(maxMemory > 0)
-    body
+    do
         _tree = new typeof(_tree)
         _maxMemory = maxMemory
 
@@ -102,7 +102,7 @@ struct SessionStorage
     void _insertIntoTree(Session* session) nothrow pure \
     in
         assert(session !is null)
-    body
+    do
         const number = _tree.insert(session)
         assert(number == 1)
         _totalSpace += session.log.space
@@ -110,7 +110,7 @@ struct SessionStorage
     void _removeFromTree(Session* session) nothrow pure \
     in
         assert(session !is null)
-    body
+    do
         assert(_totalSpace >= session.log.space)
         _totalSpace -= session.log.space
         const number = _tree.removeKey(session)
@@ -119,7 +119,7 @@ struct SessionStorage
     void _dropOldest(Session.Status status) \
     in
         assert(status != Session.Status.active)
-    body
+    do
         auto session = _tree.front
         assert(session.status == Session.Status.active)
         session.status = status

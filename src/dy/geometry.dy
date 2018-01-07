@@ -24,7 +24,7 @@ struct RectCoord
     @property int dist() const nothrow pure @safe @nogc \
     out (result)
         assert(result >= 0)
-    body
+    do
         return abs(y) + abs(x)
 
 
@@ -44,7 +44,7 @@ struct HexCoord
     @property int dist() const \
     out (result)
         assert(result >= 0)
-    body
+    do
         int result = abs(skew + horiz)
         if ((skew ^ horiz) < 0)
             result += min(abs(skew), abs(horiz))

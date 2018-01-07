@@ -41,7 +41,7 @@ bool containsWord(const(char)[ ] haystack, const(char)[ ] needle) pure \
 in
     assert(!needle.empty)
     assert(!needle.canFind!isWhite())
-body
+do
     return haystack.splitter().canFind(needle)
 
 
@@ -104,7 +104,7 @@ out (result)
     import std.math
 
     assert(result.y.isNaN == result.x.isNaN)
-body
+do
     float y, x
     const invalid = typeof(return)(float.nan, float.nan)
     //^ \s* translate \s* \( \s* ([\d.+-]+) \s* , \s* ([\d.+-]+) \s* \) \s* $
