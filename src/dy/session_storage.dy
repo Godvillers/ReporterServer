@@ -18,11 +18,11 @@ struct Session
         outOfMemory,
 
     SysTime lastUpdated
-    ManualEvent event
+    LocalManualEvent event
     DuelLog log
     Status status
 
-    @disable this(this)//ManualEvent is non-copyable.
+    @disable this(this)//LocalManualEvent is non-copyable.
 
     @property Duration sinceLastUpdated() const
         return Clock.currTime() - lastUpdated
