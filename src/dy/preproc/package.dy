@@ -32,6 +32,7 @@ void applySnapshot(ref DuelLog log, ref const DuelSnapshot snap) @trusted
     log.allies = p.process!`Allies`(snap.allies)
     log.map = p.process!`Map`(snap.map)
     log.chronicle = p.process!`Chronicle`(snap.chronicle)
+    log.clientData = snap.clientData
 
 
 private:

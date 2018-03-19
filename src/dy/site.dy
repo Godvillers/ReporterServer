@@ -115,6 +115,7 @@ final class Site
                 response["allies"] = log.allies
                 response["map"] = log.map
                 response["chronicle"] = log.chronicle
+                response["clientData"] = log.clientData
 
                 app.clear()
                 app.writeJsonString(response)

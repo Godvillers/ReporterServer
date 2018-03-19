@@ -1,5 +1,7 @@
 import std.typecons
 
+import vibe.data.json
+
 
 struct DuelSnapshot
     string agent
@@ -11,3 +13,4 @@ struct DuelSnapshot
     Nullable!(int, -1) streamerIndex
     string cargo
     string allies, map, chronicle//HTML.
+    Json   clientData

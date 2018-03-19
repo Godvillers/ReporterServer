@@ -50,13 +50,13 @@ setProgress = (value) !->
     try $q '#turn_pbar .p_bar div' .style.width = "#{value}%"
 
 
-progressTimer = null
+progressTimer = 0
 
 
 runProgressTimer = (ago, stepDuration) !->
     percentsPerMillisecond = 0.1 / stepDuration
     basePoint = Date.now!
-    clearInterval progressTimer if progressTimer?
+    clearInterval progressTimer if progressTimer
     setProgress Math.min ago *= percentsPerMillisecond * 1000, 100
     progressTimer := every 0.25s, !->
         if (progress = ago + (Date.now! - basePoint) * percentsPerMillisecond) < 100 - 1e-5
@@ -64,10 +64,10 @@ runProgressTimer = (ago, stepDuration) !->
         else
             setProgress 100
             clearInterval progressTimer
-            progressTimer := null
+            progressTimer := 0
 
 
-updatePage = ({allies, map, chronicle}) !->
+updatePage = ({allies, map, chronicle, clientData}) !->
     $id \alls .outerHTML = allies
 
     $id \map_wrap
@@ -77,6 +77,8 @@ updatePage = ({allies, map, chronicle}) !->
         ..scrollLeft = scrollValue * ..scrollWidth
 
     $id \m_fight_log .outerHTML = chronicle
+
+    window.gReporterClientData = clientData
 
 
 checksumCache = { }

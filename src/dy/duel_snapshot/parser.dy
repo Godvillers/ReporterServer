@@ -12,18 +12,26 @@ import duel_snapshot.model
 DuelSnapshot parse(scope HTTPServerRequest req)
     import std.exception
 
+    import vibe.data.json
+
     DuelSnapshot snap
     const f = req.form
     switch (f.get("protocolVersion").to!int.ifThrown!ConvException(0))
+        case 3:
+            try
+                snap.clientData = parseJsonString(f._load("clientData"))
+            catch (JSONException)
+                _httpEnforce("'clientData' must be valid JSON")
+            goto case
+        case 2:
+            snap.timezone      = f._load!int("timezone")
+            snap.streamerIndex = f._load!int("playerNumber") - 1
+            break
+
         case 1:
             snap.scale         = f._load!float("scale")
             snap.streamerIndex = f._load!int("playerIndex") - 1
             _httpEnforce(snap.scale.get >= 1e-6f, "'scale' must be positive")
-            break
-
-        case 2:
-            snap.timezone      = f._load!int("timezone")
-            snap.streamerIndex = f._load!int("playerNumber") - 1
             break
 
         default: _httpEnforce(HTTPStatus.notImplemented, "Unsupported protocol version")

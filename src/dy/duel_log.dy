@@ -1,9 +1,13 @@
+import vibe.data.json
+
+
 struct DuelLog
     string host
     string id//\w{5,}
     int step
     float stepDuration
     string allies, map, chronicle//HTML.
+    Json clientData
 
     @property size_t space() const nothrow pure @safe @nogc
         return allies.length + map.length + chronicle.length + 300

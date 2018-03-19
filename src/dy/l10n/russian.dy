@@ -1,4 +1,3 @@
-import std.math
 import std.traits
 
 
@@ -11,6 +10,8 @@ enum Number: ubyte
 
 
 Number getNumber(I)(I number) if (isIntegral!I)
+    import std.math
+
     auto x = number % 100
     static if (isSigned!I)
         x = abs(x)

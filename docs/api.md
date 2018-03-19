@@ -14,6 +14,7 @@ determine which versions are supported by querying [`/api.json`][api.json].
 [api.json]: https://github.com/Godvillers/ReporterServer/blob/master/static/api.json
 [v1]: #v1
 [v2]: #v2
+[v3]: #v3
 
 
 ## v1 ##
@@ -48,3 +49,19 @@ determine which versions are supported by querying [`/api.json`][api.json].
 + __playerNumber__ *(int)*: Renamed __playerIndex__ from [v1][].
 + __cargo__ *(string)*: See [v1][].
 + __data__ *(string)*: See [v1][].
+
+
+## v3 ##
+
++ __protocolVersion__ *(int)*: `3`.
++ __agent__ *(string)*: See [v1][].
++ __link__ *(string)*: See [v1][].
++ __stepDuration__ *(float)*: See [v1][].
++ __timezone__ *(int)*: See [v2][].
++ __step__ *(int)*: See [v1][].
++ __playerNumber__ *(int)*: See [v2][].
++ __cargo__ *(string)*: See [v1][].
++ __data__ *(string)*: See [v1][].
++ __clientData__ *(string)*: Arbitrary JSON-encoded data. The Reporter does not use it in any way,
+  except for propagating to a stream page. It's available there as `window.gReporterClientData` and
+  updates on each step. If you don't need this functionality, pass `null`.

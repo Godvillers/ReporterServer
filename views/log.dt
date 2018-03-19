@@ -7,7 +7,10 @@ append head
   script(type="text/javascript",
     src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.6/pako_inflate.min.js")
   - script("log");
-  script(type="text/javascript") var gUpdatedAgo = #{ago}, gStepDuration = #{log.stepDuration};
+  script(type="text/javascript").
+    var gUpdatedAgo = #{ago};
+    var gStepDuration = #{log.stepDuration};
+    var gReporterClientData = !{log.clientData};
   - stylesheet("log");
 
 block body

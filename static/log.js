@@ -54,12 +54,12 @@
       $q('#turn_pbar .p_bar div').style.width = value + "%";
     } catch (e$) {}
   };
-  progressTimer = null;
+  progressTimer = 0;
   runProgressTimer = function(ago, stepDuration){
     var percentsPerMillisecond, basePoint;
     percentsPerMillisecond = 0.1 / stepDuration;
     basePoint = Date.now();
-    if (progressTimer != null) {
+    if (progressTimer) {
       clearInterval(progressTimer);
     }
     setProgress(Math.min(ago *= percentsPerMillisecond * 1000, 100));
@@ -70,13 +70,13 @@
       } else {
         setProgress(100);
         clearInterval(progressTimer);
-        progressTimer = null;
+        progressTimer = 0;
       }
     });
   };
   updatePage = function(arg$){
-    var allies, map, chronicle, x$, scrollValue, y$;
-    allies = arg$.allies, map = arg$.map, chronicle = arg$.chronicle;
+    var allies, map, chronicle, clientData, x$, scrollValue, y$;
+    allies = arg$.allies, map = arg$.map, chronicle = arg$.chronicle, clientData = arg$.clientData;
     $id('alls').outerHTML = allies;
     x$ = $id('map_wrap');
     scrollValue = x$.scrollLeft / x$.scrollWidth;
@@ -84,6 +84,7 @@
     y$ = $id('map_wrap');
     y$.scrollLeft = scrollValue * y$.scrollWidth;
     $id('m_fight_log').outerHTML = chronicle;
+    window.gReporterClientData = clientData;
   };
   checksumCache = {};
   calcSymbolChecksum = function(c){
