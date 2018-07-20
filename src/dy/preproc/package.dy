@@ -63,6 +63,8 @@ struct _Preprocessor
             return html
 
     void processAllies(Document doc)
+        import std.format
+
         du.removeEverythingDangerous(doc)
         foreach (line; doc.querySelectorAll(_s!".oppl"))
             //Remove a personal message (friend) link.
@@ -87,6 +89,12 @@ struct _Preprocessor
                 //Extract HP.
                 if (const hpNode = doc.querySelector(_s!".opp_h", line))
                     players[i].hp = u.extractHeroHp(_text(hpNode))
+                    if (players[i].hp.cur > 0)
+                        //Colorize player's line.
+                        const last = _stableApp.data.length
+                        _stableApp ~= line.attr("class")
+                        _stableApp.formattedWrite!" saild_%s"(i + 1)
+                        line.attr("class", _stableApp.data[last .. $])
 
                 if (auto godNode = doc.querySelector(_s!".opp_ng", line))
                     //Extract god's name.
@@ -100,6 +108,11 @@ struct _Preprocessor
 
                 //Replace a drop-down button with a profile link.
                 du.replaceDropDown(doc, line, snap.host, players[i].godName)
+
+        //Remove unnecessary padding at the bottom.
+        foreach (line; doc.querySelectorAll(_s!".line"))
+            if (line.firstChild is null && !line.attr("class").containsWord("oppl"))
+                du.queueDestroy(line)
 
         //Remove control buttons from the header.
         if (auto header = du.findHeader(doc))

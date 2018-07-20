@@ -3,6 +3,7 @@
 
 $id = -> document.getElementById it
 $q  = -> document.querySelector  it
+$cc = -> document.getElementsByClassName it
 
 
 contains = (haystack, needle) ->
@@ -110,17 +111,28 @@ shouldUseCustomFont =
         -> it && ("↖↗←→↙↘↑↓" `contains` it || calcSymbolChecksum(it) == undrawableChecksum)
 
 
+toggleHovered = !-> @toggle \hovered # Called on a `DOMTokenList`.
+
 postprocessPage = !->
     # Localize the time.
     offset = new Date!getTimezoneOffset!
-    for node in document.getElementsByClassName \d_time
+    for node in $cc \d_time
     when (//(\d*) \s* : \s* (\d*)//.exec node.textContent)?
         node.textContent = formatTime (+that.1 * 60 + +that.2 - offset) %% (24 * 60)
 
     # Change font on the map where needed.
-    for tile in document.getElementsByClassName \tile
+    for tile in $cc \tile
     when (text = tile.getElementsByTagName \text .0)? && shouldUseCustomFont text.textContent.trim!
         tile.classList.add \em_font
+
+    # Apply a class to an ark when its owner's name is hovered.
+    mapBlock = $id \s_map
+    for line in $id \alls .getElementsByClassName \oppl
+        nameNode = line.getElementsByClassName \opp_n .0
+        if mapBlock.getElementsByClassName "pl#{parseInt nameNode.textContent}" .0?
+            toggleHovered.bind that.classList
+                line.addEventListener \mouseenter, ..
+                line.addEventListener \mouseleave, ..
 
 
 socket = null

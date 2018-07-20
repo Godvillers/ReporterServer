@@ -70,6 +70,7 @@ h2
   text-align: left
   margin-bottom: 1.0em
 
+//Sailing map:
 svg
   pointer-events: visiblePainted
   +user-select(none)
@@ -87,7 +88,8 @@ svg
     stroke: hsl(0, 0%, 70%)
     stroke-width: 2.5
 
-  &.tile.i1 polygon
+  //Points of interest:
+  &.i1 polygon
     fill: hsl(0, 90%, 92%)
 
   &.i2 polygon
@@ -108,6 +110,7 @@ svg
   &.i7 polygon
     fill: hsl(275, 92%, 79%)
 
+//Revealed points of interest:
 .tile
   &.oi1 polygon
     stroke: hsla(0, 89%, 62%, 1)
@@ -147,9 +150,11 @@ polygon:hover
   stroke-width: 1.0
   stroke: hsl(0, 0%, 50%) !important
 
+//Buoys:
 .rb polygon
   fill: hsl(200, 50%, 87%)
 
+//Various tile types:
 .tile
   &.unknown
     polygon
@@ -176,6 +181,7 @@ polygon:hover
     fill: hsl(0, 28%, 87%)
 
 .tile
+  //?
   &.q-axis-same polygon
     fill: hsl(90, 20%, 87%)
 
@@ -206,7 +212,9 @@ polygon:hover
     font-size: 10px
     pointer-events: none
 
+//Arks:
 .cpt4 text
+  //150 HP.
   font-weight: bold
 
 .tile
@@ -234,10 +242,16 @@ polygon:hover
   &.pl4 polygon
     fill: hsl(169, 74%, 51%)
 
-  &.hl polygon
-    stroke: hsla(264, 93%, 52%, 0.83)
-    stroke-width: 0.7
+  &.pl1, &.pl2, &.pl3, &.pl4
+    &:hover, &.hovered
+      text
+        font-weight: bold
 
+      polygon
+        stroke: #4A4A4A
+        stroke-width: 1.5
+
+//Font:
 @font-face
   font-family: Em
   src: url('em.ttf')
@@ -245,6 +259,7 @@ polygon:hover
 .em_font
   font-family: 'Em', sans-serif
 
+//Layout:
 img
   border-width: 0
 
@@ -345,6 +360,10 @@ $m_small_col_width: 22%
 
 .oppl
   position: relative
+  padding: 3px 4px
+
+  &:not(:first-child)
+    @extend .turn_separator_inv
 
   a
     display: block
@@ -457,6 +476,7 @@ $m_small_col_width: 22%
 
   position: relative
 
+//Links:
 .no_link
   text-decoration: none
   color: #333
@@ -530,9 +550,7 @@ $m_small_col_width: 22%
   font-size: 1.2em
   margin: 5px
 
-[glowing="1"]
-  background-color: #D0D0D0
-
+//Allies block:
 .opp_n
   height: 16px
   width: 175px
@@ -546,6 +564,12 @@ $m_small_col_width: 22%
   float: right
   text-align: right
   margin-right: 4px
+
+  > *
+    border-radius: 2px
+
+[glowing="1"]
+  background-color: rgba(0, 0, 0, 0.15)
 
 .opp_dropdown
   float: right
@@ -561,13 +585,14 @@ $m_small_col_width: 22%
     text-decoration: none
 
 .opp_ng
-  color: #AAA
+  color: #888
 
 .opp_p_content
   padding: 0.2em 0.7em 0.5em 0.7em
   font-size: 0.96em
   max-height: 500px
 
+//Dungeon map:
 .dml
   clear: both
   margin-left: auto
@@ -630,6 +655,7 @@ $m_small_col_width: 22%
     top: 18px
     right: 33px
 
+//Sailing background:
 .saild_1
   background-color: rgba(163, 180, 225, 0.25)
 
@@ -641,6 +667,9 @@ $m_small_col_width: 22%
 
 .saild_4
   background-color: rgba(38, 223, 189, 0.25)
+
+#alls > .block_content
+  padding: 10px 0 0
 
 #m_fight_log >
   .block_content

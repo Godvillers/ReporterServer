@@ -15,7 +15,7 @@ static this() nothrow @safe
 
 
 //Parse selectors at compile-time.
-package static _s(string selector) = Selector.parse(selector)
+package auto _s(string selector) = Selector.parse(selector)
 
 
 package char[ ] _text(const Node node) nothrow @safe \

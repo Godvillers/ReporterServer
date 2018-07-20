@@ -83,7 +83,7 @@ final class Site
         auto app = appender!(char[ ])
         auto session = _id in _storage
         try
-            scope(failure) socket.close(1011)//Internal Error
+            scope(failure) socket.close(WebSocketCloseReason.internalError)
             auto response = Json.emptyObject
             do
                 if (_id !in _storage || session.status == ss.Session.Status.finished)
@@ -106,7 +106,7 @@ final class Site
                         "retryCount": Json(5),
                     ]))
                     socket.send((() @trusted => zlib.compress(app.data, 0))())
-                    socket.close(1013)//Try Again Later
+                    socket.close(WebSocketCloseReason.tryAgainLater)
                     return
 
                 response["step"] = log.step

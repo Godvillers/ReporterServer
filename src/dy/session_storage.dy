@@ -103,7 +103,12 @@ struct SessionStorage
     in
         assert(session !is null)
     do
-        const number = _tree.insert(session)
+        version (unittest)
+            import std.exception
+
+            const number = assumeWontThrow(_tree.insert(session))
+        else
+            const number = _tree.insert(session)
         assert(number == 1)
         _totalSpace += session.log.space
 
