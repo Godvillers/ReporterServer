@@ -5,16 +5,16 @@ copyright   "Copyright © 2017-2018, Cordarion the Grey"
 license     "MIT"
 
 dependency "dython" version="~>0.1.0"
-dependency "htmld" version="~>0.2.19"
+dependency "htmld" version="~>0.3.2"
 //dependency "semver" version="~>0.3.1"
-dependency "vibe-d" version="==0.8.3"
+dependency "vibe-d" version="==0.8.4"
 
 stringImportPaths "src/dy" "views"
-versions "VibeCustomMain"
+versions "VibeIdleCollect" "VibeManualMemoryManagement"
 
 buildType "debug" {
     buildOptions "debugMode" "debugInfo"
-    versions /*"VibeDebugCatchAll"*/ "VibeJsonFieldNames" "JsonLineNumbers" "DietUseCache"
+    versions /*"VibeDebugCatchAll"*/ "DietUseCache"
 }
 
 buildType "release" {
