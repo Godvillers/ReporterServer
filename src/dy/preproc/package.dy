@@ -72,6 +72,8 @@ struct _Preprocessor
             foreach (node; line.descendants.filter!q{a.isElementNode})
                 node.removeAttr("style")
                 node.removeAttr("title")
+                node.removeAttr("data-etitle")
+                node.removeAttr("data-ecss")
 
             if (const heroNode = doc.querySelector(_s!".opp_n", line))
                 //Extract player index and hero's name.
@@ -91,6 +93,9 @@ struct _Preprocessor
                     players[i].godName = u.extractGodName(_text(godNode)).idup
                     //Remove guildmates' styling.
                     if (auto nameNode = doc.querySelector(_s!".opp_g", godNode))
+                        nameNode.removeAttr("class")
+                    //Remove eGUI+'s blacklist mark.
+                    if (auto nameNode = doc.querySelector(_s!".ally_blacklisted", godNode))
                         nameNode.removeAttr("class")
 
                 //Replace a drop-down button with a profile link.
