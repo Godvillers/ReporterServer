@@ -3,7 +3,6 @@ import std.conv
 import std.range
 import std.regex
 import std.string
-import std.uni
 
 import html
 import vibe.core.log
@@ -11,7 +10,7 @@ import vibe.core.log
 import duel_log
 import duel_snapshot.model
 import du = preproc.dom_utils: _s, _text
-import u  = preproc.utils: containsWord, _rx, _stableApp
+import u  = preproc.utils: maybeTo, containsWord, _rx, _stableApp
 
 
 @safe:
@@ -35,15 +34,12 @@ void applySnapshot(ref DuelLog log, ref const DuelSnapshot snap) @trusted
     log.clientData = snap.clientData
 
 
-private:
-
-struct _Preprocessor
+private struct _Preprocessor
     @system:
 
     //DuelLog* log//Unused for now.
     const(DuelSnapshot)* snap
     u.Player[4] players
-    float scale = 1
 
     string process(string func)(string html)
         import std.utf
@@ -63,8 +59,6 @@ struct _Preprocessor
             return html
 
     void processAllies(Document doc)
-        import std.format
-
         du.removeEverythingDangerous(doc)
         foreach (line; doc.querySelectorAll(_s!".oppl"))
             //Remove a personal message (friend) link.
@@ -91,10 +85,10 @@ struct _Preprocessor
                     players[i].hp = u.extractHeroHp(_text(hpNode))
                     if (players[i].hp.cur > 0)
                         //Colorize player's line.
-                        const last = _stableApp.data.length
-                        _stableApp ~= line.attr("class")
-                        _stableApp.formattedWrite!" saild_%s"(i + 1)
-                        line.attr("class", _stableApp.data[last .. $])
+                        line.attr("class", u.concat(
+                            line.attr("class"),
+                            u.format!" saild_%s"(i + 1),
+                        ))
 
                 if (auto godNode = doc.querySelector(_s!".opp_ng", line))
                     //Extract god's name.
@@ -137,10 +131,10 @@ struct _Preprocessor
             if (!snap.streamerIndex.isNull)
                 const classes = node.attr("class")
                 if (!classes.splitter().canFind!(cls => cls.startsWith("saild_")))
-                    const last = _stableApp.data.length
-                    _stableApp ~= classes
-                    _stableApp.formattedWrite!" saild_%s"(snap.streamerIndex.get + 1)
-                    node.attr("class", _stableApp.data[last .. $])
+                    node.attr("class", u.concat(
+                        classes,
+                        u.format!" saild_%s"(snap.streamerIndex.get + 1),
+                    ))
 
         if (snap.timezone)
             //Convert time to UTC.
@@ -152,9 +146,7 @@ struct _Preprocessor
                 catch (ConvException)
                     continue
                 minutes = ((minutes - snap.timezone) % (24 * 60) + 24 * 60) % (24 * 60)
-                const last = _stableApp.data.length
-                _stableApp.formattedWrite!"%02d:%02d"(minutes / 60, minutes % 60)
-                timeNode.text = _stableApp.data[last .. $]
+                timeNode.text = u.concat(u.format!"%02d:%02d"(minutes / 60, minutes % 60))
 
         if (auto header = du.findHeader(doc))
             //Remove control buttons from the header.
@@ -176,7 +168,8 @@ struct _Preprocessor
 
     void processMap(Document doc)
         import std.ascii: isDigit
-        import std.math
+        import std.math: hypot, isNaN
+        import std.uni: isSpace
 
         auto svgs = doc.elementsByTagName("svg")
         if (svgs.empty)
@@ -206,23 +199,28 @@ struct _Preprocessor
 
         //Extract map scale.
         const svgStyle = svg.attr("style")
+        float scale = 1
         if (auto c = svgStyle.matchFirst(_rx!r":\s*scale\s*\(\s*([\d.]+)\s*\)"))
             try
                 scale = 1 / c[1].to!float
             catch (ConvException) { }
-            svg.attr("style", c.pre ~ ":scale(1)" ~ c.post)
+            svg.attr("style", u.concat(c.pre, ":scale(1)", c.post))
 
         //Rescale the SVG.
         const height = svg.attr("height")
         const tail = height.find!(c => !c.isDigit && c != '.')
-        if (const newHeight = _rescale(height[0 .. $ - tail.length]))
-            svg.attr("height", newHeight ~ tail)
+        auto initialHeight = height[0 .. $ - tail.length].maybeTo!float
+        if (!initialHeight.isNull)
+            svg.attr("height", u.concat(u.format!"%s"(initialHeight.get * scale), tail))
 
         //Rescale the container.
         foreach (node; svg.ancestors)
             if (auto c = node.attr("style").matchFirst(_rx!r"\b(?<!-)height\s*:\s*([\d.]+)"))
-                if (const newHeight = _rescale(c[1]))
-                    node.attr("style", c.pre ~ "height:" ~ newHeight ~ c.post)
+                initialHeight = c[1].maybeTo!float
+                if (!initialHeight.isNull)
+                    node.attr("style", u.concat(
+                        c.pre, "height:", u.format!"%s"(initialHeight.get * scale), c.post,
+                    ))
 
         //Temporarily detach the map to prevent from scanning through it.
         auto mapWrapper = svg.parent
@@ -335,9 +333,3 @@ struct _Preprocessor
 
         if (prevTile !is null)
             du.updateTileTooltip(doc, prevTile, y, x, tileSize, prevTitleNode, player, snap.cargo)
-
-    private string _rescale(const(char)[ ] initialHeight) @safe
-        try
-            return text(initialHeight.to!float * scale)
-        catch (ConvException)
-            return null

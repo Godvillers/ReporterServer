@@ -6,11 +6,18 @@ license     "MIT"
 
 dependency "dython" version="~>0.1.0"
 dependency "htmld" version="~>0.3.2"
-//dependency "semver" version="~>0.3.1"
 dependency "vibe-d" version="==0.8.4"
 
 stringImportPaths "src/dy" "views"
 versions "VibeIdleCollect" "VibeManualMemoryManagement"
+
+configuration "application" {
+    targetType "executable"
+}
+
+configuration "syntax" {
+    buildOptions "syntaxOnly"
+}
 
 buildType "debug" {
     buildOptions "debugMode" "debugInfo"

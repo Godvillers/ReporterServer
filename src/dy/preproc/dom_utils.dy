@@ -100,8 +100,8 @@ do
 
 void removeExtraWhitespace(Document doc)
     import std.range
-    import std.uni
-    import std.utf
+    import std.uni: isWhite
+    import std.utf: stride
 
     foreach (node; doc.nodes.filter!q{a.isTextNode})
         const s = _text(node)
@@ -117,9 +117,7 @@ void removeExtraWhitespace(Document doc)
             else
                 const one = s.stride()
                 if (s.length > one && s.all!isWhite())
-                    const last = u._stableApp.data.length
-                    u._stableApp ~= s[0 .. one]
-                    node.text = u._stableApp.data[last .. $]
+                    node.text = u.concat(s[0 .. one])
 
 
 void updateTileTooltip(

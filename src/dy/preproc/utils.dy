@@ -1,12 +1,10 @@
 import std.algorithm
 import std.array
 import std.conv
-import std.format
 import std.range
 import std.regex
 import std.string
 import std.typecons
-import std.uni
 
 
 @safe:
@@ -37,8 +35,38 @@ static this() nothrow
     _stableApp.reserve(65_536)
 
 
+//A tuple with a phantom string attached.
+private struct _F(string fmt, Args...)
+    private Args _args
+
+
+auto format(string fmt, Args...)(Args args) if (Args.length)
+    return _F!(fmt, Args)(args)
+
+
+char[ ] concat(Args...)(Args args) if (Args.length)
+    import std.format
+
+    const last = _stableApp.data.length
+    foreach (arg; args)
+        static if (is(typeof(arg) == _F!(fmt, FArgs), string fmt, FArgs...))
+            _stableApp.formattedWrite!fmt(arg._args)
+        else
+            _stableApp ~= arg
+    return _stableApp.data[last .. $]
+
+
+Nullable!T maybeTo(T)(const(char)[ ] s) pure
+    try
+        return nullable(s.to!T)
+    catch (ConvException)
+        return Nullable!T.init
+
+
 bool containsWord(const(char)[ ] haystack, const(char)[ ] needle) pure \
 in
+    import std.uni: isWhite
+
     assert(!needle.empty)
     assert(!needle.canFind!isWhite())
 do
@@ -57,11 +85,7 @@ const(char)[ ] splitFilterJoin(alias splitter, alias pred, JoinerArgs...)(
     const(char)[ ] s, auto ref JoinerArgs joinerArgs) \
 if (__traits(compiles, splitter(s).filter!pred().joiner(joinerArgs)))
     auto result = splitter(s).filterIfDiffers!pred()
-    if (result.isNull)
-        return s
-    const last = _stableApp.data.length
-    _stableApp ~= result.get.joiner(joinerArgs)
-    return _stableApp.data[last .. $]
+    return result.isNull ? s : concat(result.get.joiner(joinerArgs))
 
 
 Tuple!(int, q{index}, const(char)[ ], q{heroName}) extractHeroIndexAndName(const(char)[ ] label) /+\
@@ -93,10 +117,8 @@ Stat extractHeroHp(const(char)[ ] label) /+pure+/
     return Stat.init
 
 
-const(char)[ ] formatProfileLink(const(char)[ ] host, const(char)[ ] godName)
-    const last = _stableApp.data.length
-    _stableApp.formattedWrite!"%s/gods/%s"(host, godName)
-    return _stableApp.data[last .. $]
+const(char)[ ] formatProfileLink(const(char)[ ] host, const(char)[ ] godName) nothrow
+    return concat(host, "/gods/", godName)
 
 
 Tuple!(float, q{y}, float, q{x}) extractTileTranslation(const(char)[ ] s) pure \
@@ -105,6 +127,8 @@ out (result)
 
     assert(result.y.isNaN == result.x.isNaN)
 do
+    import std.uni: isWhite
+
     float y, x
     const invalid = typeof(return)(float.nan, float.nan)
     //^ \s* translate \s* \( \s* ([\d.+-]+) \s* , \s* ([\d.+-]+) \s* \) \s* $
@@ -133,9 +157,7 @@ do
 
 
 const(char)[ ] formatTileTranslation(float y, float x)
-    const last = _stableApp.data.length
-    _stableApp.formattedWrite!"translate(%.1f,%.1f)"(x, y)
-    return _stableApp.data[last .. $]
+    return concat(format!"translate(%.1f,%.1f)"(x, y))
 
 
 const(char)[ ] removePrivateTileClasses(const(char)[ ] classes)
@@ -150,6 +172,7 @@ const(char)[ ] removePrivateTileClasses(const(char)[ ] classes)
 
 const(char)[ ] compressTileCoordinates(const(char)[ ] value)
     import std.ascii: isDigit
+    import std.format
 
     value = value.strip()
     auto s = value
@@ -173,6 +196,7 @@ const(char)[ ] compressTileCoordinates(const(char)[ ] value)
 
 const(char)[ ] extractEssentialsFromTooltip(const(char)[ ] msg)
     import std.ascii: isDigit
+    import std.uni: sicmp
 
     msg = msg.strip().splitFilterJoin!(
         msg => msg.splitter(',').map!strip(),
@@ -230,6 +254,8 @@ const(char)[ ] formatDistanceTooltip(const(char)[ ] msg, int dist) nothrow
 
 
 const(char)[ ] formatPlayerTooltip(Player player, const(char)[ ] cargo, int dist)
+    import std.format
+
     const last = _stableApp.data.length
     _stableApp.formattedWrite!"%s (%s), %d/%d, %s "(
         player.heroName, player.godName, player.hp.cur, player.hp.max, cargo)
