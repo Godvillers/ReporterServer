@@ -323,11 +323,11 @@ private struct _Preprocessor
                         du.queueDestroy(node)
                     break
 
-                /+
                 case "defs":
-                    //TODO: Remove eGUI+'s SVG defs?
+                    //Remove eGUI+'s SVG defs.
+                    if (node.attr("class").containsWord("e_ruler_defs"))
+                        du.queueDestroy(node)
                     break
-                +/
 
                 default: break
 
