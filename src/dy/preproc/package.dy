@@ -58,7 +58,7 @@ private struct _Preprocessor
             logDiagnostic(`UTF error while processing "` ~ func ~ `"`)
             return html
 
-    void processAllies(Document doc)
+    void processAllies(ref Document doc)
         du.removeEverythingDangerous(doc)
         foreach (line; doc.querySelectorAll(_s!".oppl"))
             //Remove a personal message (friend) link.
@@ -119,7 +119,7 @@ private struct _Preprocessor
         //Remove extra whitespace between tags.
         du.removeExtraWhitespace(doc)
 
-    void processChronicle(Document doc)
+    void processChronicle(ref Document doc)
         import std.format
 
         du.removeEverythingDangerous(doc)
@@ -166,7 +166,7 @@ private struct _Preprocessor
         //Remove extra whitespace between tags.
         du.removeExtraWhitespace(doc)
 
-    void processMap(Document doc)
+    void processMap(ref Document doc)
         import std.ascii: isDigit
         import std.math: hypot, isNaN
         import std.uni: isSpace
@@ -174,7 +174,7 @@ private struct _Preprocessor
         auto svgs = doc.elementsByTagName("svg")
         if (svgs.empty)
             return//Well, we could apply some transformations not affecting the SVG...
-        Node svg = svgs.front
+        Node* svg = svgs.front
 
         float tileSize = snap.scale.get(1)
         if (snap.scale.isNull)
@@ -244,7 +244,7 @@ private struct _Preprocessor
         //Reattach the map.
         mapWrapper.appendChild(svg)
 
-        Node prevTile, prevTitleNode
+        Node* prevTile, prevTitleNode
         float y, x
         const(u.Player)* player
         const(char)[ ][string] polygonCache

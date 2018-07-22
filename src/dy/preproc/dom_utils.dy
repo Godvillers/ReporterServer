@@ -8,7 +8,7 @@ import u = preproc.utils
 
 @system:
 
-private Appender!(Node[ ]) _queued
+private Appender!(Node*[ ]) _queued
 
 static this() nothrow @safe
     _queued.reserve(2048)
@@ -18,7 +18,7 @@ static this() nothrow @safe
 package auto _s(string selector) = Selector.parse(selector)
 
 
-package char[ ] _text(const Node node) nothrow @safe \
+package char[ ] _text(const(Node)* node) nothrow @safe \
 in
     assert(node !is null)
 do
@@ -30,7 +30,7 @@ do
     return u._app.data
 
 
-void queueDestroy(Node node) \
+void queueDestroy(Node* node) \
 in
     assert(node !is null)
 do
@@ -43,7 +43,7 @@ void destroyQueued()
     _queued.clear()
 
 
-bool destroyIfDangerous(Node node) \
+bool destroyIfDangerous(Node* node) \
 in
     assert(node !is null)
 do
@@ -57,7 +57,7 @@ do
         default: return false
 
 
-void removeDangerousAttrs(Node node) \
+void removeDangerousAttrs(Node* node) \
 in
     assert(node !is null)
 do
@@ -66,17 +66,17 @@ do
             node.removeAttr(name)
 
 
-void removeEverythingDangerous(Document doc)
+void removeEverythingDangerous(ref Document doc)
     import std.functional
 
     doc.elements.filter!(not!destroyIfDangerous).each!removeDangerousAttrs()
 
 
-Node findHeader(Document doc)
+Node* findHeader(ref Document doc)
     return doc.querySelector(_s!".block_h")
 
 
-void removeControlButtons(Node header) \
+void removeControlButtons(Node* header) \
 in
     assert(header !is null)
 do
@@ -86,7 +86,7 @@ do
             node.destroyChildren()
 
 
-void replaceDropDown(Document doc, Node line, const(char)[ ] host, const(char)[ ] godName) \
+void replaceDropDown(ref Document doc, Node* line, const(char)[ ] host, const(char)[ ] godName) \
 in
     assert(line !is null)
 do
@@ -98,7 +98,7 @@ do
         link.appendText("▶")
 
 
-void removeExtraWhitespace(Document doc)
+void removeExtraWhitespace(ref Document doc)
     import std.range
     import std.uni: isWhite
     import std.utf: stride
@@ -121,12 +121,12 @@ void removeExtraWhitespace(Document doc)
 
 
 void updateTileTooltip(
-    Document doc,
-    Node tile,
+    ref Document doc,
+    Node* tile,
     double y,
     double x,
     double scale,
-    Node titleNode,
+    Node* titleNode,
     const(u.Player)* player,
     const(char)[ ] cargo) \
 in
