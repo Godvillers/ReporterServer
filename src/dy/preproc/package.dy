@@ -85,10 +85,10 @@ private struct _Preprocessor
                     players[i].hp = u.extractHeroHp(_text(hpNode))
                     if (players[i].hp.cur > 0)
                         //Colorize player's line.
-                        line.attr("class", u.concat(
-                            line.attr("class"),
+                        line["class"] = u.concat(
+                            line["class"],
                             u.format!" saild_%s"(i + 1),
-                        ))
+                        )
 
                 if (auto godNode = doc.querySelector(_s!".opp_ng", line))
                     //Extract god's name.
@@ -105,7 +105,7 @@ private struct _Preprocessor
 
         //Remove unnecessary padding at the bottom.
         foreach (line; doc.querySelectorAll(_s!".line"))
-            if (line.firstChild is null && !line.attr("class").containsWord("oppl"))
+            if (line.firstChild is null && !line["class"].containsWord("oppl"))
                 du.queueDestroy(line)
 
         //Remove control buttons from the header.
@@ -129,12 +129,12 @@ private struct _Preprocessor
             node.removeAttr("style")
             //Assign streamer's color to white entries.
             if (!snap.streamerIndex.isNull)
-                const classes = node.attr("class")
+                const classes = node["class"]
                 if (!classes.splitter().canFind!(cls => cls.startsWith("saild_")))
-                    node.attr("class", u.concat(
+                    node["class"] = u.concat(
                         classes,
                         u.format!" saild_%s"(snap.streamerIndex.get + 1),
-                    ))
+                    )
             //Remove social networks' links.
             if (auto links = doc.querySelector(_s!".d_line_links", node))
                 links.destroy()
@@ -184,7 +184,7 @@ private struct _Preprocessor
             //Extract tile size.
             if (const tile = doc.querySelector(_s!".tile polygon", svg))
                 const(char)[ ][8] p
-                if (!tile.attr("points")
+                if (!tile["points"]
                     .splitter!(c => c == ',' || c.isSpace)
                     .take(8)
                     .copy(p[ ])
@@ -201,29 +201,29 @@ private struct _Preprocessor
                     catch (ConvException) { }
 
         //Extract map scale.
-        const svgStyle = svg.attr("style")
+        const svgStyle = svg["style"]
         float scale = 1
         if (auto c = svgStyle.matchFirst(_rx!r":\s*scale\s*\(\s*([\d.]+)\s*\)"))
             try
                 scale = 1 / c[1].to!float
             catch (ConvException) { }
-            svg.attr("style", u.concat(c.pre, ":scale(1)", c.post))
+            svg["style"] = u.concat(c.pre, ":scale(1)", c.post)
 
         //Rescale the SVG.
-        const height = svg.attr("height")
+        const height = svg["height"]
         const tail = height.find!(c => !c.isDigit && c != '.')
         auto initialHeight = height[0 .. $ - tail.length].maybeTo!float
         if (!initialHeight.isNull)
-            svg.attr("height", u.concat(u.format!"%s"(initialHeight.get * scale), tail))
+            svg["height"] = u.concat(u.format!"%s"(initialHeight.get * scale), tail)
 
         //Rescale the container.
         foreach (node; svg.ancestors)
-            if (auto c = node.attr("style").matchFirst(_rx!r"\b(?<!-)height\s*:\s*([\d.]+)"))
+            if (auto c = node["style"].matchFirst(_rx!r"\b(?<!-)height\s*:\s*([\d.]+)"))
                 initialHeight = c[1].maybeTo!float
                 if (!initialHeight.isNull)
-                    node.attr("style", u.concat(
+                    node["style"] = u.concat(
                         c.pre, "height:", u.format!"%s"(initialHeight.get * scale), c.post,
-                    ))
+                    )
 
         //Temporarily detach the map to prevent from scanning through it.
         auto mapWrapper = svg.parent
@@ -254,18 +254,17 @@ private struct _Preprocessor
         foreach (node; svg.descendants)
             switch (node.tag)//`null` for non-elements.
                 case "g":
-                    auto classes = node.attr("class")
+                    auto classes = node["class"]
                     //Remove eGUI+'s simplified hints and ruler tooltips.
                     if (classes.splitter().canFind!(among!("epl", "e_ruler_tooltip")))
                         du.queueDestroy(node)
                         break
 
                     //Remove various player-specific classes.
-                    classes = u.removePrivateTileClasses(classes)
-                    node.attr("class", classes)
+                    node["class"] = classes = u.removePrivateTileClasses(classes)
 
                     //Remember tiles' coordinates.
-                    const pos = u.extractTileTranslation(node.attr("transform"))
+                    const pos = u.extractTileTranslation(node["transform"])
                     if (pos.y.isNaN)
                         break
                     if (prevTile !is null)
@@ -274,7 +273,7 @@ private struct _Preprocessor
                         prevTitleNode = null
                     y = pos.y
                     x = pos.x
-                    node.attr("transform", u.formatTileTranslation(y, x))
+                    node["transform"] = u.formatTileTranslation(y, x)
                     prevTile = node
 
                     //Parse ark number.
@@ -289,13 +288,13 @@ private struct _Preprocessor
 
                 case "polygon":
                     //Compress coordinates.
-                    const points = node.attr("points")
+                    const points = node["points"]
                     if (const p = points in polygonCache)
-                        node.attr("points", *p)
+                        node["points"] = *p
                     else
                         //TODO: Get rid of `idup`.
-                        node.attr("points",
-                            (polygonCache[points.idup] = u.compressTileCoordinates(points)))
+                        node["points"] = polygonCache[points.idup] =
+                            u.compressTileCoordinates(points)
                     break
 
                 case "title":
@@ -321,14 +320,13 @@ private struct _Preprocessor
 
                 case "line":
                     //Remove eGUI+'s ruler and ark direction hint.
-                    if (node.attr("id") == "e_ruler" ||
-                        node.attr("class").containsWord("dir_arrow"))
+                    if (node["id"] == "e_ruler" || node["class"].containsWord("dir_arrow"))
                         du.queueDestroy(node)
                     break
 
                 case "defs":
                     //Remove eGUI+'s SVG defs.
-                    if (node.attr("class").containsWord("e_ruler_defs"))
+                    if (node["class"].containsWord("e_ruler_defs"))
                         du.queueDestroy(node)
                     break
 
