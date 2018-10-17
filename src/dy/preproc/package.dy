@@ -135,6 +135,9 @@ private struct _Preprocessor
                         classes,
                         u.format!" saild_%s"(snap.streamerIndex.get + 1),
                     ))
+            //Remove social networks' links.
+            if (auto links = doc.querySelector(_s!".d_line_links", node))
+                links.destroy()
 
         if (snap.timezone)
             //Convert time to UTC.

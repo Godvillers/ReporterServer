@@ -11,14 +11,6 @@ dependency "vibe-d" version="==0.8.4"
 stringImportPaths "src/dy" "views"
 versions "VibeIdleCollect" "VibeManualMemoryManagement"
 
-configuration "application" {
-    targetType "executable"
-}
-
-configuration "syntax" {
-    buildOptions "syntaxOnly"
-}
-
 buildType "debug" {
     buildOptions "debugMode" "debugInfo"
     versions /*"VibeDebugCatchAll"*/ "DietUseCache"
