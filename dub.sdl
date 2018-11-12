@@ -9,6 +9,7 @@ dependency "htmld" version="~>0.3.3"
 dependency "vibe-d" version="==0.8.4"
 
 stringImportPaths "src/dy" "views"
+subConfiguration "vibe-d" "libevent"
 versions "VibeIdleCollect" "VibeManualMemoryManagement"
 
 buildType "debug" {
