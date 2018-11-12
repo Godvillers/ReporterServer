@@ -173,6 +173,7 @@ const(char)[ ] removePrivateTileClasses(const(char)[ ] classes)
 const(char)[ ] compressTileCoordinates(const(char)[ ] value)
     import std.ascii: isDigit
     import std.format
+    import std.math
 
     value = value.strip()
     auto s = value
@@ -186,6 +187,8 @@ const(char)[ ] compressTileCoordinates(const(char)[ ] value)
             const x = parse!float(r)
             if (x < 1e-6f && x > -1e-6f)
                 _stableApp ~= '0'
+            else if (abs(x - round(x)) < 1e-6f)
+                _stableApp.formattedWrite!"%.0f"(x)
             else
                 _stableApp.formattedWrite!"%.1f"(x)
             s = r
