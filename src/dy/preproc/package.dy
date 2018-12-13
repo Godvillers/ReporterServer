@@ -137,7 +137,7 @@ private struct _Preprocessor
                     ))
             //Remove social networks' links.
             if (auto links = doc.querySelector(_s!".d_line_links", node))
-                links.destroy()
+                du.queueDestroy(links)
 
         if (snap.timezone)
             //Convert time to UTC.
