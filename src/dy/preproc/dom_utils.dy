@@ -34,12 +34,17 @@ void queueDestroy(Node node) \
 in
     assert(node !is null)
 do
-    node.destroyChildren()
+    //Cannot call `node.destroyChildren()` since they might already be queued for deletion.
+    for (Node child; (child = node.firstChild) !is null; _queued ~= child)
+        child.detach()
     _queued ~= node
 
 
 void destroyQueued()
-    _queued.data.each!q{a.destroy()}
+    //Destroy in a safe way even if one node is an ancestor of another or if the same node
+    //is queued twice.
+    _queued.data.each!q{a.detach()}
+    _queued.data.sort!q{a.toHash() < b.toHash()}.uniq!q{a is b}.each!q{a.destroy()}
     _queued.clear()
 
 

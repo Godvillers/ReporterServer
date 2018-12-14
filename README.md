@@ -12,8 +12,8 @@ The Easy Way
 The server can be used inside a Docker container. The image is 500 MB in size, plus 80 MB for the
 Docker itself.
 
-[Read this][mgmt], then `git submodule update --init --recursive`. Install `docker.io` and
-`docker-compose` (in Debian-based distributions), add yourself to `docker` group.
+[Read this][mgmt], then `git submodule update --init`. Install `docker.io` and `docker-compose`
+(in Debian-based distributions), add yourself to `docker` group.
 
 * `mgmt/update.sh [-P | --no-pull]` takes care of everything: downloads the latest source
   (optionally), builds the image, compiles and restarts the server. It might fail, though, if you
@@ -56,7 +56,7 @@ DFLAGS=-mcpu=native dub build -brelease-nobounds
 
 ### Running ###
 
-`./gvrepsrv [-p8000] [--prefix=/reporter] [--max-memory=128M]`
+`./gvrepsrv [-p8000] [--prefix=/] [--max-memory=128M]`
 
 However, the server is recommended to be run under [Supervisor][supervisor] so that it will
 auto-restart if/when crashing.

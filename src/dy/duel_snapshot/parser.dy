@@ -49,9 +49,9 @@ DuelSnapshot parse(scope HTTPServerRequest req)
     const payload = f._load("data")
     const headerLength = snap.agent.length + rawLink.length + snap.cargo.length
     if (headerLength > 256 || payload.length > 60 << 10)
-        logDiagnostic("Declined a request of %.1f KB", (headerLength + payload.length) / 1024.)
+        logWarn("Declined a request of %.1f KB", (headerLength + payload.length) / 1024.)
         throw new HTTPStatusException(HTTPStatus.requestEntityTooLarge)
-    (() @trusted => _decodePayload(snap, payload, Yes.useBase64))()
+    () @trusted { _decodePayload(snap, payload, Yes.useBase64) }()
 
     //Be careful to handle NaNs.
     _httpEnforce(snap.stepDuration >= 1e-6f, "'stepDuration' must be positive")
@@ -120,7 +120,7 @@ void _decodePayload(ref DuelSnapshot snap, const(char)[ ] raw, Flag!q{useBase64}
             Base64.decode(raw, _ubyteApp)
             decoded = _ubyteApp.data
         catch (Base64Exception e)
-            logDiagnostic("Base64 error: %s", e.msg)
+            logWarn("Base64 error: %s", e.msg)
             throw new HTTPStatusException(HTTPStatus.badRequest)
 
     string concatenated
@@ -129,10 +129,10 @@ void _decodePayload(ref DuelSnapshot snap, const(char)[ ] raw, Flag!q{useBase64}
         //We expect a compression ratio of about 20x-30x, so choose the buffer size accordingly.
         concatenated = cast(string)zlib.uncompress(decoded, 1 << 20, decoded.length << 5)
     catch (ZlibException e)
-        logDiagnostic("Zlib decompression error: %s", e.msg)
+        logWarn("Zlib decompression error: %s", e.msg)
         throw new HTTPStatusException(HTTPStatus.badRequest)
     catch (ZlibTooLarge)
-        logDiagnostic("Declined a zip bomb of %.1f KB", raw.length / 1024.)
+        logWarn("Declined a zip bomb of %.1f KB", raw.length / 1024.)
         throw new HTTPStatusException(HTTPStatus.requestEntityTooLarge)
 
     logDiagnostic(

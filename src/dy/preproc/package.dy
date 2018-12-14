@@ -53,9 +53,11 @@ private struct _Preprocessor
                 du.destroyQueued()
             u._app.clear()
             doc.root.innerHTML(u._app)
+            doc.root.destroy()
+            doc.root = null
             return u._app.data.idup
         catch (UTFException)
-            logDiagnostic(`UTF error while processing "` ~ func ~ `"`)
+            logWarn(`UTF error while processing "` ~ func ~ `"`)
             return html
 
     void processAllies(Document doc)
@@ -124,6 +126,9 @@ private struct _Preprocessor
 
         du.removeEverythingDangerous(doc)
 
+        //Remove social networks' links.
+        doc.querySelectorAll(_s!".d_line_links").each!(du.queueDestroy)
+
         foreach (node; doc.querySelectorAll(_s!".d_line"))
             //Remove custom styling, showing partially hidden text.
             node.removeAttr("style")
@@ -135,9 +140,6 @@ private struct _Preprocessor
                         classes,
                         u.format!" saild_%s"(snap.streamerIndex.get + 1),
                     ))
-            //Remove social networks' links.
-            if (auto links = doc.querySelector(_s!".d_line_links", node))
-                du.queueDestroy(links)
 
         if (snap.timezone)
             //Convert time to UTC.
