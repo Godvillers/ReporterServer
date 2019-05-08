@@ -141,6 +141,10 @@ private struct _Preprocessor
                         u.format!" saild_%s"(snap.streamerIndex.get + 1),
                     )
 
+        //Show beasties' HP.
+        foreach (node; doc.querySelectorAll(_s!".d_msg sup.hidden"))
+            node.removeAttr("class")
+
         if (snap.timezone)
             //Convert time to UTC.
             foreach (timeNode; doc.querySelectorAll(_s!".d_time"))
@@ -264,6 +268,7 @@ private struct _Preprocessor
 
                     //Remove various player-specific classes.
                     node["class"] = classes = u.removePrivateTileClasses(classes)
+                    node.removeAttr("dir");
 
                     //Remember tiles' coordinates.
                     const pos = u.extractTileTranslation(node["transform"])

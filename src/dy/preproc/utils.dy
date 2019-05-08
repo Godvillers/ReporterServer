@@ -197,13 +197,29 @@ const(char)[ ] compressTileCoordinates(const(char)[ ] value)
     return _stableApp.data[last .. $]
 
 
+private immutable string[12] _directionTooltips = [
+    "Рулить на северо-восток",
+    "Рулить на восток",
+    "Рулить на юго-восток",
+    "Рулить на юго-запад",
+    "Рулить на запад",
+    "Рулить на северо-запад",
+    "Sail north-east",
+    "Sail east",
+    "Sail south-east",
+    "Sail south-west",
+    "Sail west",
+    "Sail north-west",
+]
+
+
 const(char)[ ] extractEssentialsFromTooltip(const(char)[ ] msg)
     import std.ascii: isDigit
     import std.uni: sicmp
 
     msg = msg.strip().splitFilterJoin!(
         msg => msg.splitter(',').map!strip(),
-        part => sicmp(part, "Рулить в этом направлении") && sicmp(part, "Sail in this direction"),
+        part => _directionTooltips[ ].all!(pattern => sicmp(part, pattern)),
     )(", ")
     //^ (.*?) \s* \( [^()]* \d [^()\d]* \) $
     if (msg.endsWith(')'))
@@ -218,12 +234,11 @@ const(char)[ ] extractEssentialsFromTooltip(const(char)[ ] msg)
 void formatDistance(ref Appender!(char[ ]) sink, int dist) nothrow pure
     import ru = l10n.russian
 
-    sink ~= '('
+    sink ~= "(в "
     sink ~= dist.toChars()
     final switch (ru.getNumber(dist)) with (ru.Number)
-        case plural:   sink ~= " клеток)"; break
-        case paucal:   sink ~= " клетки)"; break
-        case singular: sink ~= " клетка)"; break
+        case plural, paucal: sink ~= " клетках)"; break
+        case singular:       sink ~= " клетке)";  break
 
 
 //Precalc distance-only tooltips.
