@@ -86,7 +86,7 @@ in
     assert(header !is null)
 do
     foreach (node; header.descendants)
-        if (node.attr("class").splitter().canFind!(among!("l_slot", "r_slot")))
+        if (node["class"].splitter().canFind!(among!("l_slot", "r_slot")))
             //Do not destroy slot nodes themselves.
             node.destroyChildren()
 
@@ -98,8 +98,8 @@ do
     if (auto dropDown = doc.querySelector(_s!".opp_dropdown", line))
         dropDown.destroyChildren()
         auto link = doc.createElement("a", dropDown)
-        link.attr("href", u.formatProfileLink(host, godName))
-        link.attr("target", "_blank")
+        link["href"] = u.formatProfileLink(host, godName)
+        link["target"] = "_blank"
         link.appendText("▶")
 
 
