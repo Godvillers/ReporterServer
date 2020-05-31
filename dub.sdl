@@ -6,7 +6,7 @@ license     "MIT"
 
 dependency "dython" version="~>0.1.0"
 dependency "htmld" version="~>0.3.7"
-dependency "vibe-d" version="==0.8.5"
+dependency "vibe-d" version="==0.8.6"
 
 stringImportPaths "src/dy" "views"
 versions "VibeIdleCollect" "VibeManualMemoryManagement"

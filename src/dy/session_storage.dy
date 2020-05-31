@@ -50,9 +50,9 @@ struct SessionStorage
         size_t _totalSpace, _maxMemory
 
     invariant
-        assert(_aa.length == _tree.length)
+        assert(_tree is null || _aa.length == _tree.length)
 
-    @disable this()
+    //@disable this()
     @disable this(this)
 
     this(size_t maxMemory) nothrow pure \

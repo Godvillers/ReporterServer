@@ -16,9 +16,6 @@ final class Site
 
     private ss.SessionStorage _storage
 
-    this(size_t maxMemory) nothrow pure
-        _storage = ss.SessionStorage(maxMemory)
-
     private void _emitBasicCORSHeaders()
         header("Access-Control-Allow-Origin", "*")
 
@@ -133,3 +130,9 @@ final class Site
             logError("Zlib compression error: %s", e.msg)
         catch (Exception e)
             logError("Unexpected exception during WebSocket handling: %s", e.msg)
+
+
+Site makeSite(size_t maxMemory) nothrow pure
+    auto site = new Site
+    site._storage = ss.SessionStorage(maxMemory)
+    return site

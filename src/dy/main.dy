@@ -47,7 +47,7 @@ private void _configure()
 
     auto router = (
         new URLRouter(su.prefix)
-        .registerWebInterface(new Site(_maxMemory))
+        .registerWebInterface(makeSite(_maxMemory))
         .get("/static/*",    serveStaticFiles(".", fsettings))
         .get("/api.json",    serveStaticFile("static/api.json"))
         .get("/version",     serveStaticFile("static/version.txt"))
