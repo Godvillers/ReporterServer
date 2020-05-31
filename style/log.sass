@@ -140,22 +140,30 @@ svg
     stroke: hsla(275, 100%, 48%, 1)
     stroke-width: 1.0
 
+  //Map border (provided by Erinome Godville UI+):
+  &, &.rb:not(:hover)
+    &.e_border polygon
+      fill: hsla(200, 40%, 70%, 0.5)
+
+  //Buoys:
+  &.rb polygon
+    fill: hsl(200, 50%, 87%)
+
+  //Closed map border:
+  &.e_border_n polygon
+    fill: hsla(53, 69%, 78%, 0.5)
+
   polygon
     pointer-events: all
     fill: hsl(200, 50%, 92%)
     stroke: hsl(0, 0%, 70%)
     stroke-width: 0.5
 
-polygon:hover
-  stroke-width: 1.0
-  stroke: hsl(0, 0%, 50%) !important
+    &:hover
+      stroke-width: 1.0
+      stroke: hsl(0, 0%, 50%) !important
 
-//Buoys:
-.rb polygon
-  fill: hsl(200, 50%, 87%)
-
-//Various tile types:
-.tile
+  //Various tile types:
   &.unknown
     polygon
       fill: hsla(60, 10%, 95%, 0.5)
@@ -180,7 +188,6 @@ polygon:hover
   &.monster polygon
     fill: hsl(0, 28%, 87%)
 
-.tile
   //?
   &.q-axis-same polygon
     fill: hsl(90, 20%, 87%)
@@ -216,6 +223,26 @@ polygon:hover
 .cpt4 text
   //150 HP.
   font-weight: bold
+
+//Arks' stems:
+.dir_arrow
+  stroke-width: 3
+
+  &.pl1
+    stroke: hsl(223, 51%, 30%)
+    fill: hsl(223, 51%, 30%)
+
+  &.pl2
+    stroke: hsl(0, 57%, 40%)
+    fill: hsl(0, 57%, 40%)
+
+  &.pl3
+    stroke: hsl(120, 50%, 40%)
+    fill: hsl(120, 50%, 40%)
+
+  &.pl4
+    stroke: hsl(169, 74%, 30%)
+    fill: hsl(169, 74%, 30%)
 
 .tile
   &.tr_pl1 polygon

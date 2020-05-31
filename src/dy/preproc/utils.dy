@@ -164,8 +164,8 @@ const(char)[ ] removePrivateTileClasses(const(char)[ ] classes)
     return classes.splitFilterJoin!(
         splitter,
         cls => !cls.startsWith("e_hint", "e_poi") && !cls.among!(
-            "em_font", "d_overlay", "d_selected", "hl",
-            "e_clickable", "hovered", "e_ruler_anchor",
+            "em_font", "d_overlay", "d_selected", "hl", "e_clickable", "hovered",
+            "e_treasure_hover", "e_ruler_anchor",
         ),
     )(" ")
 
