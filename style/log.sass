@@ -77,116 +77,29 @@ svg
   margin: 0 auto
   display: block
 
-.tile polygon
-  pointer-events: visiblePainted
-  stroke: hsl(0, 0%, 70%)
-  stroke-width: 0.5
-
-.imp
-  polygon
-    pointer-events: visiblePainted
-    stroke: hsl(0, 0%, 70%)
-    stroke-width: 2.5
-
-  //Points of interest:
-  &.i1 polygon
-    fill: hsl(0, 90%, 92%)
-
-  &.i2 polygon
-    fill: hsl(39, 93%, 77%)
-
-  &.i3 polygon
-    fill: hsl(61, 93%, 77%)
-
-  &.i4 polygon
-    fill: hsl(123, 90%, 92%)
-
-  &.i5 polygon
-    fill: hsl(180, 90%, 92%)
-
-  &.i6 polygon
-    fill: hsl(221, 92%, 79%)
-
-  &.i7 polygon
-    fill: hsl(275, 92%, 79%)
-
-//Revealed points of interest:
 .tile
-  &.oi1 polygon
-    stroke: hsla(0, 89%, 62%, 1)
-    stroke-width: 1.0
-
-  &.oi2 polygon
-    stroke: hsla(39, 93%, 52%, 1)
-    stroke-width: 1.5
-
-  &.oi3 polygon
-    stroke: hsla(61, 93%, 52%, 1)
-    stroke-width: 1.5
-
-  &.oi4 polygon
-    stroke: hsla(123, 93%, 52%, 1)
-    stroke-width: 1.0
-
-  &.oi5 polygon
-    stroke: hsla(181, 93%, 52%, 1)
-    stroke-width: 1.0
-
-  &.oi6 polygon
-    stroke: hsla(221, 93%, 52%, 1)
-    stroke-width: 1.0
-
-  &.oi7 polygon
-    stroke: hsla(275, 100%, 48%, 1)
-    stroke-width: 1.0
-
-  //Map border (provided by Erinome Godville UI+):
-  &, &.rb:not(:hover)
-    &.e_border polygon
-      fill: hsla(200, 40%, 70%, 0.5)
-
-  //Buoys:
-  &.rb polygon
-    fill: hsl(200, 50%, 87%)
-
-  //Closed map border:
-  &.e_border_n polygon
-    fill: hsla(53, 69%, 78%, 0.5)
-
-  polygon
-    pointer-events: all
-    fill: hsl(200, 50%, 92%)
-    stroke: hsl(0, 0%, 70%)
-    stroke-width: 0.5
-
-    &:hover
-      stroke-width: 1.0
-      stroke: hsl(0, 0%, 50%) !important
-
-  //Various tile types:
   &.unknown
     polygon
       fill: hsla(60, 10%, 95%, 0.5)
       stroke: inherit
 
+    //Buoys:
     &.rb polygon
       fill: hsla(60, 10%, 86%, 0.8)
 
+    //Map edge (as predicted by Erinome Godville UI+):
+    &.e_border polygon
+      fill: hsla(200, 40%, 70%, 0.5)
+
     polygon:hover
       fill: hsla(60, 10%, 90%, 0.1)
-      stroke: hsl(0, 0%, 70%)
 
-  &.border polygon
-    fill: hsl(200, 40%, 70%)
+    //Predicted closed map edge:
+    &.e_border_n polygon
+      fill: hsla(53, 69%, 78%, 0.5)
 
-  &.island polygon
-    fill: hsl(53, 69%, 78%)
-
-  &.reefs polygon
-    fill: hsl(60, 40%, 94%)
-
-  &.monster polygon
-    fill: hsl(0, 28%, 87%)
+  &.rb polygon
+    fill: hsl(200, 50%, 87%)
 
   //?
   &.q-axis-same polygon
@@ -214,6 +127,82 @@ svg
     fill: hsl(300, 80%, 50%)
     font-weight: bold
 
+  //Fogged points of interest:
+  &.imp polygon
+    pointer-events: visiblePainted
+    stroke: hsl(0, 0%, 70%)
+    stroke-width: 1.75
+
+  &.i1 polygon
+    fill: hsl(0, 90%, 92%)
+
+  &.i2 polygon
+    fill: hsl(39, 93%, 77%)
+
+  &.i3 polygon
+    fill: hsl(61, 93%, 77%)
+
+  &.i4 polygon
+    fill: hsl(123, 90%, 92%)
+
+  &.i5 polygon
+    fill: hsl(180, 90%, 92%)
+
+  &.i6 polygon
+    fill: hsl(221, 92%, 79%)
+
+  &.i7 polygon
+    fill: hsl(275, 92%, 79%)
+
+  //Revealed points of interest:
+  &.oi1, &.oi2, &.oi3, &.oi4, &.oi5, &.oi6, &.oi7
+    polygon
+      stroke-width: 1.5
+
+  &.oi1 polygon
+    stroke: hsla(0, 89%, 62%, 1)
+
+  &.oi2 polygon
+    stroke: hsla(39, 93%, 52%, 1)
+
+  &.oi3 polygon
+    stroke: hsla(61, 93%, 52%, 1)
+
+  &.oi4 polygon
+    stroke: hsla(123, 93%, 52%, 1)
+
+  &.oi5 polygon
+    stroke: hsla(181, 93%, 52%, 1)
+
+  &.oi6 polygon
+    stroke: hsla(221, 93%, 52%, 1)
+
+  &.oi7 polygon
+    stroke: hsla(275, 100%, 48%, 1)
+
+  //Various tile types:
+  &.border polygon
+    fill: hsl(200, 40%, 70%)
+
+  &.island polygon
+    fill: hsl(53, 69%, 78%)
+
+  &.reefs polygon
+    fill: hsl(60, 40%, 94%)
+
+  &.monster polygon
+    fill: hsl(0, 28%, 87%)
+
+  polygon
+    pointer-events: all
+    fill: hsl(200, 50%, 92%)
+    stroke: hsl(0, 0%, 70%)
+    stroke-width: 0.5
+
+    &:hover
+      stroke-width: 1.0
+      stroke: hsl(0, 0%, 50%) !important
+
   text
     text-anchor: middle
     font-size: 10px
@@ -226,7 +215,7 @@ svg
 
 //Arks' stems:
 .dir_arrow
-  stroke-width: 3
+  stroke-width: 3.5
 
   &.pl1
     stroke: hsl(223, 51%, 30%)
@@ -520,7 +509,8 @@ $m_small_col_width: 22%
     cursor: pointer
     color: #199BDC
 
-.div_link_nu
+.div_link_nu,
+.vote_link,
   text-decoration: none
   color: #199BDC
 
