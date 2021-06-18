@@ -99,6 +99,9 @@ private struct _Preprocessor
                     if (auto nameNode = doc.querySelector(_s!".opp_g", godNode))
                         nameNode.removeAttr("class")
                     //Remove eGUI+'s blacklist mark.
+                    if (auto nameNode = doc.querySelector(_s!".e_player_marked", godNode))
+                        nameNode.removeAttr("class")
+                    //Remove eGUI+'s legacy blacklist mark.
                     if (auto nameNode = doc.querySelector(_s!".ally_blacklisted", godNode))
                         nameNode.removeAttr("class")
 
