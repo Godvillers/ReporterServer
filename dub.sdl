@@ -1,7 +1,7 @@
 name        "gvrepsrv"
 description "Godville Reporter Server."
 authors     "Cordarion the Grey"
-copyright   "Copyright © 2017-2018, Cordarion the Grey"
+copyright   "Copyright © 2017-2021, Cordarion the Grey"
 license     "MIT"
 
 dependency "dython" version="~>0.1.0"
