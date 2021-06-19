@@ -43,7 +43,6 @@ This project is implemented in the [D Programming Language][dlang], so you'll ne
 To get a release version, run from the project root:
 
 ```sh
-dub upgrade
 ./waf configure build
 dub build -brelease-nobounds
 # Or, to tweak for your CPU:
